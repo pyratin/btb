@@ -1,34 +1,16 @@
 import { createRoot } from 'react-dom/client';
-import '@pixi/layout';
-import { LayoutContainer } from '@pixi/layout/components';
-import { Application, useExtend } from '@pixi/react';
+import { StrictMode } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router';
 
+import Route_ from '#browser/Route_';
 import '#browser/index.scss';
 
-const windowInnerDimensionGet = () => {
-  const {
-    visualViewport: { width, height }
-  } = window;
-
-  return { width, height };
-};
-
-const Application_ = () => {
-  useExtend({ LayoutContainer });
-
-  return (
-    <pixiLayoutContainer
-      layout={{
-        ...windowInnerDimensionGet(),
-        borderWidth: 10,
-        borderColor: 0xff0000
-      }}
-    ></pixiLayoutContainer>
-  );
-};
-
 createRoot(document.body).render(
-  <Application resizeTo={window}>
-    <Application_ />
-  </Application>
+  <StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Route_ />}></Route>
+      </Routes>
+    </BrowserRouter>
+  </StrictMode>
 );

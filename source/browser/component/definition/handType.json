@@ -1,0 +1,74 @@
+[
+  {
+    "id": "straightFlush",
+    "name": "Straight Flush",
+    "chipBase": 100,
+    "chipUpgrade": 40,
+    "multiplierBase": 8,
+    "multiplierUpgrade": 4
+  },
+  {
+    "id": "fourOfAKind",
+    "name": "Four of a Kind",
+    "chipBase": 60,
+    "chipUpgrade": 30,
+    "multiplierBase": 7,
+    "multiplierUpgrade": 3
+  },
+  {
+    "id": "fullHouse",
+    "name": "Full House",
+    "chipBase": 40,
+    "chipUpgrade": 25,
+    "multiplierBase": 4,
+    "multiplierUpgrade": 4
+  },
+  {
+    "id": "flush",
+    "name": "Flush",
+    "chipBase": 35,
+    "chipUpgrade": 15,
+    "multiplierBase": 4,
+    "multiplierUpgrade": 2
+  },
+  {
+    "id": "straight",
+    "name": "Straight",
+    "chipBase": 30,
+    "chipUpgrade": 30,
+    "multiplierBase": 4,
+    "multiplierUpgrade": 4
+  },
+  {
+    "id": "threeOfAKind",
+    "name": "Three of a Kind",
+    "chipBase": 30,
+    "chipUpgrade": 20,
+    "multiplierBase": 3,
+    "multiplierUpgrade": 2
+  },
+  {
+    "id": "twoPair",
+    "name": "Two Pair",
+    "chipBase": 20,
+    "chipUpgrade": 20,
+    "multiplierBase": 2,
+    "multiplierUpgrade": 1
+  },
+  {
+    "id": "pair",
+    "name": "Pair",
+    "chipBase": 10,
+    "chipUpgrade": 15,
+    "multiplierBase": 2,
+    "multiplierUpgrade": 1
+  },
+  {
+    "id": "highCard",
+    "name": "High Card",
+    "chipBase": 5,
+    "chipUpgrade": 10,
+    "multiplierBase": 1,
+    "multiplierUpgrade": 1
+  }
+]

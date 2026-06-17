@@ -1,0 +1,20 @@
+[
+  {
+    "name": "small",
+    "multiplier": 1.0,
+    "borderColor": "#1c639f",
+    "backgroundColor": "#1d497a"
+  },
+  {
+    "name": "big",
+    "multiplier": 1.5,
+    "borderColor": "#af7727",
+    "backgroundColor": "#7f551a"
+  },
+  {
+    "name": "boss",
+    "multiplier": 2.0,
+    "borderColor": "#a5b081",
+    "backgroundColor": "#889668"
+  }
+]

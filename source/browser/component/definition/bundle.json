@@ -1,0 +1,16 @@
+{
+  "image": [
+    { "alias": "playingCards", "src": "sprite", "extension": "json" },
+    { "alias": "_playingCards", "src": "sprite", "extension": "json" },
+    { "alias": "jokers", "src": "sprite", "extension": "json" },
+    { "alias": "stickers", "src": "sprite", "extension": "json" }
+  ],
+  "font": [
+    {
+      "alias": "m6x11plus",
+      "src": "font",
+      "extension": "ttf",
+      "data": { "family": "m6x11plus" }
+    }
+  ]
+}
