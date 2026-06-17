@@ -6,17 +6,8 @@ import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
 import cardTextureGet from '#browser/component/utility/cardTextureGet';
-import PerspectiveMesh from '#browser/Component/PerspectiveMesh';
-import Edition from '#browser/Component/Edition';
 
-const Card = ({
-  cursor = 'default',
-  idle = false,
-  perspectiveMeshDisableFlag = false,
-  card
-}) => {
-  const { id, faceDownFlag, editionType } = card;
-
+const Card = ({ card }) => {
   useExtend({ LayoutContainer, Sprite });
 
   const { texture } = useStore(
@@ -31,26 +22,16 @@ const Card = ({
       }}
       eventMode='passive'
     >
-      <PerspectiveMesh
-        dirtyKey={`${id}-${faceDownFlag}`}
-        animating={!faceDownFlag && !!editionType}
-        cursor={cursor}
-        idle={idle}
-        disableFlag={perspectiveMeshDisableFlag}
+      <pixiLayoutContainer
+        layout={{
+          borderWidth: 0,
+          borderColor: 0x00ff00,
+          borderRadius: 8,
+          backgroundColor: 0xf4f0e6
+        }}
       >
-        <Edition type={!faceDownFlag && editionType}>
-          <pixiLayoutContainer
-            layout={{
-              borderWidth: 0,
-              borderColor: 0x00ff00,
-              borderRadius: 8,
-              backgroundColor: 0xf4f0e6
-            }}
-          >
-            <pixiSprite texture={texture} layout={{}} />
-          </pixiLayoutContainer>
-        </Edition>
-      </PerspectiveMesh>
+        <pixiSprite texture={texture} layout={{}} />
+      </pixiLayoutContainer>
     </pixiLayoutContainer>
   );
 };
