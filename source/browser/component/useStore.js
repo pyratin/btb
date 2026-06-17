@@ -7,7 +7,6 @@ import seedrandom from 'seedrandom';
 import handTypeDefinitionCollection from '#browser/component/definition/handType.json';
 import blindTypeDefinitionCollection from '#browser/component/definition/blindType.json';
 import bundleGet from '#browser/component/utility/bundleGet';
-import cardTextureGet from '#browser/component/utility/cardTextureGet';
 import handTypeIndexGet from '#browser/component/utility/handTypeIndexGet';
 
 const localStorageKey = 'state';
@@ -121,22 +120,11 @@ const handCardGet = (card) => {
   };
 };
 
-const roundLayoutDefinitionGet = (_layoutDefinition) => {
-  const { padding, stage } = _layoutDefinition;
-
-  return {
-    hand: {
-      widthMaximum: stage.width - 2 * padding
-    }
-  };
-};
-
 const roundInitializedGet = (
   seed,
   handSize,
   handSortTypeIndex,
   pack,
-  _layoutDefinition,
   index = 0
 ) => {
   const _deck = collectionSuffledGet(
@@ -150,8 +138,6 @@ const roundInitializedGet = (
 
   const deck = _deck.slice(handSize);
 
-  const layoutDefinition = roundLayoutDefinitionGet(_layoutDefinition);
-
   return {
     index,
     handPlayedCount: 0,
@@ -160,30 +146,7 @@ const roundInitializedGet = (
     hand,
     handPlayed: undefined,
     muck: undefined,
-    handTypeIndex: undefined,
-    layoutDefinition
-  };
-};
-
-const layoutDefinitionGet = (bundle) => {
-  const stage = (() => {
-    const { innerWidth, innerHeight } = window;
-
-    return { width: innerWidth, height: innerHeight };
-  })();
-
-  const handWidthFactor = Math.min((stage.width * 1) / 1920, 0.75);
-
-  const cardDimension = (() => {
-    const { width, height } = cardTextureGet(bundle);
-
-    return { width, height, handWidthFactor };
-  })();
-
-  return {
-    padding: 20,
-    stage,
-    cardDimension
+    handTypeIndex: undefined
   };
 };
 
@@ -197,8 +160,6 @@ const stateInitializedGet = async () => {
   const handSortTypeIndex = 0;
 
   const pack = packInitializedGet();
-
-  const layoutDefinition = layoutDefinitionGet(bundle);
 
   return {
     seed,
@@ -215,15 +176,8 @@ const stateInitializedGet = async () => {
       level: 1,
       count: 0
     })),
-    round: roundInitializedGet(
-      seed,
-      handSize,
-      handSortTypeIndex,
-      pack,
-      layoutDefinition
-    ),
-    bundle,
-    layoutDefinition
+    round: roundInitializedGet(seed, handSize, handSortTypeIndex, pack),
+    bundle
   };
 };
 
@@ -389,11 +343,5 @@ const useStore = create(
     }
   )
 );
-
-const onWindowResizeHandle = () => {
-  window.location.reload();
-};
-
-window.addEventListener('resize', onWindowResizeHandle);
 
 export default useStore;
