@@ -14,6 +14,7 @@
     "build": "npx webpack-cli --mode production",
     "start": "sirv target/browser --single --port ${PORT:-7860} --host 0.0.0.0",
     "tunnel": "ssh -R 80:localhost:7860 nokey@localhost.run",
+    "docker": "docker build -t btb . && docker run -it -p 7860:7860 btb",
     "eslint": "npx eslint",
     "tsc": "npx tsc",
     "stylelint": "npx stylelint .",
