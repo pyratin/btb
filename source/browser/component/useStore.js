@@ -168,10 +168,10 @@ const stateInitializedGet = async () => {
 
   const pack = packInitializedGet();
 
-  const cardDimension = cardDimensionGet(bundle);
-
   return {
     seed,
+    bundle,
+    cardDimension: cardDimensionGet(bundle),
     roundCountMaximum: 8 * blindTypeDefinitionCollection.length,
     handPlayedCountMaximum: 4,
     discardCardCountMaximun: 5,
@@ -185,9 +185,7 @@ const stateInitializedGet = async () => {
       level: 1,
       count: 0
     })),
-    round: roundInitializedGet(seed, handSize, handSortTypeIndex, pack),
-    bundle,
-    cardDimension
+    round: roundInitializedGet(seed, handSize, handSortTypeIndex, pack)
   };
 };
 

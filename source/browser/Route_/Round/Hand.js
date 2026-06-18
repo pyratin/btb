@@ -1,25 +1,155 @@
+import { useRef, useState, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import * as pixiJs from 'pixi.js';
 import { Container, Graphics } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 import { DropShadowFilter } from 'pixi-filters';
+import { gsap } from 'gsap';
+import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
+import { useGSAP } from '@gsap/react';
 
 import useStore from '#browser/component/useStore';
 import Card from '#browser/Component/Card';
 
+gsap.registerPlugin(gsapPixiPlugin, useGSAP);
+gsapPixiPlugin.registerPIXI(pixiJs);
+
+const cardTransformGet = (index, hand, cardDimension, containerElement) => {
+  const { layout: { _computedLayout: { width: _width = 0 } = {} } = {} } =
+    containerElement;
+
+  const cardWidthFactor = 0.75;
+
+  const width = Math.min(
+    ...[_width / hand.length, cardDimension.width * cardWidthFactor].map(
+      (cardWidth) => cardWidth * hand.length
+    )
+  );
+
+  const cardWidth = width / hand.length;
+
+  const _offset = Math.abs(_width - width) / 2;
+
+  const __offset = _offset
+    ? ((1 - cardWidthFactor) * cardDimension.width) / 2
+    : 0;
+
+  const offset = _offset - __offset;
+
+  return {
+    x: offset + cardWidth * index,
+    y: (() => {
+      const { activeFlag } = hand[index];
+
+      return activeFlag ? -30 : 0;
+    })()
+  };
+};
+
+const onCardCollectionAnimationCompleteHandle = (
+  index,
+  collection,
+  onComplete
+) => index === collection.length - 1 && onComplete();
+
+const activeAnimationHandle = (
+  collection,
+  hand,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  collection.map((card, index) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    gsapTimeline.to(
+      element,
+      {
+        pixi: {
+          ...cardTransformGet(index, hand, cardDimension, containerElement)
+        },
+        duration: 0.1,
+        ease: 'back.out(1.5)',
+        onComplete: () =>
+          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
+      },
+      0
+    );
+  });
+};
+
 const Hand = () => {
   useExtend({ LayoutContainer, Container, Graphics });
 
-  const { hand, cardDimension } = useStore(
-    useShallow(({ round: { hand }, cardDimension }) => ({
-      hand,
-      cardDimension
-    }))
+  const {
+    discardCardCountMaximun,
+    hand: _hand,
+    cardDimension,
+    handSet: _handSet
+  } = useStore(
+    useShallow(
+      ({
+        cardDimension,
+        discardCardCountMaximun,
+        round: { hand },
+        handSet
+      }) => ({
+        discardCardCountMaximun,
+        hand,
+        cardDimension,
+        handSet
+      })
+    )
+  );
+
+  const ref = useRef(undefined);
+
+  const handPreviousRef = useRef(undefined);
+
+  const [hand, handSet] = useState(_hand);
+
+  const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
+
+  useEffect(() => {
+    const __handSet = () =>
+      // eslint-disable-next-line @eslint-react/set-state-in-effect
+      handSet((hand) => {
+        Object.assign(handPreviousRef, { current: hand });
+
+        return _hand;
+      });
+
+    switch (true) {
+      case activeTriggerFlag:
+        return __handSet();
+    }
+  }, [activeTriggerFlag, _hand]);
+
+  useGSAP(
+    () => {
+      activeTriggerFlag &&
+        (() => {
+          activeTriggerFlagSet(false);
+
+          return activeAnimationHandle(
+            handPreviousRef.current,
+            hand,
+            cardDimension,
+            ref.current,
+            () => {}
+          );
+        })();
+    },
+    { dependencies: [hand] }
   );
 
   return (
     <pixiLayoutContainer
+      ref={ref}
       layout={{
         // eslint-disable-next-line @eslint-react/unsupported-syntax
         ...(() => {
@@ -34,39 +164,49 @@ const Hand = () => {
       onLayout={(event) => {
         const eventTarget = event.target;
 
-        const { layout: { _computedLayout: { width: _width = 0 } = {} } = {} } =
-          eventTarget;
-
-        const cardWidthFactor = 0.75;
-
-        const width = Math.min(
-          ...[_width / hand.length, cardDimension.width * cardWidthFactor].map(
-            (cardWidth) => cardWidth * hand.length
-          )
-        );
-
-        const cardWidth = width / hand.length;
-
-        const _offset = Math.abs(_width - width) / 2;
-
-        const __offset = _offset
-          ? ((1 - cardWidthFactor) * cardDimension.width) / 2
-          : 0;
-
-        const offset = _offset - __offset;
-
         eventTarget.children
           .find(({ children }) => children.length)
           .children.map((container, index) => {
-            Object.assign(container, {
-              position: { x: offset + cardWidth * index, y: 0 }
-            });
+            Object.assign(
+              container,
+              cardTransformGet(index, hand, cardDimension, eventTarget)
+            );
           });
       }}
     >
-      {hand.map((card) => {
+      {hand.map((card, index, collection) => {
+        // eslint-disable-next-line @eslint-react/unsupported-syntax
+        const activeFlagSetEnabled = (() =>
+          collection
+            .filter(({ id }) => id !== card.id)
+            .filter(({ activeFlag }) => activeFlag).length <
+          discardCardCountMaximun)();
+
         return (
-          <pixiContainer key={card.id} eventMode='static' cursor='pointer'>
+          <pixiContainer
+            key={card.id}
+            label={card.id}
+            eventMode='static'
+            cursor='pointer'
+            onPointerTap={() => {
+              switch (true) {
+                case activeFlagSetEnabled:
+                  // eslint-disable-next-line @eslint-react/unsupported-syntax
+                  return (() => {
+                    _handSet([
+                      ...hand.slice(0, index),
+                      {
+                        ...card,
+                        activeFlag: !card.activeFlag
+                      },
+                      ...hand.slice(index + 1)
+                    ]);
+
+                    activeTriggerFlagSet(true);
+                  })();
+              }
+            }}
+          >
             <pixiGraphics
               draw={(graphics) => {
                 graphics
