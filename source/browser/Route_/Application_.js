@@ -6,9 +6,11 @@ import { Application, useExtend, useApplication } from '@pixi/react';
 import '@pixi/layout';
 
 const windowInnerDimenesionGet = () => {
-  const { innerWidth, innerHeight } = window;
+  const {
+    visualViewport: { width = 0, height = 0 }
+  } = window;
 
-  return { width: innerWidth, height: innerHeight };
+  return { width, height };
 };
 
 const Application__ = ({ children }) => {

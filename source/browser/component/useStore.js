@@ -7,6 +7,7 @@ import seedrandom from 'seedrandom';
 import handTypeDefinitionCollection from '#browser/component/definition/handType.json';
 import blindTypeDefinitionCollection from '#browser/component/definition/blindType.json';
 import bundleGet from '#browser/component/utility/bundleGet';
+import cardTextureGet from './utility/cardTextureGet';
 import handTypeIndexGet from '#browser/component/utility/handTypeIndexGet';
 
 const localStorageKey = 'state';
@@ -150,6 +151,12 @@ const roundInitializedGet = (
   };
 };
 
+const cardDimensionGet = (bundle) => {
+  const { width, height } = cardTextureGet(bundle);
+
+  return { width, height };
+};
+
 const stateInitializedGet = async () => {
   const seed = localStorageItemGet('seed') || seedGet();
 
@@ -160,6 +167,8 @@ const stateInitializedGet = async () => {
   const handSortTypeIndex = 0;
 
   const pack = packInitializedGet();
+
+  const cardDimension = cardDimensionGet(bundle);
 
   return {
     seed,
@@ -177,7 +186,8 @@ const stateInitializedGet = async () => {
       count: 0
     })),
     round: roundInitializedGet(seed, handSize, handSortTypeIndex, pack),
-    bundle
+    bundle,
+    cardDimension
   };
 };
 

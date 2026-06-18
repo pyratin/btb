@@ -1,41 +1,39 @@
 import { useShallow } from 'zustand/react/shallow';
-import { Sprite } from 'pixi.js';
-import '@pixi/layout';
-import { LayoutContainer } from '@pixi/layout/components';
+import { Container, Graphics, Sprite } from 'pixi.js';
 import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
 import cardTextureGet from '#browser/component/utility/cardTextureGet';
-import PerspectiveMesh from './PerspectiveMesh';
 
 const Card = ({ card }) => {
-  useExtend({ LayoutContainer, Sprite });
+  useExtend({ Container, Graphics, Sprite });
 
-  const { texture } = useStore(
-    useShallow(({ bundle }) => ({ texture: cardTextureGet(bundle, card) }))
+  const { texture, cardDimension } = useStore(
+    useShallow(({ bundle, cardDimension }) => ({
+      texture: cardTextureGet(bundle, card),
+      cardDimension
+    }))
   );
 
   return (
-    <pixiLayoutContainer
-      layout={{
-        borderWidth: 0,
-        borderColor: 0x00ff00
-      }}
-      eventMode='passive'
-    >
-      <PerspectiveMesh>
-        <pixiLayoutContainer
-          layout={{
-            borderWidth: 0,
-            borderColor: 0x00ff00,
-            borderRadius: 8,
-            backgroundColor: 0xf4f0e6
-          }}
-        >
-          <pixiSprite texture={texture} layout={{}} />
-        </pixiLayoutContainer>
-      </PerspectiveMesh>
-    </pixiLayoutContainer>
+    <pixiContainer>
+      <pixiGraphics
+        draw={(graphics) =>
+          graphics
+            .roundRect(
+              // eslint-disable-next-line @eslint-react/unsupported-syntax
+              ...(() => {
+                const { width, height } = cardDimension;
+
+                return /** @type {const} * */ ([0, 0, width, height, 8]);
+              })()
+            )
+            .fill({ color: 0xf4f0e6 })
+        }
+      />
+
+      <pixiSprite texture={texture} />
+    </pixiContainer>
   );
 };
 
