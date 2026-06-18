@@ -1,10 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import * as pixiJs from 'pixi.js';
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Sprite } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
-import { useExtend } from '@pixi/react';
+import { useExtend, useApplication } from '@pixi/react';
 import { DropShadowFilter } from 'pixi-filters';
 import { gsap } from 'gsap';
 import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
@@ -15,6 +15,37 @@ import Card from '#browser/Component/Card';
 
 gsap.registerPlugin(gsapPixiPlugin, useGSAP);
 gsapPixiPlugin.registerPIXI(pixiJs);
+
+const shadowTextureGet = (cardDimension, renderer) => {
+  const { width, height } = cardDimension;
+
+  const padding = 20; // Pad enough room for the offset and blur radius
+
+  const container = new Container();
+
+  const boundsExpander = new Graphics()
+    .rect(0, 0, width + padding * 2, height + padding * 2)
+    .fill({ color: 0x000000, alpha: 0 }); // alpha 0 = invisible
+
+  container.addChild(boundsExpander);
+
+  const shadowCaster = new Graphics()
+    .rect(padding, padding, width, height)
+    .fill({ color: 0x000000 });
+
+  container.addChild(shadowCaster);
+
+  container.filters = [
+    new DropShadowFilter({
+      offset: { x: -5, y: 5 },
+      shadowOnly: true
+    })
+  ];
+
+  return renderer.textureGenerator.generateTexture({
+    target: container
+  });
+};
 
 const cardTransformGet = (index, hand, cardDimension, containerElement) => {
   const { layout: { _computedLayout: { width: _width = 0 } = {} } = {} } =
@@ -83,7 +114,11 @@ const activeAnimationHandle = (
 };
 
 const Hand = () => {
-  useExtend({ LayoutContainer, Container, Graphics });
+  useExtend({ LayoutContainer, Container, Sprite });
+
+  const {
+    app: { renderer }
+  } = useApplication();
 
   const {
     discardCardCountMaximun,
@@ -114,6 +149,8 @@ const Hand = () => {
 
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
 
+  const [shadowTexture, shadowTextureSet] = useState(null);
+
   useEffect(() => {
     const __handSet = () =>
       // eslint-disable-next-line @eslint-react/set-state-in-effect
@@ -128,6 +165,17 @@ const Hand = () => {
         return __handSet();
     }
   }, [activeTriggerFlag, _hand]);
+
+  useEffect(() => {
+    const shadowTexture = shadowTextureGet(cardDimension, renderer);
+
+    // eslint-disable-next-line @eslint-react/set-state-in-effect
+    shadowTextureSet(shadowTexture);
+
+    return () => {
+      shadowTexture.destroy(true);
+    };
+  }, [cardDimension, renderer]);
 
   useGSAP(
     () => {
@@ -207,26 +255,12 @@ const Hand = () => {
               }
             }}
           >
-            <pixiGraphics
-              draw={(graphics) => {
-                graphics
-                  .rect(
-                    // eslint-disable-next-line @eslint-react/unsupported-syntax
-                    ...(() => {
-                      const { width, height } = cardDimension;
-
-                      return /** @type {const} */ ([0, 0, width, height]);
-                    })()
-                  )
-                  .fill({ color: 0xff0000 });
-              }}
-              filters={[
-                new DropShadowFilter({
-                  offset: { x: -5, y: 5 },
-                  shadowOnly: true
-                })
-              ]}
-            />
+            {shadowTexture && (
+              <pixiSprite
+                texture={shadowTexture}
+                position={{ x: -20, y: -20 }}
+              />
+            )}
 
             <Card card={card} />
           </pixiContainer>
