@@ -6,6 +6,7 @@ import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
 import cardTextureGet from '#browser/component/utility/cardTextureGet';
+import PerspectiveMesh from './PerspectiveMesh';
 
 const Card = ({ card }) => {
   useExtend({ LayoutContainer, Sprite });
@@ -22,16 +23,18 @@ const Card = ({ card }) => {
       }}
       eventMode='passive'
     >
-      <pixiLayoutContainer
-        layout={{
-          borderWidth: 0,
-          borderColor: 0x00ff00,
-          borderRadius: 8,
-          backgroundColor: 0xf4f0e6
-        }}
-      >
-        <pixiSprite texture={texture} layout={{}} />
-      </pixiLayoutContainer>
+      <PerspectiveMesh>
+        <pixiLayoutContainer
+          layout={{
+            borderWidth: 0,
+            borderColor: 0x00ff00,
+            borderRadius: 8,
+            backgroundColor: 0xf4f0e6
+          }}
+        >
+          <pixiSprite texture={texture} layout={{}} />
+        </pixiLayoutContainer>
+      </PerspectiveMesh>
     </pixiLayoutContainer>
   );
 };

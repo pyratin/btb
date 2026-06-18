@@ -13,7 +13,7 @@ const Route_ = () => {
       <pixiLayoutContainer
         layout={{
           flex: 1,
-          borderWidth: 1,
+          borderWidth: 0,
           borderColor: 0xff0000
         }}
       >
