@@ -27,6 +27,7 @@ const Hand = () => {
 
           return { height };
         })(),
+        marginTop: 'auto',
         borderWidth: 0,
         borderColor: 0xff0000
       }}
@@ -36,17 +37,29 @@ const Hand = () => {
         const { layout: { _computedLayout: { width: _width = 0 } = {} } = {} } =
           eventTarget;
 
+        const cardWidthFactor = 0.75;
+
         const width = Math.min(
-          ...[_width / hand.length].map((cardWidth) => cardWidth * hand.length)
+          ...[_width / hand.length, cardDimension.width * cardWidthFactor].map(
+            (cardWidth) => cardWidth * hand.length
+          )
         );
 
         const cardWidth = width / hand.length;
+
+        const _offset = Math.abs(_width - width) / 2;
+
+        const __offset = _offset
+          ? ((1 - cardWidthFactor) * cardDimension.width) / 2
+          : 0;
+
+        const offset = _offset - __offset;
 
         eventTarget.children
           .find(({ children }) => children.length)
           .children.map((container, index) => {
             Object.assign(container, {
-              position: { x: cardWidth * index, y: 0 }
+              position: { x: offset + cardWidth * index, y: 0 }
             });
           });
       }}
