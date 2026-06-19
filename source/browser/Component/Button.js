@@ -1,14 +1,15 @@
 import { useRef, useMemo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import * as pixiJs from 'pixi.js';
-import { Text, Graphics } from 'pixi.js';
+import { Text, NineSliceSprite } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
-import { DropShadowFilter } from 'pixi-filters';
 import { gsap } from 'gsap';
 import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
 import { useGSAP } from '@gsap/react';
 
+import useStore from '#browser/component/useStore';
 import animationDefinitionProcessedGet from '#browser/component/utility/animationDefinitionProcessedGet';
 import onAnimationDefinitionUpdateHandle from '#browser/component/utility/onAnimationDefinitionUpdateHandle';
 
@@ -17,14 +18,12 @@ gsapPixiPlugin.registerPIXI(pixiJs);
 
 const disableColor = 0x5d6060;
 
-const filters = [
-  new DropShadowFilter({
-    offset: { x: -1, y: 2 },
-    blur: 0,
-    alpha: 0.25,
-    antialias: true
-  })
-];
+const nineSliceSpriteOption = [
+  'leftWidth',
+  'topHeight',
+  'rightWidth',
+  'bottomHeight'
+].reduce((memo, key) => ({ ...memo, [key]: 4 }), {});
 
 const Button = ({
   text,
@@ -35,9 +34,15 @@ const Button = ({
   disableFlag = false,
   onPointerTap
 }) => {
-  useExtend({ LayoutContainer, Text, Graphics });
+  useExtend({ LayoutContainer, NineSliceSprite, Text });
 
   const { contextSafe } = useGSAP();
+
+  const { texture } = useStore(
+    useShallow(({ bundle }) => ({
+      texture: bundle.miscellaneous.buttonBackground
+    }))
+  );
 
   const ref = useRef(undefined);
 
@@ -111,44 +116,13 @@ const Button = ({
         })();
       }}
     >
-      <pixiLayoutContainer
-        layout={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          borderWidth: 0,
-          borderColor: 0xff0000
-        }}
-        onLayout={(event) => {
-          const eventTarget = event.target;
-
-          const graphics = /** @type {Graphics} */ (eventTarget.getChildAt(0));
-
-          graphics
-            .clear()
-            .roundRect(
-              // eslint-disable-next-line @eslint-react/unsupported-syntax
-              ...(() => {
-                const {
-                  layout: {
-                    _computedLayout: { width, height }
-                  }
-                } = eventTarget;
-
-                return /** @type {const} */ ([
-                  0,
-                  0,
-                  width,
-                  height,
-                  borderRadius
-                ]);
-              })()
-            )
-            .fill({ color: 0x000000, alpha: 0.25 });
-        }}
-      >
-        <pixiGraphics draw={() => {}} layout={{ position: 'absolute' }} />
-      </pixiLayoutContainer>
+      <pixiNineSliceSprite
+        texture={texture}
+        {...nineSliceSpriteOption}
+        layout={{ position: 'absolute', width: '100%', height: '100%' }}
+        tint={0x000000}
+        alpha={0.25}
+      />
 
       <pixiLayoutContainer
         label='text-container'
@@ -161,10 +135,16 @@ const Button = ({
           ...padding,
           borderWidth: 0,
           borderColor: 0xff0000,
-          borderRadius,
-          backgroundColor: disableFlag ? disableColor : backgroundColor
+          borderRadius
         }}
       >
+        <pixiNineSliceSprite
+          texture={texture}
+          {...nineSliceSpriteOption}
+          layout={{ position: 'absolute', width: '100%', height: '100%' }}
+          tint={disableFlag ? disableColor : backgroundColor}
+        />
+
         <pixiLayoutContainer
           layout={{
             position: 'absolute',
@@ -183,10 +163,16 @@ const Button = ({
           style={{
             fontFamily: 'm6x11plus',
             fontSize,
-            fill: 0xffffff
+            fill: 0xffffff,
+            dropShadow: {
+              alpha: 0.25,
+              angle: Math.PI / 2,
+              blur: 0,
+              color: '#000000',
+              distance: 2
+            }
           }}
           alpha={disableFlag ? 0.5 : 1}
-          filters={filters}
         />
       </pixiLayoutContainer>
     </pixiLayoutContainer>

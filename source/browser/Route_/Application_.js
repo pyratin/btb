@@ -60,7 +60,7 @@ const Application_ = ({ children = undefined }) => {
       resolution={Math.round(window.devicePixelRatio) || 1}
       autoDensity={true}
       useBackBuffer
-      backgroundColor={0x000000}
+      backgroundColor={0xaaaaaa}
       onInit={({ stage }) => {
         Object.assign(
           stage,
