@@ -145,17 +145,13 @@ const Button = ({
           tint={disableFlag ? disableColor : backgroundColor}
         />
 
-        <pixiLayoutContainer
-          layout={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            borderWidth: 0,
-            borderColor: 0x000000,
-            backgroundColor: 0x000000
-          }}
+        <pixiNineSliceSprite
+          texture={texture}
+          {...nineSliceSpriteOption}
+          layout={{ position: 'absolute', width: '100%', height: '100%' }}
+          tint={0x000000}
           alpha={hoverFlag ? 0.2 : 0}
-        ></pixiLayoutContainer>
+        />
 
         <pixiText
           text={text}
