@@ -48,14 +48,14 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
   return {
     x: offset + cardWidth * index + cardDimension.width / 2 - swingX * 0.7,
     y:
-      Math.abs(_index * 6) +
+      Math.abs(_index * 4) +
       (() => {
         const { activeFlag } = hand[index];
 
         return activeFlag ? -30 : 0;
       })() +
       cardDimension.height,
-    angle: _index * 3
+    angle: _index * 2
   };
 };
 

@@ -10,7 +10,6 @@ const Round = () => {
   return (
     <pixiLayoutContainer
       layout={{
-        overflow: 'hidden',
         flex: 1,
         flexDirection: 'column',
         marginLeft: 10,
