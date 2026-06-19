@@ -4,20 +4,20 @@
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 99,
-        "h": 123
+        "w": 91,
+        "h": 115
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 99,
-        "h": 123
+        "w": 91,
+        "h": 115
       },
       "sourceSize": {
-        "w": 99,
-        "h": 123
+        "w": 91,
+        "h": 115
       }
     }
   },
@@ -25,8 +25,8 @@
     "image": "miscellaneous.png",
     "format": "RGBA8888",
     "size": {
-      "w": 99,
-      "h": 123
+      "w": 91,
+      "h": 115
     },
     "scale": "1"
   }

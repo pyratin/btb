@@ -222,13 +222,13 @@ const Hand = () => {
               }
             }}
           >
-            <Card card={card} />
-
             <pixiSprite
               texture={cardShadowTexture}
               position={{ x: -10, y: -10 }}
-              alpha={0.25}
+              alpha={1}
             />
+
+            <Card card={card} />
           </pixiContainer>
         );
       })}
