@@ -46,7 +46,7 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
   const swingX = cardDimension.height * Math.sin(angleRad);
 
   return {
-    x: offset + cardWidth * index + cardDimension.width / 2 - swingX * 0.2,
+    x: offset + cardWidth * index + cardDimension.width / 2,
     y:
       Math.abs(_index * 4) +
       (() => {
