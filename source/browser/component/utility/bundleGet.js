@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import bundleDefinition from '#browser/component/definition/bundle.json';
 
-const textureScaledGet = (texture, factor = 1) => {
+const textureScaledGet = (texture, factor = 1.5) => {
   const keyCollection = ['orig', 'trim'];
 
   keyCollection.map(
