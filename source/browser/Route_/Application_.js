@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import * as pixiJs from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
@@ -22,6 +22,8 @@ const Application__ = ({ children }) => {
     app: { renderer, stage }
   } = useApplication();
 
+  const filters = useMemo(() => [new CRT()], []);
+
   useEffect(() => {
     const onRendererResizeHandle = () =>
       Object.assign(
@@ -38,6 +40,12 @@ const Application__ = ({ children }) => {
     };
   }, [renderer, stage]);
 
+  useEffect(() => {
+    return () => {
+      filters.map((filter) => filter.destroy());
+    };
+  }, [filters]);
+
   return (
     <pixiLayoutContainer
       layout={{
@@ -46,7 +54,7 @@ const Application__ = ({ children }) => {
         borderWidth: 0,
         borderColor: 0xffffff
       }}
-      filters={[new CRT()]}
+      filters={filters}
     >
       {children}
     </pixiLayoutContainer>
