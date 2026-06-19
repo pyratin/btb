@@ -226,7 +226,7 @@ const Hand = () => {
 
             <pixiSprite
               texture={cardShadowTexture}
-              position={{ x: -20, y: -15 }}
+              position={{ x: -10, y: -10 }}
               alpha={0.25}
             />
           </pixiContainer>
