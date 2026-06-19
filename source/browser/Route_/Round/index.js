@@ -3,6 +3,8 @@ import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
+import { BACKGROUND_PRESETS } from '#browser/component/definition/backgroundPresets';
+import Background from '#browser/Component/Background';
 import Hand from './Hand';
 import Control from './Control';
 
@@ -24,6 +26,8 @@ const Round = () => {
         borderColor: 0xffffff
       }}
     >
+      <Background {...BACKGROUND_PRESETS.DEFAULT} />
+
       <pixiLayoutContainer
         layout={{
           width: '100%',

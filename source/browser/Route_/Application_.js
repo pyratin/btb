@@ -5,6 +5,8 @@ import { LayoutContainer } from '@pixi/layout/components';
 import { Application, useExtend, useApplication } from '@pixi/react';
 import '@pixi/layout';
 
+import CRT from '#browser/component/shader/CRT';
+
 const windowInnerDimenesionGet = () => {
   const {
     visualViewport: { width = 0, height = 0 }
@@ -44,6 +46,7 @@ const Application__ = ({ children }) => {
         borderWidth: 0,
         borderColor: 0xffffff
       }}
+      filters={[new CRT()]}
     >
       {children}
     </pixiLayoutContainer>
