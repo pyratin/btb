@@ -37,7 +37,13 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
 
   const offset = _offset - __offset;
 
-  const _index = index - (hand.length - 1) / 2;
+  const _index = (() => {
+    const indexMiddle = (hand.length - 1) / 2;
+
+    return index < indexMiddle
+      ? index - Math.floor(indexMiddle)
+      : index - Math.ceil(indexMiddle);
+  })();
 
   const angle = _index * 2;
 

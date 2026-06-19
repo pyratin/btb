@@ -59,7 +59,7 @@ const Sort = ({ onSortTrigger }) => {
         alignItems: 'center',
         justifyContent: 'center',
         gap: 5,
-        padding: 10,
+        padding: 5,
         ...borderStyle,
         borderColor: '#ffffff44'
       }}
