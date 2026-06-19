@@ -1,7 +1,7 @@
 import { useRef, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import * as pixiJs from 'pixi.js';
-import { Text, NineSliceSprite } from 'pixi.js';
+import { NineSliceSprite, BitmapText } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
@@ -34,7 +34,7 @@ const Button = ({
   disableFlag = false,
   onPointerTap
 }) => {
-  useExtend({ LayoutContainer, NineSliceSprite, Text });
+  useExtend({ LayoutContainer, NineSliceSprite, BitmapText });
 
   const { contextSafe } = useGSAP();
 
@@ -153,20 +153,13 @@ const Button = ({
           alpha={hoverFlag ? 0.2 : 0}
         />
 
-        <pixiText
+        <pixiBitmapText
           text={text}
-          layout={{}}
+          layout={{ top: -4 }}
           style={{
             fontFamily: 'm6x11plus',
             fontSize,
-            fill: 0xffffff,
-            dropShadow: {
-              alpha: 0.25,
-              angle: Math.PI / 2,
-              blur: 0,
-              color: '#000000',
-              distance: 2
-            }
+            fill: 0xffffff
           }}
           alpha={disableFlag ? 0.5 : 1}
         />

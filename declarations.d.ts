@@ -22,6 +22,11 @@ declare module 'react' {
         typeof import('pixi.js').HTMLText
       > &
         import('pixi.js').HTMLTextOptions;
+      /** Registered at runtime via `@pixi/react` useExtend */
+      pixiBitmapText: import('@pixi/react').PixiReactElementProps<
+        typeof import('pixi.js').BitmapText
+      > &
+        import('pixi.js').BitmapTextOptions;
     }
   }
 }
