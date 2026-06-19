@@ -19,7 +19,6 @@ const HandPlayedTrigger = ({ onHandPlayedTrigger }) => {
   return (
     <pixiLayoutContainer
       layout={{
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'flex-start',
         borderWidth: 0,

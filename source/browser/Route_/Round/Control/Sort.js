@@ -34,7 +34,7 @@ const Sort = ({ onSortTrigger }) => {
     <pixiLayoutContainer
       ref={ref}
       layout={{
-        flex: 1,
+        flexBasis: '100%',
         borderWidth: 0,
         borderColor: 0xff0000
       }}
