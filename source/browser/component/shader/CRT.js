@@ -258,7 +258,7 @@ export default class CRT extends Filter {
       resources: {
         shaderUniforms
       },
-      resolution: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
+      resolution: 1.0,
       antialias: true
     });
 

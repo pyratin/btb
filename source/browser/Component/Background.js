@@ -120,10 +120,10 @@ export class BackgroundFilter extends Filter {
     const new_colour = options.new_colour ?? options.new_color ?? options.color ?? options.tint ?? 0x50846e;
     const special_colour = options.special_colour ?? options.special_color ?? null;
     const tertiary_colour = options.tertiary_colour ?? options.tertiary_color ?? null;
-    const contrast = options.contrast ?? 1.0;
-    const spin_amount = options.spin_amount ?? 0.25;
+    const contrast = options.contrast ?? 0.85;
+    const spin_amount = options.spin_amount ?? 0.0;
     const scale = options.scale ?? 1.0;
-    const speed = options.speed ?? 1.0;
+    const speed = options.speed ?? 0.3;
     const alpha = options.alpha ?? options.opacity ?? 1.0;
 
     // 1. Initialize dynamic uniform group
@@ -149,6 +149,7 @@ export class BackgroundFilter extends Filter {
       resources: {
         shaderUniforms,
       },
+      resolution: 1.0,
     });
 
     this._uniforms = shaderUniforms;
@@ -506,10 +507,10 @@ const Background = ({
   special_color,
   tertiary_colour = null,
   tertiary_color,
-  contrast = 1.0,
-  spin_amount = 0.25,
+  contrast = 0.85,
+  spin_amount = 0.0,
   scale = 1.0,
-  speed = 1.0,
+  speed = 0.3,
   alpha = 1.0,
   opacity,
   ...props
