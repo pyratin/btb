@@ -37,24 +37,25 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
 
   const offset = _offset - __offset;
 
-  const _index = (() => {
-    const indexMiddle = (hand.length - 1) / 2;
+  const _index = index - (hand.length - 1) / 2;
 
-    return index < indexMiddle
-      ? index - Math.floor(indexMiddle)
-      : index - Math.ceil(indexMiddle);
-  })();
+  const angle = _index * 3;
+
+  const angleRad = (angle * Math.PI) / 180;
+
+  const swingX = cardDimension.height * Math.sin(angleRad);
 
   return {
-    x: offset + cardWidth * index,
+    x: offset + cardWidth * index + cardDimension.width / 2 - swingX * 0.7,
     y:
       Math.abs(_index * 6) +
       (() => {
         const { activeFlag } = hand[index];
 
         return activeFlag ? -30 : 0;
-      })(),
-    angle: _index * 2
+      })() +
+      cardDimension.height,
+    angle: _index * 3
   };
 };
 
@@ -168,7 +169,7 @@ const Hand = () => {
         ...(() => {
           const { height } = cardDimension;
 
-          return { height };
+          return { height: height + 20 };
         })(),
         marginTop: 'auto',
         borderWidth: 0,
@@ -199,6 +200,7 @@ const Hand = () => {
           <pixiContainer
             key={card.id}
             label={card.id}
+            pivot={{ x: cardDimension.width / 2, y: cardDimension.height }}
             eventMode='static'
             cursor='pointer'
             onPointerTap={() => {
@@ -224,7 +226,7 @@ const Hand = () => {
 
             <pixiSprite
               texture={cardShadowTexture}
-              position={{ x: -20, y: -20 }}
+              position={{ x: -20, y: -15 }}
               alpha={0.25}
             />
           </pixiContainer>
