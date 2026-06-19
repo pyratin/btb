@@ -9,6 +9,13 @@ import _ from 'lodash';
 import useStore from '#browser/component/useStore';
 import Button from '#browser/Component/Button';
 
+const nineSliceSpriteOption = [
+  'leftWidth',
+  'topHeight',
+  'rightWidth',
+  'bottomHeight'
+].reduce((memo, key) => ({ ...memo, [key]: 16 }), {});
+
 const Sort = ({ onSortTrigger }) => {
   useExtend({ LayoutContainer, Text, Graphics });
 
@@ -34,10 +41,7 @@ const Sort = ({ onSortTrigger }) => {
     >
       <pixiNineSliceSprite
         texture={borderOutlineTexture}
-        leftWidth={16}
-        topHeight={16}
-        rightWidth={16}
-        bottomHeight={16}
+        {...nineSliceSpriteOption}
         layout={{ position: 'absolute', width: '100%', height: '100%' }}
         tint={0xffffff}
         alpha={0.25}
@@ -47,7 +51,7 @@ const Sort = ({ onSortTrigger }) => {
         layout={{
           flexDirection: 'column',
           gap: 5,
-          padding: 20,
+          padding: 10,
           borderWidth: 0,
           borderColor: 0x00ff00
         }}
