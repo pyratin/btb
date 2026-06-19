@@ -16,37 +16,6 @@ import Card from '#browser/Component/Card';
 gsap.registerPlugin(gsapPixiPlugin, useGSAP);
 gsapPixiPlugin.registerPIXI(pixiJs);
 
-const shadowTextureGet = (cardDimension, renderer) => {
-  const { width, height } = cardDimension;
-
-  const padding = 20; // Pad enough room for the offset and blur radius
-
-  const container = new Container();
-
-  const boundsExpander = new Graphics()
-    .rect(0, 0, width + padding * 2, height + padding * 2)
-    .fill({ color: 0x000000, alpha: 0 }); // alpha 0 = invisible
-
-  container.addChild(boundsExpander);
-
-  const shadowCaster = new Graphics()
-    .rect(padding, padding, width, height)
-    .fill({ color: 0x000000 });
-
-  container.addChild(shadowCaster);
-
-  container.filters = [
-    new DropShadowFilter({
-      offset: { x: -5, y: 5 },
-      shadowOnly: true
-    })
-  ];
-
-  return renderer.textureGenerator.generateTexture({
-    target: container
-  });
-};
-
 const cardTransformGet = (index, hand, cardDimension, containerElement) => {
   const { layout: { _computedLayout: { width: _width = 0 } = {} } = {} } =
     containerElement;
@@ -121,21 +90,24 @@ const Hand = () => {
   } = useApplication();
 
   const {
+    cardShadowTexture,
+    cardDimension,
     discardCardCountMaximun,
     hand: _hand,
-    cardDimension,
     handSet: _handSet
   } = useStore(
     useShallow(
       ({
+        bundle,
         cardDimension,
         discardCardCountMaximun,
         round: { hand },
         handSet
       }) => ({
+        cardShadowTexture: bundle.miscellaneous.cardShadow,
+        cardDimension,
         discardCardCountMaximun,
         hand,
-        cardDimension,
         handSet
       })
     )
@@ -148,8 +120,6 @@ const Hand = () => {
   const [hand, handSet] = useState(_hand);
 
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
-
-  const [shadowTexture, shadowTextureSet] = useState(null);
 
   useEffect(() => {
     const __handSet = () =>
@@ -165,17 +135,6 @@ const Hand = () => {
         return __handSet();
     }
   }, [activeTriggerFlag, _hand]);
-
-  useEffect(() => {
-    const shadowTexture = shadowTextureGet(cardDimension, renderer);
-
-    // eslint-disable-next-line @eslint-react/set-state-in-effect
-    shadowTextureSet(shadowTexture);
-
-    return () => {
-      shadowTexture.destroy(true);
-    };
-  }, [cardDimension, renderer]);
 
   useGSAP(
     () => {
@@ -255,14 +214,13 @@ const Hand = () => {
               }
             }}
           >
-            {shadowTexture && (
-              <pixiSprite
-                texture={shadowTexture}
-                position={{ x: -20, y: -20 }}
-              />
-            )}
-
             <Card card={card} />
+
+            <pixiSprite
+              texture={cardShadowTexture}
+              position={{ x: -20, y: -20 }}
+              alpha={0.25}
+            />
           </pixiContainer>
         );
       })}

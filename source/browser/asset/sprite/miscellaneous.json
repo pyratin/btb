@@ -1,0 +1,33 @@
+{
+  "frames": {
+    "cardShadow": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 99,
+        "h": 123
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 99,
+        "h": 123
+      },
+      "sourceSize": {
+        "w": 99,
+        "h": 123
+      }
+    }
+  },
+  "meta": {
+    "image": "miscellaneous.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 99,
+      "h": 123
+    },
+    "scale": "1"
+  }
+}

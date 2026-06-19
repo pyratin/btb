@@ -3,7 +3,8 @@
     { "alias": "playingCards", "src": "sprite", "extension": "json" },
     { "alias": "_playingCards", "src": "sprite", "extension": "json" },
     { "alias": "jokers", "src": "sprite", "extension": "json" },
-    { "alias": "stickers", "src": "sprite", "extension": "json" }
+    { "alias": "stickers", "src": "sprite", "extension": "json" },
+    { "alias": "miscellaneous", "src": "sprite", "extension": "json" }
   ],
   "font": [
     {
