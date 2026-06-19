@@ -30,8 +30,8 @@ const Sort = ({ onSortTrigger }) => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 5,
-        padding: 5,
+        gap: 2,
+        padding: 2,
         borderWidth: 0,
         borderColor: 0xff0000
       }}
@@ -40,7 +40,7 @@ const Sort = ({ onSortTrigger }) => {
         <pixiText
           text='Sort Hand'
           layout={{}}
-          style={{ fontFamily: 'm6x11plus', fontSize: 28, fill: 0xffffff }}
+          style={{ fontFamily: 'm6x11plus', fontSize: 24, fill: 0xffffff }}
           alpha={0.8}
         />
       </pixiLayoutContainer>
@@ -53,7 +53,7 @@ const Sort = ({ onSortTrigger }) => {
             key={key}
             text={_.capitalize(key)}
             fontSize={24}
-            padding={{ padding: 5 }}
+            padding={{ padding: 2 }}
             borderRadius={4}
             backgroundColor={0xf69000}
             disableFlag={handPlayedFlag}
