@@ -93,7 +93,19 @@ const activeAnimationHandle = (
   });
 };
 
-const Hand = () => {
+const Hand = ({
+  sortTriggerFlag,
+  handPlayedTriggerFlag,
+  discardTriggerFlag
+}) => {
+  // eslint-disable-next-line
+  console.log(
+    'HERE>',
+    sortTriggerFlag,
+    handPlayedTriggerFlag,
+    discardTriggerFlag
+  );
+
   useExtend({ LayoutContainer, Container, Sprite });
 
   const {
@@ -169,9 +181,8 @@ const Hand = () => {
         ...(() => {
           const { height } = cardDimension;
 
-          return { height: height + 20 };
+          return { height };
         })(),
-        marginTop: 'auto',
         borderWidth: 0,
         borderColor: 0xff0000
       }}

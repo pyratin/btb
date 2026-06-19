@@ -58,9 +58,10 @@ const Button = ({
       ref={ref}
       layout={{
         position: 'relative',
+        width: '100%',
         top: 5,
         borderWidth: 0,
-        borderColor: 0xff0000
+        borderColor: 0x0000ff
       }}
       {...(_disableFlag
         ? { eventMode: 'none', cursor: 'none' }
@@ -154,6 +155,7 @@ const Button = ({
         layout={{
           position: 'relative',
           top: -5,
+          width: '100%',
           justifyContent: 'center',
           alignItems: 'center',
           ...padding,
