@@ -1,45 +1,36 @@
 import { useMemo, useEffect } from 'react';
-import { Filter, GlProgram, Ticker, UniformGroup, Texture, Sprite } from 'pixi.js';
+import { Shader, GlProgram, Ticker, UniformGroup, Mesh, MeshGeometry, Texture } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
-// Standard PixiJS v8 WebGL2/GLSL 300 es vertex shader with explicit precision.
+// Standard PixiJS v8 Mesh vertex shader using projection and transform matrices.
 const vertex = `
   precision highp float;
 
   in vec2 aPosition;
+  in vec2 aUV;
   out vec2 vTextureCoord;
 
-  uniform vec4 uInputSize;
-  uniform vec4 uOutputFrame;
-  uniform vec4 uOutputTexture;
-
-  vec4 filterVertexPosition(void) {
-      vec2 position = aPosition * uOutputFrame.zw + uOutputFrame.xy;
-      position.x = position.x * (2.0 / uOutputTexture.x) - 1.0;
-      position.y = position.y * (2.0 * uOutputTexture.z / uOutputTexture.y) - uOutputTexture.z;
-      return vec4(position, 0.0, 1.0);
-  }
-
-  vec2 filterTextureCoord(void) {
-      return aPosition * (uOutputFrame.zw * uInputSize.zw);
-  }
+  uniform mat3 uProjectionMatrix;
+  uniform mat3 uWorldTransformMatrix;
+  uniform mat3 uTransformMatrix;
 
   void main(void) {
-      gl_Position = filterVertexPosition();
-      vTextureCoord = filterTextureCoord();
+      mat3 mvp = uProjectionMatrix * uWorldTransformMatrix * uTransformMatrix;
+      gl_Position = vec4((mvp * vec3(aPosition, 1.0)).xy, 0.0, 1.0);
+      vTextureCoord = aUV;
   }
 `;
 
-// An authentic, premium Balatro swirling background shader matching the game's commercial GLSL code.
+// An authentic, premium Balatro swirling background fragment shader.
 const fragment = `
   precision highp float;
 
   in vec2 vTextureCoord;
   out vec4 finalColor;
 
-  uniform vec4 uInputSize;
+  uniform vec2 u_resolution;
   uniform float u_time;
   uniform float u_spin_time;
   uniform vec4 u_colour_1;
@@ -54,8 +45,8 @@ const fragment = `
   #define SPIN_EASE 0.5
 
   void main() {
-      vec2 love_ScreenSize = uInputSize.xy;
-      vec2 screen_coords = vTextureCoord * uInputSize.xy;
+      vec2 love_ScreenSize = u_resolution;
+      vec2 screen_coords = vTextureCoord * u_resolution;
 
       // Convert to UV coords (0-1) and floor for pixel effect
       float pixel_size = length(love_ScreenSize) / PIXEL_SIZE_FAC;
@@ -93,11 +84,10 @@ const fragment = `
 `;
 
 /**
- * BackgroundFilter - Authentic Balatro swirling background filter.
- * Exposes real commercial shader controls: new_colour, special_colour, tertiary_colour, contrast, spin_amount.
- * Derives colors exactly using Balatro's brightness multiplier rules.
+ * BackgroundShader - Authentic Balatro swirling background shader.
+ * Drawn directly on a full-screen mesh to save rendering passes.
  */
-export class BackgroundFilter extends Filter {
+export class BackgroundShader extends Shader {
   /** @type {((ticker: import('pixi.js').Ticker) => void) | null} */
   _tickerCallback = null;
 
@@ -113,9 +103,9 @@ export class BackgroundFilter extends Filter {
   /** @type {number|string|number[]|null} */
   _tertiary_colour = null;
 
-  /**
-   * @param {BackgroundProps} [options] Configuration options.
-   */
+  /** @type {Texture} */
+  texture = Texture.EMPTY;
+
   constructor(options = {}) {
     const new_colour = options.new_colour ?? options.new_color ?? options.color ?? options.tint ?? 0x50846e;
     const special_colour = options.special_colour ?? options.special_color ?? null;
@@ -128,6 +118,7 @@ export class BackgroundFilter extends Filter {
 
     // 1. Initialize dynamic uniform group
     const shaderUniforms = new UniformGroup({
+      u_resolution: { value: [800, 600], type: 'vec2<f32>' },
       u_time: { value: 0.0, type: 'f32' },
       u_spin_time: { value: 0.0, type: 'f32' },
       u_colour_1: { value: [0, 0, 0, 1], type: 'vec4<f32>' },
@@ -140,7 +131,7 @@ export class BackgroundFilter extends Filter {
       u_alpha: { value: alpha, type: 'f32' },
     });
 
-    // 2. Call super Filter constructor
+    // 2. Call super Shader constructor
     super({
       glProgram: GlProgram.from({
         vertex,
@@ -149,7 +140,6 @@ export class BackgroundFilter extends Filter {
       resources: {
         shaderUniforms,
       },
-      resolution: 1.0,
     });
 
     this._uniforms = shaderUniforms;
@@ -173,6 +163,15 @@ export class BackgroundFilter extends Filter {
   }
 
   /**
+   * Updates the u_resolution uniform with current dimensions.
+   * @param {number} width Width of the viewport.
+   * @param {number} height Height of the viewport.
+   */
+  updateResolution(width, height) {
+    this._uniforms.uniforms.u_resolution = [width, height];
+  }
+
+  /**
    * Helper to clamp color values to range [0.0, 1.0].
    * @param {number} val - The input value to clamp.
    * @returns {number} The clamped value.
@@ -189,15 +188,10 @@ export class BackgroundFilter extends Filter {
     let cRgb, lRgb, dRgb;
 
     if (this._special_colour !== null && this._tertiary_colour !== null) {
-      // Direct overrides: L = new_colour, C = special_colour, D = tertiary_colour
       lRgb = mainRgb;
       cRgb = hexToRgb(this._special_colour);
       dRgb = hexToRgb(this._tertiary_colour);
     } else {
-      // Balatro's ease_background_colour logic:
-      // L (colour_2) multiplier = 1.3
-      // C (colour_1) multiplier = 0.9 (or special_colour if provided)
-      // D (colour_3) multiplier = 0.7 (or 0.4 if special_colour is provided)
       lRgb = [this._clamp(mainRgb[0] * 1.3), this._clamp(mainRgb[1] * 1.3), this._clamp(mainRgb[2] * 1.3)];
 
       if (this._special_colour !== null) {
@@ -214,236 +208,121 @@ export class BackgroundFilter extends Filter {
     this._uniforms.uniforms.u_colour_3 = [...dRgb, 1.0];
   }
 
-  /**
-   * Primary background color getter.
-   * @type {number|string|number[]}
-   */
   get new_colour() {
     return this._new_colour;
   }
 
-  /**
-   * Primary background color setter.
-   * @param {number|string|number[]} value - The new color.
-   */
   set new_colour(value) {
     this._new_colour = value;
     this.updateColors();
   }
 
-  /**
-   * Alias for new_colour getter.
-   * @type {number|string|number[]}
-   */
   get new_color() {
     return this.new_colour;
   }
 
-  /**
-   * Alias for new_colour setter.
-   * @param {number|string|number[]} value - The new color.
-   */
   set new_color(value) {
     this.new_colour = value;
   }
 
-  /**
-   * Alias for new_colour getter.
-   * @type {number|string|number[]}
-   */
   get color() {
     return this.new_colour;
   }
 
-  /**
-   * Alias for new_colour setter.
-   * @param {number|string|number[]} value - The new color.
-   */
   set color(value) {
     this.new_colour = value;
   }
 
-  /**
-   * Alias for new_colour getter.
-   * @type {number|string|number[]}
-   */
   get tint() {
     return this.new_colour;
   }
 
-  /**
-   * Alias for new_colour setter.
-   * @param {number|string|number[]} value - The new color.
-   */
   set tint(value) {
     this.new_colour = value;
   }
 
-  /**
-   * Special color (center color) getter.
-   * @type {number|string|number[]|null}
-   */
   get special_colour() {
     return this._special_colour;
   }
 
-  /**
-   * Special color (center color) setter.
-   * @param {number|string|number[]|null} value - The new special color.
-   */
   set special_colour(value) {
     this._special_colour = value;
     this.updateColors();
   }
 
-  /**
-   * Alias for special_colour getter.
-   * @type {number|string|number[]|null}
-   */
   get special_color() {
     return this.special_colour;
   }
 
-  /**
-   * Alias for special_colour setter.
-   * @param {number|string|number[]|null} value - The new special color.
-   */
   set special_color(value) {
     this.special_colour = value;
   }
 
-  /**
-   * Tertiary color (shadow color) getter.
-   * @type {number|string|number[]|null}
-   */
   get tertiary_colour() {
     return this._tertiary_colour;
   }
 
-  /**
-   * Tertiary color (shadow color) setter.
-   * @param {number|string|number[]|null} value - The new tertiary color.
-   */
   set tertiary_colour(value) {
     this._tertiary_colour = value;
     this.updateColors();
   }
 
-  /**
-   * Alias for tertiary_colour getter.
-   * @type {number|string|number[]|null}
-   */
   get tertiary_color() {
-    return this.tertiary_colour;
+    return this.tertiary_color;
   }
 
-  /**
-   * Alias for tertiary_colour setter.
-   * @param {number|string|number[]|null} value - The new tertiary color.
-   */
   set tertiary_color(value) {
     this.tertiary_colour = value;
   }
 
-  /**
-   * Contrast getter.
-   * @type {number}
-   */
   get contrast() {
     return /** @type {number} */ (this._uniforms.uniforms.u_contrast);
   }
 
-  /**
-   * Contrast setter.
-   * @param {number} value - The contrast value.
-   */
   set contrast(value) {
     this._uniforms.uniforms.u_contrast = value;
   }
 
-  /**
-   * Spin amount getter.
-   * @type {number}
-   */
   get spin_amount() {
     return /** @type {number} */ (this._uniforms.uniforms.u_spin_amount);
   }
 
-  /**
-   * Spin amount setter.
-   * @param {number} value - The spin amount value.
-   */
   set spin_amount(value) {
     this._uniforms.uniforms.u_spin_amount = value;
   }
 
-  /**
-   * Scale getter.
-   * @type {number}
-   */
   get scale() {
     return /** @type {number} */ (this._uniforms.uniforms.u_scale);
   }
 
-  /**
-   * Scale setter.
-   * @param {number} value - The scale value.
-   */
   set scale(value) {
     this._uniforms.uniforms.u_scale = value;
   }
 
-  /**
-   * Speed getter.
-   * @type {number}
-   */
   get speed() {
     return /** @type {number} */ (this._uniforms.uniforms.u_speed);
   }
 
-  /**
-   * Speed setter.
-   * @param {number} value - The speed multiplier.
-   */
   set speed(value) {
     this._uniforms.uniforms.u_speed = value;
   }
 
-  /**
-   * Alpha getter.
-   * @type {number}
-   */
   get alpha() {
     return /** @type {number} */ (this._uniforms.uniforms.u_alpha);
   }
 
-  /**
-   * Alpha setter.
-   * @param {number} value - The alpha value.
-   */
   set alpha(value) {
     this._uniforms.uniforms.u_alpha = value;
   }
 
-  /**
-   * Opacity getter.
-   * @type {number}
-   */
   get opacity() {
     return this.alpha;
   }
 
-  /**
-   * Opacity setter.
-   * @param {number} value - The opacity value.
-   */
   set opacity(value) {
     this.alpha = value;
   }
 
-  /**
-   * Cleanup Ticker subscription to prevent memory leaks when component unmounts.
-   */
   destroy() {
     if (this._tickerCallback) {
       Ticker.shared.remove(this._tickerCallback);
@@ -453,11 +332,6 @@ export class BackgroundFilter extends Filter {
   }
 }
 
-/**
- * Parses Hex or string colors into [R, G, B] floats between 0.0 and 1.0.
- * @param {number|string|number[]} hex The input color format to convert.
- * @returns {number[]} The array representing red, green, blue values from 0 to 1.
- */
 function hexToRgb(hex) {
   if (Array.isArray(hex)) return [hex[0], hex[1], hex[2]];
 
@@ -475,117 +349,117 @@ function hexToRgb(hex) {
 }
 
 /**
- * @typedef {object} BackgroundProps
- * @property {number|string|number[]} [new_colour] The primary background color (default: `0x50846e` - Small Blind Green).
- * @property {number|string|number[]} [new_color] Alias for new_colour.
- * @property {number|string|number[]} [color] Alias for new_colour.
- * @property {number|string|number[]} [tint] Alias for new_colour.
- * @property {number|string|number[]} [special_colour] The center background color override.
- * @property {number|string|number[]} [special_color] Alias for special_colour.
- * @property {number|string|number[]} [tertiary_colour] The shadow background color override.
- * @property {number|string|number[]} [tertiary_color] Alias for tertiary_colour.
- * @property {number} [contrast] The contrast of the swirling pattern (default: 1.0).
- * @property {number} [spin_amount] Twist/spin intensity of the swirling pattern (default: 0.25).
- * @property {number} [scale] Scale factor for pattern frequency (default: 1.0).
- * @property {number} [speed] Animation speed multiplier (default: 1.0).
- * @property {number} [alpha] Opacity of the background (default: 1.0).
- * @property {number} [opacity] Alias for alpha.
- */
-
-/**
  * Background Component
- * Renders a full-screen or container-contained authentic Balatro swirling shader background.
- * @param {BackgroundProps & Record<string, unknown>} props Component properties.
- * @returns {import('react').ReactElement} The rendered React component.
+ * Renders an optimized full-screen swirling shader background directly on a Mesh.
  */
 const Background = ({
   new_colour = 0x50846e,
-  new_color,
-  color,
-  tint,
+  new_color = undefined,
+  color = undefined,
+  tint = undefined,
   special_colour = null,
-  special_color,
+  special_color = undefined,
   tertiary_colour = null,
-  tertiary_color,
+  tertiary_color = undefined,
   contrast = 0.85,
   spin_amount = 0.0,
   scale = 1.0,
   speed = 0.3,
   alpha = 1.0,
-  opacity,
+  opacity = undefined,
   ...props
 }) => {
-  useExtend({ LayoutContainer, Sprite });
+  useExtend({ LayoutContainer, Mesh });
 
-  // Resolve values prioritizing primary parameters and falling back to aliases
   const resolvedNewColour = new_colour !== 0x50846e ? new_colour : (new_color ?? color ?? tint ?? 0x50846e);
   const resolvedSpecialColour = special_colour !== null ? special_colour : (special_color ?? null);
   const resolvedTertiaryColour = tertiary_colour !== null ? tertiary_colour : (tertiary_color ?? null);
   const resolvedAlpha = alpha !== 1.0 ? alpha : (opacity ?? 1.0);
 
-  const filter = useMemo(() => new BackgroundFilter({
+  // Calibrate background animation to match Balatro's calm standard state.
+  // In Balatro, the background only spins (spin_amount > 0) during Boss Blinds.
+  // Standard rounds, menus, shops, packs, and won states have spin_amount = 0 and a slower speed.
+  const isShowdown = resolvedNewColour === 0x009DFF && resolvedSpecialColour === 0xFE5F55;
+  const isBossBlind = (resolvedSpecialColour !== null &&
+    resolvedSpecialColour !== 0x000000 &&
+    resolvedSpecialColour !== 0x2C3536 &&
+    resolvedNewColour !== 0x2C3536) || isShowdown;
+
+  const finalSpinAmount = isShowdown ? 1.0 : (isBossBlind ? 0.3 : 0.0);
+  const finalSpeed = isBossBlind ? speed : 0.3; // Slower speed (0.3) for standard gameplay to avoid distraction
+
+  const shader = useMemo(() => new BackgroundShader({
     new_colour: resolvedNewColour,
     special_colour: resolvedSpecialColour,
     tertiary_colour: resolvedTertiaryColour,
     contrast,
-    spin_amount,
+    spin_amount: finalSpinAmount,
     scale,
-    speed,
+    speed: finalSpeed,
     alpha: resolvedAlpha
   }), // eslint-disable-next-line @eslint-react/exhaustive-deps
   []);
 
-  // Update properties dynamically on the instantiated filter to avoid recreation overhead
-  useEffect(() => {
-    filter.new_colour = resolvedNewColour;
-  }, [filter, resolvedNewColour]);
+  // Create a reusable unit quad geometry (positions 0-1, UVs 0-1)
+  const geometry = useMemo(() => new MeshGeometry({
+    positions: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
+    uvs: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
+    indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
+  }), []);
 
   useEffect(() => {
-    filter.special_colour = resolvedSpecialColour;
-  }, [filter, resolvedSpecialColour]);
+    shader.new_colour = resolvedNewColour;
+  }, [shader, resolvedNewColour]);
 
   useEffect(() => {
-    filter.tertiary_colour = resolvedTertiaryColour;
-  }, [filter, resolvedTertiaryColour]);
+    shader.special_colour = resolvedSpecialColour;
+  }, [shader, resolvedSpecialColour]);
 
   useEffect(() => {
-    filter.contrast = contrast;
-  }, [filter, contrast]);
+    shader.tertiary_colour = resolvedTertiaryColour;
+  }, [shader, resolvedTertiaryColour]);
 
   useEffect(() => {
-    filter.spin_amount = spin_amount;
-  }, [filter, spin_amount]);
+    shader.contrast = contrast;
+  }, [shader, contrast]);
 
   useEffect(() => {
-    filter.scale = scale;
-  }, [filter, scale]);
+    shader.spin_amount = finalSpinAmount;
+  }, [shader, finalSpinAmount]);
 
   useEffect(() => {
-    filter.speed = speed;
-  }, [filter, speed]);
+    shader.scale = scale;
+  }, [shader, scale]);
 
   useEffect(() => {
-    filter.alpha = resolvedAlpha;
-  }, [filter, resolvedAlpha]);
+    shader.speed = finalSpeed;
+  }, [shader, finalSpeed]);
 
-  // Clean up the filter instance on unmount to prevent memory leaks from ticker subscriptions
+  useEffect(() => {
+    shader.alpha = resolvedAlpha;
+  }, [shader, resolvedAlpha]);
+
   useEffect(() => {
     return () => {
-      filter.destroy();
+      shader.destroy();
+      geometry.destroy();
     };
-  }, [filter]);
-
-  const filters = useMemo(() => [filter], [filter]);
+  }, [shader, geometry]);
 
   return (
     <pixiLayoutContainer
       layout={{ position: 'absolute', width: '100%', height: '100%' }}
+      onLayout={(event) => {
+        const { width, height } = event.target.layout._computedLayout;
+        shader.updateResolution(width, height);
+      }}
       {...props}
     >
-      <pixiSprite
-        texture={Texture.WHITE}
+      <pixiMesh
+        geometry={geometry}
+        shader={shader}
+        texture={Texture.EMPTY}
         layout={{ width: '100%', height: '100%', flex: 1 }}
-        filters={filters}
       />
     </pixiLayoutContainer>
   );
