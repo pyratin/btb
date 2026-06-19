@@ -1,11 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import * as pixiJs from 'pixi.js';
-import { Container, Graphics, Sprite } from 'pixi.js';
+import { Container, Sprite } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
-import { useExtend, useApplication } from '@pixi/react';
-import { DropShadowFilter } from 'pixi-filters';
+import { useExtend } from '@pixi/react';
 import { gsap } from 'gsap';
 import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
 import { useGSAP } from '@gsap/react';
@@ -84,10 +83,6 @@ const activeAnimationHandle = (
 
 const Hand = () => {
   useExtend({ LayoutContainer, Container, Sprite });
-
-  const {
-    app: { renderer }
-  } = useApplication();
 
   const {
     cardShadowTexture,

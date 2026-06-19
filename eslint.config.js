@@ -46,5 +46,8 @@ export default defineConfig([
         { ignoreRestSiblings: true }
       ]
     }
+  },
+  {
+    ignores: ['target/**']
   }
 ]);
