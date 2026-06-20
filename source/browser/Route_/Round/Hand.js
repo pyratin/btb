@@ -77,6 +77,61 @@ const onCardCollectionAnimationCompleteHandle = (
   onComplete
 ) => index === collection.length - 1 && onComplete();
 
+const entryAnimationHandle = (
+  collection,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  collection?.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    gsapTimeline.fromTo(
+      element,
+      {
+        pixi: card.entryFlag
+          ? (() => {
+              const { width, height } = cardDimension;
+
+              return {
+                x: containerElementWidthGet(containerElement) + width / 2,
+                y: height,
+                angle: 20,
+                skewX: -50,
+                skewY: 50,
+                alpha: 0
+              };
+            })()
+          : (() => {
+              const { x, y, angle } = element;
+
+              return { x, y, angle };
+            })()
+      },
+      {
+        pixi: {
+          ...cardTransformGet(
+            index,
+            collection,
+            cardDimension,
+            containerElement
+          ),
+          skewX: 0,
+          skewY: 0,
+          alpha: 1
+        },
+        duration: 0.35,
+        ease: 'back.out(1.4)',
+        onComplete: () =>
+          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
+      },
+      index * 0.08
+    );
+  });
+};
+
 const activeAnimationHandle = (
   collection,
   cardDimension,
@@ -200,61 +255,6 @@ const discardAnimationHandle = (
   );
 };
 
-const entryAnimationHandle = (
-  collection,
-  cardDimension,
-  containerElement,
-  onComplete
-) => {
-  const gsapTimeline = gsap.timeline();
-
-  collection?.map((card, index, collection) => {
-    const element = containerElement.getChildByLabel(card.id);
-
-    gsapTimeline.fromTo(
-      element,
-      {
-        pixi: card.entryFlag
-          ? (() => {
-              const { width, height } = cardDimension;
-
-              return {
-                x: containerElementWidthGet(containerElement) + width / 2,
-                y: height,
-                angle: 20,
-                skewX: -50,
-                skewY: 50,
-                alpha: 0
-              };
-            })()
-          : (() => {
-              const { x, y, angle } = element;
-
-              return { x, y, angle };
-            })()
-      },
-      {
-        pixi: {
-          ...cardTransformGet(
-            index,
-            collection,
-            cardDimension,
-            containerElement
-          ),
-          skewX: 0,
-          skewY: 0,
-          alpha: 1
-        },
-        duration: 0.35,
-        ease: 'back.out(1.4)',
-        onComplete: () =>
-          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
-      },
-      index * 0.08
-    );
-  });
-};
-
 const Hand = ({
   sortTriggerFlag,
   handPlayedTriggerFlag,
@@ -297,21 +297,11 @@ const Hand = ({
 
   const handPreviousRef = useRef(undefined);
 
-  const [hand, handSet] = useState(_hand);
+  const [hand, handSet] = useState(undefined);
+
+  const [entryTriggerFlag, entryTriggerFlagSet] = useState(true);
 
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
-
-  const [entryTriggerFlag, entryTriggerFlagSet] = useState(false);
-
-  useEffect(() => {
-    activeFlagClearTrigger &&
-      (() => {
-        // eslint-disable-next-line @eslint-react/set-state-in-effect
-        activeTriggerFlagSet(true);
-
-        activeFlagClearTriggerSet(false);
-      })();
-  }, [activeFlagClearTrigger, activeFlagClearTriggerSet]);
 
   useEffect(() => {
     const __handSet = () =>
@@ -323,6 +313,18 @@ const Hand = ({
       });
 
     switch (true) {
+      case entryTriggerFlag:
+        return handSet((hand) => {
+          Object.assign(handPreviousRef, {
+            current: _hand.map((card) => ({
+              ...card,
+              entryFlag: !hand?.map(({ id }) => id).includes(card.id)
+            }))
+          });
+
+          return handPreviousRef.current;
+        });
+
       case activeTriggerFlag:
         return __handSet();
 
@@ -340,18 +342,6 @@ const Hand = ({
 
           return handPreviousRef.current;
         });
-
-      case entryTriggerFlag:
-        return handSet((hand) => {
-          Object.assign(handPreviousRef, {
-            current: _hand.map((card) => ({
-              ...card,
-              entryFlag: !hand.map(({ id }) => id).includes(card.id)
-            }))
-          });
-
-          return handPreviousRef.current;
-        });
     }
   }, [
     activeTriggerFlag,
@@ -360,6 +350,33 @@ const Hand = ({
     entryTriggerFlag,
     _hand
   ]);
+
+  useEffect(() => {
+    activeFlagClearTrigger &&
+      (() => {
+        // eslint-disable-next-line @eslint-react/set-state-in-effect
+        activeTriggerFlagSet(true);
+
+        activeFlagClearTriggerSet(false);
+      })();
+  }, [activeFlagClearTrigger, activeFlagClearTriggerSet]);
+
+  useGSAP(
+    () => {
+      entryTriggerFlag &&
+        (() => {
+          return entryAnimationHandle(
+            handPreviousRef.current,
+            cardDimension,
+            ref.current,
+            () => {
+              entryTriggerFlagSet(false);
+            }
+          );
+        })();
+    },
+    { dependencies: [hand] }
+  );
 
   useGSAP(
     () => {
@@ -414,23 +431,6 @@ const Hand = ({
     { dependencies: [hand] }
   );
 
-  useGSAP(
-    () => {
-      entryTriggerFlag &&
-        (() => {
-          return entryAnimationHandle(
-            handPreviousRef.current,
-            cardDimension,
-            ref.current,
-            () => {
-              entryTriggerFlagSet(false);
-            }
-          );
-        })();
-    },
-    { dependencies: [hand] }
-  );
-
   return (
     <pixiLayoutContainer
       ref={ref}
@@ -450,7 +450,7 @@ const Hand = ({
 
         eventTarget.children
           .find(({ children }) => children.length)
-          .children.map((container, index) => {
+          ?.children.map((container, index) => {
             Object.assign(
               container,
               cardTransformGet(index, hand, cardDimension, eventTarget)
@@ -458,7 +458,7 @@ const Hand = ({
           });
       }}
     >
-      {hand.map((card, index, collection) => {
+      {hand?.map((card, index, collection) => {
         // eslint-disable-next-line @eslint-react/unsupported-syntax
         const activeFlagSetEnabled = (() =>
           collection
