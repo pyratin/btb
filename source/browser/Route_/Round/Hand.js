@@ -189,6 +189,22 @@ const Hand = ({
     }
   }, [activeTriggerFlag, sortTriggerFlag, _hand]);
 
+  useEffect(() => {
+    const onContextMenuHandle = (event) => {
+      event.preventDefault();
+
+      _handSet(hand.map((card) => ({ ...card, activeFlag: false })));
+
+      activeTriggerFlagSet(true);
+    };
+
+    window.addEventListener('contextmenu', onContextMenuHandle);
+
+    return () => {
+      window.removeEventListener('contextmenu', onContextMenuHandle);
+    };
+  }, [hand, _handSet]);
+
   useGSAP(
     () => {
       activeTriggerFlag &&
