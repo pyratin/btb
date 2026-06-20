@@ -17,9 +17,9 @@ const Round = () => {
 
   const [sortTriggerFlag, sortTriggerFlagSet] = useState(false);
 
-  const [handPlayedTriggerFlag, handPlayedTriggerFlagSet] = useState(false);
-
   const [discardTriggerFlag, discardTriggerFlagSet] = useState(false);
+
+  const [handPlayedTriggerFlag, handPlayedTriggerFlagSet] = useState(false);
 
   const [activeFlagClearTrigger, activeFlagClearTriggerSet] = useState(false);
 
@@ -64,8 +64,8 @@ const Round = () => {
       >
         <Hand
           sortTriggerFlag={sortTriggerFlag}
-          handPlayedTriggerFlag={handPlayedTriggerFlag}
           discardTriggerFlag={discardTriggerFlag}
+          handPlayedTriggerFlag={handPlayedTriggerFlag}
           activeFlagClearTrigger={activeFlagClearTrigger}
           sortTriggerFlagSet={sortTriggerFlagSet}
           activeFlagClearTriggerSet={activeFlagClearTriggerSet}
@@ -80,8 +80,8 @@ const Round = () => {
         >
           <Control
             onSortTrigger={() => sortTriggerFlagSet(true)}
-            onHandPlayedTrigger={() => handPlayedTriggerFlagSet(true)}
             onDiscardTrigger={() => discardTriggerFlagSet(true)}
+            onHandPlayedTrigger={() => handPlayedTriggerFlagSet(true)}
           />
         </pixiLayoutContainer>
       </pixiLayoutContainer>

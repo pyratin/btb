@@ -15,9 +15,15 @@ import Card from '#browser/Component/Card';
 gsap.registerPlugin(gsapPixiPlugin, useGSAP);
 gsapPixiPlugin.registerPIXI(pixiJs);
 
-const cardTransformGet = (index, hand, cardDimension, containerElement) => {
-  const { layout: { _computedLayout: { width: _width = 0 } = {} } = {} } =
+const containerElementWidthGet = (containerElement) => {
+  const { layout: { _computedLayout: { width = 0 } = {} } = {} } =
     containerElement;
+
+  return width;
+};
+
+const cardTransformGet = (index, hand, cardDimension, containerElement) => {
+  const _width = containerElementWidthGet(containerElement);
 
   const cardWidthFactor = 0.75;
 
@@ -73,7 +79,6 @@ const onCardCollectionAnimationCompleteHandle = (
 
 const activeAnimationHandle = (
   collection,
-  hand,
   cardDimension,
   containerElement,
   onComplete
@@ -86,7 +91,12 @@ const activeAnimationHandle = (
     gsapTimeline.to(
       element,
       {
-        pixi: cardTransformGet(index, hand, cardDimension, containerElement),
+        pixi: cardTransformGet(
+          index,
+          collection,
+          cardDimension,
+          containerElement
+        ),
         duration: 0.1,
         ease: 'back.out(1.5)',
         onComplete: () =>
@@ -99,7 +109,6 @@ const activeAnimationHandle = (
 
 const sortAnimationHandle = (
   collection,
-  hand,
   cardDimension,
   containerElement,
   onComplete
@@ -113,8 +122,8 @@ const sortAnimationHandle = (
       element,
       {
         pixi: cardTransformGet(
-          hand.findIndex(({ id }) => id === card.id),
-          hand,
+          index,
+          collection,
           cardDimension,
           containerElement
         ),
@@ -128,6 +137,68 @@ const sortAnimationHandle = (
   });
 };
 
+const discardAnimationHandle = (
+  collection,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  const discardCollection = collection.filter(({ discardFlag }) => discardFlag);
+
+  const sortCollection = collection.filter(({ discardFlag }) => !discardFlag);
+
+  const animationTotalCount =
+    discardCollection.length + (sortCollection.length > 0 ? 1 : 0);
+
+  let animationCompletedCount = 0;
+
+  const _onComplete = () => {
+    animationCompletedCount++;
+
+    animationCompletedCount === animationTotalCount && onComplete();
+  };
+
+  discardCollection.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    gsap.set(element, {
+      pixi: { zIndex: collection.length + index }
+    });
+
+    gsapTimeline.to(
+      element,
+      {
+        pixi: {
+          ...(() => {
+            const { width, height } = cardDimension;
+
+            return {
+              x: containerElementWidthGet(containerElement) + width / 2,
+              y: -height / 2,
+              angle: 20,
+              skewY: 50
+            };
+          })(),
+          alpha: 0
+        },
+        duration: 0.25,
+        ease: 'back.out(1.4)',
+        onComplete: _onComplete
+      },
+      index * 0.05
+    );
+  });
+
+  sortAnimationHandle(
+    sortCollection,
+    cardDimension,
+    containerElement,
+    onComplete
+  );
+};
+
 const Hand = ({
   sortTriggerFlag,
   handPlayedTriggerFlag,
@@ -137,7 +208,7 @@ const Hand = ({
   activeFlagClearTriggerSet
 }) => {
   // eslint-disable-next-line
-  console.log(handPlayedTriggerFlag, discardTriggerFlag);
+  console.log(handPlayedTriggerFlag);
 
   useExtend({ LayoutContainer, Container, Sprite });
 
@@ -198,8 +269,20 @@ const Hand = ({
 
       case sortTriggerFlag:
         return __handSet();
+
+      case discardTriggerFlag:
+        return handSet((hand) => {
+          Object.assign(handPreviousRef, {
+            current: hand.map((card) => ({
+              ...card,
+              discardFlag: !_hand.map(({ id }) => id).includes(card.id)
+            }))
+          });
+
+          return handPreviousRef.current;
+        });
     }
-  }, [activeTriggerFlag, sortTriggerFlag, _hand]);
+  }, [activeTriggerFlag, sortTriggerFlag, discardTriggerFlag, _hand]);
 
   useGSAP(
     () => {
@@ -208,7 +291,6 @@ const Hand = ({
           activeTriggerFlagSet(false);
 
           return activeAnimationHandle(
-            handPreviousRef.current,
             hand,
             cardDimension,
             ref.current,
@@ -226,8 +308,22 @@ const Hand = ({
           sortTriggerFlagSet(false);
 
           return sortAnimationHandle(
-            handPreviousRef.current,
             hand,
+            cardDimension,
+            ref.current,
+            () => {}
+          );
+        })();
+    },
+    { dependencies: [hand] }
+  );
+
+  useGSAP(
+    () => {
+      discardTriggerFlag &&
+        (() => {
+          return discardAnimationHandle(
+            handPreviousRef.current,
             cardDimension,
             ref.current,
             () => {}
