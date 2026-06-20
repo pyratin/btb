@@ -255,18 +255,75 @@ const discardAnimationHandle = (
   );
 };
 
+const handPlayedAnimationHandle = (
+  collection,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  const handPlayedCollection = collection.filter(
+    ({ playedFlag }) => playedFlag
+  );
+
+  const sortCollection = collection.filter(({ playedFlag }) => !playedFlag);
+
+  const animationTotalCount =
+    handPlayedCollection.length + (sortCollection.length > 0 ? 1 : 0);
+
+  let animationCompletedCount = 0;
+
+  const _onComplete = () => {
+    animationCompletedCount++;
+
+    animationCompletedCount === animationTotalCount && onComplete();
+  };
+
+  handPlayedCollection.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    gsap.set(element, { pixi: { zIndex: collection.length + index } });
+
+    gsapTimeline.to(
+      element,
+      {
+        ...{
+          pixi: {
+            y: (() => {
+              const { height } = cardDimension;
+
+              return -height / 2;
+            })(),
+            alpha: 0
+          }
+        },
+        duration: 0.25,
+        ease: 'back.out(1.4)',
+        onComplete: _onComplete
+      },
+      index * 0.05
+    );
+  });
+
+  sortAnimationHandle(
+    sortCollection,
+    cardDimension,
+    containerElement,
+    _onComplete
+  );
+};
+
 const Hand = ({
   sortTriggerFlag,
-  handPlayedTriggerFlag,
   discardTriggerFlag,
+  handPlayedTriggerFlag,
   activeFlagClearTrigger,
   sortTriggerFlagSet,
   discardTriggerFlagSet,
+  handPlayedTriggerFlagSet,
   activeFlagClearTriggerSet
 }) => {
-  // eslint-disable-next-line
-  console.log(handPlayedTriggerFlag);
-
   useExtend({ LayoutContainer, Container, Sprite });
 
   const {
@@ -342,12 +399,25 @@ const Hand = ({
 
           return handPreviousRef.current;
         });
+
+      case handPlayedTriggerFlag:
+        return handSet((hand) => {
+          Object.assign(handPreviousRef, {
+            current: hand.map((card) => ({
+              ...card,
+              playedFlag: !_hand.map(({ id }) => id).includes(card.id)
+            }))
+          });
+
+          return handPreviousRef.current;
+        });
     }
   }, [
     activeTriggerFlag,
     sortTriggerFlag,
     discardTriggerFlag,
     entryTriggerFlag,
+    handPlayedTriggerFlag,
     _hand
   ]);
 
@@ -424,6 +494,23 @@ const Hand = ({
               discardTriggerFlagSet(false);
 
               entryTriggerFlagSet(true);
+            }
+          );
+        })();
+    },
+    { dependencies: [hand] }
+  );
+
+  useGSAP(
+    () => {
+      handPlayedTriggerFlag &&
+        (() => {
+          return handPlayedAnimationHandle(
+            handPreviousRef.current,
+            cardDimension,
+            ref.current,
+            () => {
+              handPlayedTriggerFlagSet(false);
             }
           );
         })();

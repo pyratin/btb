@@ -69,6 +69,7 @@ const Round = () => {
           activeFlagClearTrigger={activeFlagClearTrigger}
           sortTriggerFlagSet={sortTriggerFlagSet}
           discardTriggerFlagSet={discardTriggerFlagSet}
+          handPlayedTriggerFlagSet={handPlayedTriggerFlagSet}
           activeFlagClearTriggerSet={activeFlagClearTriggerSet}
         />
 
