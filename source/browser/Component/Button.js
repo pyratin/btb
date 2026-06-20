@@ -10,8 +10,6 @@ import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
 import { useGSAP } from '@gsap/react';
 
 import useStore from '#browser/component/useStore';
-import animationDefinitionProcessedGet from '#browser/component/utility/animationDefinitionProcessedGet';
-import onAnimationDefinitionUpdateHandle from '#browser/component/utility/onAnimationDefinitionUpdateHandle';
 
 gsap.registerPlugin(gsapPixiPlugin, useGSAP);
 gsapPixiPlugin.registerPIXI(pixiJs);
@@ -86,29 +84,11 @@ const Button = ({
           const textContainerElement =
             eventCurrentTarget.getChildByLabel('text-container');
 
-          const { layout: { style: { top = 0 } = {} } = {} } =
-            textContainerElement;
-
-          const animationDefinition = {
-            from: /** @type {pixiJs.ContainerOptions} */ ({ layout: { top } }),
-            to: /** @type {pixiJs.ContainerOptions} */ ({ layout: { top: 0 } })
-          };
-
-          const [target, to] =
-            animationDefinitionProcessedGet(animationDefinition);
-
-          gsap.to(target, {
-            ...to,
+          gsap.to(textContainerElement, {
+            pixi: { y: 0 },
             duration: 0.2,
             yoyo: true,
             ease: 'back.out',
-            onUpdate: () => {
-              onAnimationDefinitionUpdateHandle(
-                target,
-                animationDefinition.to,
-                textContainerElement
-              );
-            },
             onComplete: () => {
               animationActiveFlagSet(false);
             }
@@ -126,9 +106,9 @@ const Button = ({
 
       <pixiLayoutContainer
         label='text-container'
+        position={{ x: 0, y: -5 }}
         layout={{
           position: 'relative',
-          top: -5,
           width: '100%',
           justifyContent: 'center',
           alignItems: 'center',

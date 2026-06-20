@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import '@pixi/layout';
-import { BitmapText, Graphics } from 'pixi.js';
+import { NineSliceSprite, BitmapText } from 'pixi.js';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 import _ from 'lodash';
@@ -17,7 +17,7 @@ const nineSliceSpriteOption = [
 ].reduce((memo, key) => ({ ...memo, [key]: 16 }), {});
 
 const Sort = ({ onSortTrigger }) => {
-  useExtend({ LayoutContainer, BitmapText, Graphics });
+  useExtend({ LayoutContainer, NineSliceSprite, BitmapText });
 
   const { borderOutlineTexture, handPlayedFlag, handSortTypeIndexSet } =
     useStore(
