@@ -524,10 +524,10 @@ const Hand = ({
       ref={ref}
       layout={{
         // eslint-disable-next-line @eslint-react/unsupported-syntax
-        ...(() => {
+        height: (() => {
           const { height } = cardDimension;
 
-          return { height };
+          return height;
         })(),
         borderWidth: 0,
         borderColor: 0xff0000

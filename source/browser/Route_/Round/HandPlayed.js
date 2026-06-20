@@ -1,0 +1,114 @@
+import { useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import * as pixiJs from 'pixi.js';
+import { Container, Sprite } from 'pixi.js';
+import '@pixi/layout';
+import { LayoutContainer } from '@pixi/layout/components';
+import { useExtend } from '@pixi/react';
+import gsap from 'gsap';
+import gsapPixiPlugin from 'gsap/PixiPlugin';
+import { useGSAP } from '@gsap/react';
+
+import useStore from '#browser/component/useStore';
+import Card from '#browser/Component/Card';
+
+gsap.registerPlugin(gsapPixiPlugin, useGSAP);
+gsapPixiPlugin.registerPIXI(pixiJs);
+
+const containerElementWidthGet = (containerElement) => {
+  const { layout: { _computedLayout: { width = 0 } = {} } = {} } =
+    containerElement;
+
+  return width;
+};
+
+const cardTransformGet = (index, hand, cardDimension, containerElement) => {
+  const _width = containerElementWidthGet(containerElement);
+
+  const cardWidthFactor = 1.1;
+
+  const width = Math.min(
+    ...[_width / hand.length, cardDimension.width * cardWidthFactor].map(
+      (cardWidth) => cardWidth * hand.length
+    )
+  );
+
+  const cardWidth = width / hand.length;
+
+  const _offset = Math.abs(_width - width) / 2;
+
+  const __offset = _offset
+    ? ((1 - cardWidthFactor) * cardDimension.width) / 2
+    : 0;
+
+  const offset = _offset - __offset;
+
+  return {
+    x: offset + cardWidth * index + cardDimension.width / 2
+  };
+};
+
+const HandPlayed = () => {
+  useExtend({ LayoutContainer, Container, Sprite });
+
+  const { cardShadowTexture, cardDimension, handPlayed } = useStore(
+    useShallow(({ bundle, cardDimension, round: { handPlayed } }) => ({
+      cardShadowTexture: bundle.miscellaneous.cardShadow,
+      handPlayed,
+      cardDimension
+    }))
+  );
+
+  const ref = useRef(undefined);
+
+  return (
+    <pixiLayoutContainer
+      ref={ref}
+      layout={{
+        // eslint-disable-next-line @eslint-react/unsupported-syntax
+        height: (() => {
+          const { height } = cardDimension;
+
+          return height;
+        })(),
+        justifyContent: 'center',
+        borderWidth: 0,
+        borderColor: 0xff0000
+      }}
+      sortableChildren={true}
+      onLayout={(event) => {
+        const eventTarget = event.target;
+
+        eventTarget.children
+          .find(({ children }) => children.length)
+          ?.children.map((container, index) =>
+            Object.assign(
+              container,
+              cardTransformGet(index, handPlayed, cardDimension, eventTarget)
+            )
+          );
+      }}
+    >
+      {handPlayed?.map((card, index) => {
+        return (
+          <pixiContainer
+            key={card.id}
+            label={card.id}
+            pivot={{ x: cardDimension.width / 2, y: 0 }}
+            zIndex={index}
+          >
+            <pixiSprite
+              texture={cardShadowTexture}
+              position={{ x: -10, y: -10 }}
+              alpha={1}
+            />
+
+            <Card card={card} />
+          </pixiContainer>
+        );
+      })}
+    </pixiLayoutContainer>
+  );
+};
+
+export default HandPlayed;

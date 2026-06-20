@@ -9,6 +9,7 @@ import { BACKGROUND_PRESETS } from '#browser/component/definition/backgroundPres
 import Background from '#browser/Component/Background';
 import Hand from './Hand';
 import Control from './Control';
+import HandPlayed from './HandPlayed';
 
 const Round = () => {
   useExtend({ LayoutContainer });
@@ -59,9 +60,11 @@ const Round = () => {
           gap: 25,
           marginTop: 'auto',
           borderWidth: 0,
-          borderColor: 0xff0000
+          borderColor: 0xffffff
         }}
       >
+        <HandPlayed />
+
         <Hand
           sortTriggerFlag={sortTriggerFlag}
           discardTriggerFlag={discardTriggerFlag}

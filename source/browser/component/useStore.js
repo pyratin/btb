@@ -146,7 +146,7 @@ const roundInitializedGet = (
     discardCount: 0,
     deck,
     hand,
-    handPlayed: undefined,
+    handPlayed: hand.slice(0, 4),
     muck: undefined,
     handTypeIndex: undefined
   };
