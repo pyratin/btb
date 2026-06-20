@@ -200,12 +200,68 @@ const discardAnimationHandle = (
   );
 };
 
+const entryAnimationHandle = (
+  collection,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  collection?.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    gsapTimeline.fromTo(
+      element,
+      {
+        pixi: card.entryFlag
+          ? (() => {
+              const { width, height } = cardDimension;
+
+              return {
+                x: containerElementWidthGet(containerElement) + width / 2,
+                y: height,
+                angle: 20,
+                skewX: -50,
+                skewY: 50,
+                alpha: 0
+              };
+            })()
+          : (() => {
+              const { x, y, angle } = element;
+
+              return { x, y, angle };
+            })()
+      },
+      {
+        pixi: {
+          ...cardTransformGet(
+            index,
+            collection,
+            cardDimension,
+            containerElement
+          ),
+          skewX: 0,
+          skewY: 0,
+          alpha: 1
+        },
+        duration: 0.35,
+        ease: 'back.out(1.4)',
+        onComplete: () =>
+          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
+      },
+      index * 0.08
+    );
+  });
+};
+
 const Hand = ({
   sortTriggerFlag,
   handPlayedTriggerFlag,
   discardTriggerFlag,
   activeFlagClearTrigger,
   sortTriggerFlagSet,
+  discardTriggerFlagSet,
   activeFlagClearTriggerSet
 }) => {
   // eslint-disable-next-line
@@ -245,6 +301,8 @@ const Hand = ({
 
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
 
+  const [entryTriggerFlag, entryTriggerFlagSet] = useState(false);
+
   useEffect(() => {
     activeFlagClearTrigger &&
       (() => {
@@ -282,8 +340,26 @@ const Hand = ({
 
           return handPreviousRef.current;
         });
+
+      case entryTriggerFlag:
+        return handSet((hand) => {
+          Object.assign(handPreviousRef, {
+            current: _hand.map((card) => ({
+              ...card,
+              entryFlag: !hand.map(({ id }) => id).includes(card.id)
+            }))
+          });
+
+          return handPreviousRef.current;
+        });
     }
-  }, [activeTriggerFlag, sortTriggerFlag, discardTriggerFlag, _hand]);
+  }, [
+    activeTriggerFlag,
+    sortTriggerFlag,
+    discardTriggerFlag,
+    entryTriggerFlag,
+    _hand
+  ]);
 
   useGSAP(
     () => {
@@ -327,7 +403,28 @@ const Hand = ({
             handPreviousRef.current,
             cardDimension,
             ref.current,
-            () => {}
+            () => {
+              discardTriggerFlagSet(false);
+
+              entryTriggerFlagSet(true);
+            }
+          );
+        })();
+    },
+    { dependencies: [hand] }
+  );
+
+  useGSAP(
+    () => {
+      entryTriggerFlag &&
+        (() => {
+          return entryAnimationHandle(
+            handPreviousRef.current,
+            cardDimension,
+            ref.current,
+            () => {
+              entryTriggerFlagSet(false);
+            }
           );
         })();
     },
