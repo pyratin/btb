@@ -42,6 +42,7 @@ const Round = () => {
           sortTriggerFlag={sortTriggerFlag}
           handPlayedTriggerFlag={handPlayedTriggerFlag}
           discardTriggerFlag={discardTriggerFlag}
+          sortTriggerFlagSet={sortTriggerFlagSet}
         />
 
         <pixiLayoutContainer

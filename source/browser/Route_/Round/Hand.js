@@ -86,9 +86,7 @@ const activeAnimationHandle = (
     gsapTimeline.to(
       element,
       {
-        pixi: {
-          ...cardTransformGet(index, hand, cardDimension, containerElement)
-        },
+        pixi: cardTransformGet(index, hand, cardDimension, containerElement),
         duration: 0.1,
         ease: 'back.out(1.5)',
         onComplete: () =>
@@ -99,18 +97,45 @@ const activeAnimationHandle = (
   });
 };
 
+const sortAnimationHandle = (
+  collection,
+  hand,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  collection.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    gsapTimeline.to(
+      element,
+      {
+        pixi: cardTransformGet(
+          hand.findIndex(({ id }) => id === card.id),
+          hand,
+          cardDimension,
+          containerElement
+        ),
+        duration: 0.35,
+        ease: 'back.out(1.4)',
+        onComplete: () =>
+          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
+      },
+      index * 0.02
+    );
+  });
+};
+
 const Hand = ({
   sortTriggerFlag,
   handPlayedTriggerFlag,
-  discardTriggerFlag
+  discardTriggerFlag,
+  sortTriggerFlagSet
 }) => {
   // eslint-disable-next-line
-  console.log(
-    'HERE>',
-    sortTriggerFlag,
-    handPlayedTriggerFlag,
-    discardTriggerFlag
-  );
+  console.log(handPlayedTriggerFlag, discardTriggerFlag);
 
   useExtend({ LayoutContainer, Container, Sprite });
 
@@ -158,8 +183,11 @@ const Hand = ({
     switch (true) {
       case activeTriggerFlag:
         return __handSet();
+
+      case sortTriggerFlag:
+        return __handSet();
     }
-  }, [activeTriggerFlag, _hand]);
+  }, [activeTriggerFlag, sortTriggerFlag, _hand]);
 
   useGSAP(
     () => {
@@ -168,6 +196,24 @@ const Hand = ({
           activeTriggerFlagSet(false);
 
           return activeAnimationHandle(
+            handPreviousRef.current,
+            hand,
+            cardDimension,
+            ref.current,
+            () => {}
+          );
+        })();
+    },
+    { dependencies: [hand] }
+  );
+
+  useGSAP(
+    () => {
+      sortTriggerFlag &&
+        (() => {
+          sortTriggerFlagSet(false);
+
+          return sortAnimationHandle(
             handPreviousRef.current,
             hand,
             cardDimension,
@@ -192,6 +238,7 @@ const Hand = ({
         borderWidth: 0,
         borderColor: 0xff0000
       }}
+      sortableChildren={true}
       onLayout={(event) => {
         const eventTarget = event.target;
 
@@ -218,6 +265,7 @@ const Hand = ({
             key={card.id}
             label={card.id}
             pivot={{ x: cardDimension.width / 2, y: cardDimension.height }}
+            zIndex={index}
             eventMode='static'
             cursor='pointer'
             onPointerTap={() => {
