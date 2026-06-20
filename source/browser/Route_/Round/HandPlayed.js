@@ -44,8 +44,57 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
   const offset = _offset - __offset;
 
   return {
-    x: offset + cardWidth * index + cardDimension.width / 2
+    x: offset + cardWidth * index + cardDimension.width / 2,
+    y: 0
   };
+};
+
+const onCardCollectionAnimationCompleteHandle = (
+  index,
+  collection,
+  onComplete
+) => index === collection.length - 1 && onComplete();
+
+const entryAnimationHandle = (
+  collection,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  collection?.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    const cardTransform = cardTransformGet(
+      index,
+      collection,
+      cardDimension,
+      containerElement
+    );
+
+    gsapTimeline.fromTo(
+      element,
+      {
+        pixi: {
+          ...cardTransform,
+          y: (() => {
+            const { height } = cardDimension;
+
+            return height;
+          })()
+        }
+      },
+      {
+        pixi: cardTransform,
+        duration: 0.4,
+        ease: 'back.out(1.4)',
+        onComplete: () =>
+          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
+      },
+      index * 0.08
+    );
+  });
 };
 
 const HandPlayed = () => {
@@ -60,6 +109,14 @@ const HandPlayed = () => {
   );
 
   const ref = useRef(undefined);
+
+  useGSAP(
+    () => {
+      handPlayed &&
+        entryAnimationHandle(handPlayed, cardDimension, ref.current, () => {});
+    },
+    { dependencies: [handPlayed] }
+  );
 
   return (
     <pixiLayoutContainer

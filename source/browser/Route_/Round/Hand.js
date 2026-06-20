@@ -401,6 +401,10 @@ const Hand = ({
           return handPreviousRef.current;
         });
 
+      case !handPlayedTriggerFlag &&
+        handPreviousRef.current.some(({ playedFlag }) => playedFlag):
+        return __handSet();
+
       case handPlayedTriggerFlag:
         return handSet((hand) => {
           Object.assign(handPreviousRef, {
