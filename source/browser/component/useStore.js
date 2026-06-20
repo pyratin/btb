@@ -3,6 +3,7 @@ import { combine, subscribeWithSelector, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { current, produce } from 'immer';
 import seedrandom from 'seedrandom';
+import _ from 'lodash';
 
 import handTypeDefinitionCollection from '#browser/component/definition/handType.json';
 import blindTypeDefinitionCollection from '#browser/component/definition/blindType.json';
@@ -213,20 +214,23 @@ const handSortTypeIndexSet = (handSortTypeIndex, set) => {
   });
 };
 
-const handSet = (hand, set) => {
+const handSet = (__hand, set) => {
   set((state) => {
     const { round, ...rest } = current(state);
 
     return {
       ...rest,
       round: produce((round) => {
-        const rest = /** @type {ReturnType<typeof roundInitializedGet>} */ (
-          current(round)
-        );
+        const { hand, ...rest } =
+          /** @type {ReturnType<typeof roundInitializedGet>} */ (
+            current(round)
+          );
+
+        const _hand = _.isFunction(__hand) ? __hand(hand) : __hand;
 
         return {
           ...rest,
-          hand,
+          hand: _hand,
           handTypeIndex: handTypeIndexGet(hand)
         };
       })(round)

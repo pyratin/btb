@@ -132,7 +132,9 @@ const Hand = ({
   sortTriggerFlag,
   handPlayedTriggerFlag,
   discardTriggerFlag,
-  sortTriggerFlagSet
+  activeFlagClearTrigger,
+  sortTriggerFlagSet,
+  activeFlagClearTriggerSet
 }) => {
   // eslint-disable-next-line
   console.log(handPlayedTriggerFlag, discardTriggerFlag);
@@ -172,6 +174,13 @@ const Hand = ({
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line @eslint-react/set-state-in-effect
+    activeTriggerFlagSet(true);
+
+    activeFlagClearTriggerSet(false);
+  }, [activeFlagClearTrigger, activeFlagClearTriggerSet]);
+
+  useEffect(() => {
     const __handSet = () =>
       // eslint-disable-next-line @eslint-react/set-state-in-effect
       handSet((hand) => {
@@ -188,36 +197,6 @@ const Hand = ({
         return __handSet();
     }
   }, [activeTriggerFlag, sortTriggerFlag, _hand]);
-
-  useEffect(() => {
-    const onContextMenuHandle = (event) => {
-      event.preventDefault();
-
-      (() => {
-        const { clientX, clientY } = event;
-
-        const bounds = ref.current.getBounds();
-
-        return !(
-          clientX >= bounds.x &&
-          clientX <= bounds.x + bounds.width &&
-          clientY >= bounds.y &&
-          clientY <= bounds.y + bounds.height
-        );
-      })() &&
-        (() => {
-          _handSet(hand.map(({ activeFlag, ...rest }) => rest));
-
-          activeTriggerFlagSet(true);
-        })();
-    };
-
-    window.addEventListener('contextmenu', onContextMenuHandle);
-
-    return () => {
-      window.removeEventListener('contextmenu', onContextMenuHandle);
-    };
-  }, [hand, _handSet]);
 
   useGSAP(
     () => {
