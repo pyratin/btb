@@ -295,6 +295,7 @@ const handPlayedAnimationHandle = (
 
               return -height / 2;
             })(),
+            angle: 0,
             alpha: 0
           }
         },
