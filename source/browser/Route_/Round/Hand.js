@@ -193,9 +193,23 @@ const Hand = ({
     const onContextMenuHandle = (event) => {
       event.preventDefault();
 
-      _handSet(hand.map((card) => ({ ...card, activeFlag: false })));
+      (() => {
+        const { clientX, clientY } = event;
 
-      activeTriggerFlagSet(true);
+        const bounds = ref.current.getBounds();
+
+        return !(
+          clientX >= bounds.x &&
+          clientX <= bounds.x + bounds.width &&
+          clientY >= bounds.y &&
+          clientY <= bounds.y + bounds.height
+        );
+      })() &&
+        (() => {
+          _handSet(hand.map(({ activeFlag, ...rest }) => rest));
+
+          activeTriggerFlagSet(true);
+        })();
     };
 
     window.addEventListener('contextmenu', onContextMenuHandle);
