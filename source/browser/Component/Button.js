@@ -87,7 +87,6 @@ const Button = ({
           gsap.to(textContainerElement, {
             pixi: { y: 0 },
             duration: 0.2,
-            yoyo: true,
             ease: 'back.out',
             onComplete: () => {
               animationActiveFlagSet(false);
