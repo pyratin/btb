@@ -178,6 +178,7 @@ const discardAnimationHandle = (
               x: containerElementWidthGet(containerElement) + width / 2,
               y: -height / 2,
               angle: 20,
+              skewX: -50,
               skewY: 50
             };
           })(),
