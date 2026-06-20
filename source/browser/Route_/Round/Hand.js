@@ -196,7 +196,7 @@ const discardAnimationHandle = (
     sortCollection,
     cardDimension,
     containerElement,
-    onComplete
+    _onComplete
   );
 };
 
