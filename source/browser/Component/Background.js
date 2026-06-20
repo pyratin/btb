@@ -332,6 +332,11 @@ export class BackgroundShader extends Shader {
   }
 }
 
+/**
+ * Converts a hex color string, number, or array to RGB components normalized to [0.0, 1.0].
+ * @param {string|number|number[]} hex - The hex color to convert.
+ * @returns {number[]} The RGB color components.
+ */
 function hexToRgb(hex) {
   if (Array.isArray(hex)) return [hex[0], hex[1], hex[2]];
 
@@ -349,8 +354,24 @@ function hexToRgb(hex) {
 }
 
 /**
- * Background Component
+ * Background Component.
  * Renders an optimized full-screen swirling shader background directly on a Mesh.
+ * @param {object} root0 - The component props.
+ * @param {number|string|number[]} [root0.new_colour] - Main background color.
+ * @param {number|string|number[]} [root0.new_color] - Alias for new_colour.
+ * @param {number|string|number[]} [root0.color] - Alias for new_colour.
+ * @param {number|string|number[]} [root0.tint] - Alias for new_colour.
+ * @param {number|string|number[]|null} [root0.special_colour] - Secondary color.
+ * @param {number|string|number[]} [root0.special_color] - Alias for special_colour.
+ * @param {number|string|number[]|null} [root0.tertiary_colour] - Tertiary color.
+ * @param {number|string|number[]} [root0.tertiary_color] - Alias for tertiary_colour.
+ * @param {number} [root0.contrast] - Background contrast multiplier.
+ * @param {number} [root0.spin_amount] - Spin speed multiplier.
+ * @param {number} [root0.scale] - Texture scale.
+ * @param {number} [root0.speed] - Animation speed multiplier.
+ * @param {number} [root0.alpha] - Background opacity.
+ * @param {number} [root0.opacity] - Alias for alpha.
+ * @returns {import('react').ReactElement} The rendered background layout container.
  */
 const Background = ({
   new_colour = 0x50846e,
@@ -364,7 +385,7 @@ const Background = ({
   contrast = 0.85,
   spin_amount = 0.0,
   scale = 1.0,
-  speed = 0.3,
+  speed = 1.0,
   alpha = 1.0,
   opacity = undefined,
   ...props
@@ -385,8 +406,8 @@ const Background = ({
     resolvedSpecialColour !== 0x2C3536 &&
     resolvedNewColour !== 0x2C3536) || isShowdown;
 
-  const finalSpinAmount = isShowdown ? 1.0 : (isBossBlind ? 0.3 : 0.0);
-  const finalSpeed = isBossBlind ? speed : 0.3; // Slower speed (0.3) for standard gameplay to avoid distraction
+  const finalSpinAmount = isShowdown ? 1.0 : (isBossBlind ? 0.3 : spin_amount);
+  const finalSpeed = speed; // Use speed directly from presets or default (1.0) to match Balatro's speed
 
   const shader = useMemo(() => new BackgroundShader({
     new_colour: resolvedNewColour,
