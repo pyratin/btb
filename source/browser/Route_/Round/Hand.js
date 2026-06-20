@@ -174,10 +174,13 @@ const Hand = ({
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line @eslint-react/set-state-in-effect
-    activeTriggerFlagSet(true);
+    activeFlagClearTrigger &&
+      (() => {
+        // eslint-disable-next-line @eslint-react/set-state-in-effect
+        activeTriggerFlagSet(true);
 
-    activeFlagClearTriggerSet(false);
+        activeFlagClearTriggerSet(false);
+      })();
   }, [activeFlagClearTrigger, activeFlagClearTriggerSet]);
 
   useEffect(() => {
