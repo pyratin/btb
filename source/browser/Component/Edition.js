@@ -55,15 +55,15 @@ const folioFragment = `
       }
 
       // Unpremultiply color for accurate math
-      vec4 straightTexel = vec4(texel.rgb / texel.a, texel.a);
+      vec4 tex = vec4(texel.rgb / texel.a, texel.a);
 
       // Local UV ranging from 0.0 to 1.0 within card bounds
       vec2 uv = vLocalCoord;
       vec2 adjusted_uv = uv - vec2(0.5, 0.5);
       adjusted_uv.x = adjusted_uv.x * (uOutputFrame.z / uOutputFrame.w);
 
-      float low = min(straightTexel.r, min(straightTexel.g, straightTexel.b));
-      float high = max(straightTexel.r, max(straightTexel.g, straightTexel.b));
+      float low = min(tex.r, min(tex.g, tex.b));
+      float high = max(tex.r, max(tex.g, tex.b));
       float delta = min(high, max(0.5, 1.0 - low));
 
       vec2 foil = u_effect_vector;
@@ -78,19 +78,15 @@ const folioFragment = `
       float maxfac = max(max(fac, max(fac2, max(fac3, max(fac4, 0.0)))) + 2.2 * (fac + fac2 + fac3 + fac4), 0.0);
 
       vec3 texRgb;
-      texRgb.r = straightTexel.r - delta + delta * maxfac * 0.3;
-      texRgb.g = straightTexel.g - delta + delta * maxfac * 0.3;
-      texRgb.b = straightTexel.b + delta * maxfac * 1.9;
+      texRgb.r = clamp(tex.r - delta + delta * maxfac * 0.3, 0.0, 1.0);
+      texRgb.g = clamp(tex.g - delta + delta * maxfac * 0.3, 0.0, 1.0);
+      texRgb.b = clamp(tex.b + delta * maxfac * 1.9, 0.0, 1.0);
 
-      // Replicate the exact Love2D alpha modulation but blended over the original opaque card base
-      float blendAlpha = min(straightTexel.a, 0.3 * straightTexel.a + 0.9 * min(0.5, maxfac * 0.1));
+      float blendAlpha = clamp(min(tex.a, 0.3 * tex.a + 0.9 * min(0.5, maxfac * 0.1)), 0.0, 1.0);
 
-      // Apply strong blend while keeping the beautiful base sheen active
-      float activeBlend = clamp(blendAlpha, 0.0, 1.0);
-      vec3 finalRgb = mix(straightTexel.rgb, texRgb, activeBlend);
-      
-      // Preserve clean card edges and perfect card opacity
-      finalColor = vec4(finalRgb * straightTexel.a, straightTexel.a);
+      vec3 finalRgb = mix(tex.rgb, texRgb, blendAlpha);
+
+      finalColor = vec4(finalRgb * tex.a, tex.a);
   }
 `;
 
@@ -158,7 +154,7 @@ const holoFragment = `
       }
 
       // Unpremultiply color for accurate math
-      vec4 straightTexel = vec4(texel.rgb / texel.a, texel.a);
+      vec4 tex = vec4(texel.rgb / texel.a, texel.a);
 
       // Local UV ranging from 0.0 to 1.0 within card bounds
       vec2 uv = vLocalCoord;
@@ -169,7 +165,7 @@ const holoFragment = `
       vec2 uv_scaled_centered = (floored_uv - vec2(0.5, 0.5)) * 250.0;
 
       // HSL calculation with 50% card, 50% blue
-      vec4 hsl = HSL(0.5 * straightTexel + 0.5 * vec4(0.0, 0.0, 1.0, straightTexel.a));
+      vec4 hsl = HSL(0.5 * tex + 0.5 * vec4(0.0, 0.0, 1.0, tex.a));
 
       vec2 holo = u_effect_vector;
       float t = holo.y * 7.221 + u_time;
@@ -185,10 +181,8 @@ const holoFragment = `
 
       float res = 0.5 + 0.5 * cos(holo.x * 2.612 + (field - 0.5) * 3.14159);
 
-      float low = min(straightTexel.r, min(straightTexel.g, straightTexel.b));
-      float high = max(straightTexel.r, max(straightTexel.g, straightTexel.b));
-      
-      // Amplified holographic intensity factors
+      float low = min(tex.r, min(tex.g, tex.b));
+      float high = max(tex.r, max(tex.g, tex.b));
       float delta = 0.2 + 0.3 * (high - low) + 0.1 * high;
 
       float gridsize = 0.79;
@@ -200,21 +194,14 @@ const holoFragment = `
           max(0.0, 7.0 * cos(uv.y * gridsize * 45.0 - uv.x * gridsize * 20.0) - 6.0)
       );
 
-      // Boost saturation and brightness of HSL for high-contrast visibility
       hsl.x = hsl.x + res + fac;
-      hsl.y = hsl.y * 1.3; // Boost saturation (optimised from simulation)
-      if (hsl.z > 0.15) {
-          hsl.z = hsl.z * 0.7 + 0.25; // Scale lightness of bright card background to bring out saturated colors (optimised)
-      }
+      hsl.y = hsl.y * 1.3;
+      hsl.z = hsl.z * 0.6 + 0.4;
 
-      vec3 holoColor = RGB(hsl).rgb * vec3(0.9, 0.8, 1.2);
-      
-      // Exact Balatro blend
-      float active_delta = clamp(delta, 0.0, 0.95);
-      vec3 finalRgb = mix(straightTexel.rgb, holoColor, active_delta);
+      vec4 holoColor = RGB(hsl) * vec4(0.9, 0.8, 1.2, tex.a);
+      vec4 finalTex = (1.0 - delta) * tex + delta * holoColor;
 
-      // Preserve clean card edges and opaque face
-      finalColor = vec4(finalRgb * straightTexel.a, straightTexel.a);
+      finalColor = vec4(finalTex.rgb * tex.a, tex.a);
   }
 `;
 
@@ -282,7 +269,7 @@ const polyFragment = `
       }
 
       // Unpremultiply color for accurate math
-      vec4 straightTexel = vec4(texel.rgb / texel.a, texel.a);
+      vec4 tex = vec4(texel.rgb / texel.a, texel.a);
 
       // Local UV ranging from 0.0 to 1.0 within card bounds
       vec2 uv = vLocalCoord;
@@ -292,13 +279,13 @@ const polyFragment = `
       vec2 floored_uv = floor(uv * card_size) / card_size;
       vec2 uv_scaled_centered = (floored_uv - vec2(0.5, 0.5)) * 50.0;
 
-      float low = min(straightTexel.r, min(straightTexel.g, straightTexel.b));
-      float high = max(straightTexel.r, max(straightTexel.g, straightTexel.b));
+      float low = min(tex.r, min(tex.g, tex.b));
+      float high = max(tex.r, max(tex.g, tex.b));
       float delta = high - low;
 
       float saturation_fac = 1.0 - max(0.0, 0.05 * (1.1 - delta));
 
-      vec4 hsl = HSL(vec4(straightTexel.r * saturation_fac, straightTexel.g * saturation_fac, straightTexel.b, straightTexel.a));
+      vec4 hsl = HSL(vec4(tex.r * saturation_fac, tex.g * saturation_fac, tex.b, tex.a));
 
       vec2 polychrome = u_effect_vector;
       float t = polychrome.y * 2.221 + u_time;
@@ -315,18 +302,11 @@ const polyFragment = `
       float res = 0.5 + 0.5 * cos(polychrome.x * 2.612 + (field - 0.5) * 3.14159);
       
       hsl.x = hsl.x + res + polychrome.y * 0.04;
-      hsl.y = min(0.85, hsl.y + 0.55); // Boost saturation (optimised from simulation)
-      if (hsl.z > 0.15) {
-          hsl.z = hsl.z * 0.8 + 0.15; // Scale lightness of bright card background to bring out saturated colors (optimised)
-      }
+      hsl.y = min(0.6, hsl.y + 0.5);
 
-      vec3 polyColor = RGB(hsl).rgb;
+      tex.rgb = RGB(hsl).rgb;
 
-      // Exact Balatro polychrome style with strong mix, keeping outlines crisp naturally through HSL math
-      vec3 finalRgb = mix(straightTexel.rgb, polyColor, 0.5);
-
-      // Preserve clean card edges and opaque face
-      finalColor = vec4(finalRgb * straightTexel.a, straightTexel.a);
+      finalColor = vec4(tex.rgb * tex.a, tex.a);
   }
 `;
 
