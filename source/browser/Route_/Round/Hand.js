@@ -402,7 +402,7 @@ const Hand = ({
         });
 
       case !handPlayedTriggerFlag &&
-        handPreviousRef.current.some(({ playedFlag }) => playedFlag):
+        handPreviousRef.current?.some(({ playedFlag }) => playedFlag):
         return __handSet();
 
       case handPlayedTriggerFlag:
