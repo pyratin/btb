@@ -15,7 +15,7 @@ const Control = ({ onSortTrigger, onHandPlayedTrigger, onDiscardTrigger }) => {
         width: '100%',
         maxWidth: 600,
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         gap: 10,
         borderWidth: 0,
         borderColor: 0x00ff00
