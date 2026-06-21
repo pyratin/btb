@@ -27,7 +27,7 @@ const windowInnerDimenesionGet = () => {
 };
 
 const textureScaleFactorGet = (windowInnerDimenesion) => {
-  const widthCollection = [400, 1024];
+  const widthCollection = [400, 707];
 
   const { width } = windowInnerDimenesion;
 
