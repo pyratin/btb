@@ -88,8 +88,8 @@ const cardGet = (
   suitIndex,
   packIndex = _rankIndex + suitIndex * rankLength,
   faceDownFlag = true,
-  activeFlag = false,
-  editionType = undefined
+  activeFlag = false
+  // editionType = undefined
 ) => {
   const rankIndex = _rankIndex + 1;
 
@@ -121,7 +121,21 @@ const cardGet = (
     suit,
     faceDownFlag,
     activeFlag,
-    editionType
+    editionType: (() => {
+      switch (true) {
+        case !((rankIndex + 1) % 4):
+          return 'polychrome';
+
+        case !((rankIndex + 1) % 3):
+          return 'holographic';
+
+        case !((rankIndex + 1) % 2):
+          return 'folio';
+
+        default:
+          return undefined;
+      }
+    })()
   };
 };
 
