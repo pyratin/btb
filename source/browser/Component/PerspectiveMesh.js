@@ -174,9 +174,13 @@ const PerspectiveMesh = forwardRef(
             };
 
             wrapper.interactive = true;
+            wrapper.on('pointerdown', pointerMoveHandle);
             wrapper.on('pointermove', pointerMoveHandle);
             wrapper.on('pointerout', pointerOutHandle);
             wrapper.on('pointerleave', pointerOutHandle);
+            wrapper.on('pointerup', pointerOutHandle);
+            wrapper.on('pointerupoutside', pointerOutHandle);
+            wrapper.on('pointercancel', pointerOutHandle);
 
             const tickerHandle = () => {
               const bounds = boundsCached || sourceContainer.getLocalBounds();
@@ -332,9 +336,13 @@ const PerspectiveMesh = forwardRef(
             tickerStart();
 
             return () => {
+              wrapper.off('pointerdown', pointerMoveHandle);
               wrapper.off('pointermove', pointerMoveHandle);
               wrapper.off('pointerout', pointerOutHandle);
               wrapper.off('pointerleave', pointerOutHandle);
+              wrapper.off('pointerup', pointerOutHandle);
+              wrapper.off('pointerupoutside', pointerOutHandle);
+              wrapper.off('pointercancel', pointerOutHandle);
               tickerStop();
               rt &&
                 (() => {
