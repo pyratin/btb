@@ -560,6 +560,8 @@ const Hand = ({
             .filter(({ activeFlag }) => activeFlag).length <
           discardCardCountMaximun)();
 
+        const cursor = activeFlagSetEnabled ? 'pointer' : undefined;
+
         return (
           <pixiContainer
             key={card.id}
@@ -567,7 +569,7 @@ const Hand = ({
             pivot={{ x: cardDimension.width / 2, y: cardDimension.height }}
             zIndex={index}
             eventMode={!handPlayedFlag ? 'static' : 'none'}
-            cursor='pointer'
+            cursor={cursor}
             onPointerTap={() => {
               switch (true) {
                 case activeFlagSetEnabled:
@@ -593,7 +595,7 @@ const Hand = ({
               alpha={1}
             />
 
-            <Card card={card} />
+            <Card cursor={cursor} idle={true} card={card} />
           </pixiContainer>
         );
       })}

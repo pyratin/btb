@@ -5,8 +5,6 @@ import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore.js';
-import { BACKGROUND_PRESETS } from '#browser/component/definition/backgroundPresets';
-import Background from '#browser/Component/Background';
 import Hand from './Hand';
 import Control from './Control';
 import HandPlayed from './HandPlayed';

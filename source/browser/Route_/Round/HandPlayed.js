@@ -161,7 +161,7 @@ const HandPlayed = () => {
               alpha={1}
             />
 
-            <Card card={card} />
+            <Card perspectiveMeshDisableFlag={true} card={card} />
           </pixiContainer>
         );
       })}

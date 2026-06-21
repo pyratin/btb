@@ -4,8 +4,16 @@ import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
 import cardTextureGet from '#browser/component/utility/cardTextureGet';
+import PerspectiveMesh from '#browser/Component/PerspectiveMesh';
 
-const Card = ({ card }) => {
+const Card = ({
+  cursor = 'default',
+  idle = false,
+  perspectiveMeshDisableFlag = false,
+  card
+}) => {
+  const { id, faceDownFlag, editionType } = card;
+
   useExtend({ Container, Sprite });
 
   const { texture, backgroundTexture } = useStore(
@@ -17,11 +25,19 @@ const Card = ({ card }) => {
   );
 
   return (
-    <pixiContainer>
-      <pixiSprite texture={backgroundTexture} />
+    <PerspectiveMesh
+      dirtyKey={`${id}-${faceDownFlag}`}
+      animating={!faceDownFlag && !!editionType}
+      cursor={cursor}
+      idle={idle}
+      disableFlag={perspectiveMeshDisableFlag}
+    >
+      <pixiContainer>
+        <pixiSprite texture={backgroundTexture} />
 
-      <pixiSprite texture={texture} />
-    </pixiContainer>
+        <pixiSprite texture={texture} />
+      </pixiContainer>
+    </PerspectiveMesh>
   );
 };
 
