@@ -5,6 +5,7 @@ import { useExtend } from '@pixi/react';
 import useStore from '#browser/component/useStore';
 import cardTextureGet from '#browser/component/utility/cardTextureGet';
 import PerspectiveMesh from '#browser/Component/PerspectiveMesh';
+import Edition from '#browser/Component/Edition';
 
 const Card = ({
   cursor = 'default',
@@ -32,11 +33,13 @@ const Card = ({
       idle={idle}
       disableFlag={perspectiveMeshDisableFlag}
     >
-      <pixiContainer>
-        <pixiSprite texture={backgroundTexture} />
+      <Edition type={!faceDownFlag && editionType}>
+        <pixiContainer>
+          <pixiSprite texture={backgroundTexture} />
 
-        <pixiSprite texture={texture} />
-      </pixiContainer>
+          <pixiSprite texture={texture} />
+        </pixiContainer>
+      </Edition>
     </PerspectiveMesh>
   );
 };
