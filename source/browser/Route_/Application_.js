@@ -1,22 +1,20 @@
 import { useMemo, useState, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import * as pixiJs from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { Application, useExtend, useApplication } from '@pixi/react';
 import '@pixi/layout';
 
+import useStore from '#browser/component/useStore';
 import CRT from '#browser/component/shader/CRT';
-
-const windowInnerDimenesionGet = () => {
-  const {
-    visualViewport: { width = 0, height = 0 }
-  } = window;
-
-  return { width, height };
-};
 
 const Application__ = ({ children }) => {
   useExtend({ LayoutContainer });
+
+  const { windowInnerDimenesion } = useStore(
+    useShallow(({ windowInnerDimenesion }) => ({ windowInnerDimenesion }))
+  );
 
   const {
     app: { renderer, stage }
@@ -29,7 +27,7 @@ const Application__ = ({ children }) => {
       Object.assign(
         stage,
         /** @type {pixiJs.ContainerOptions} */ ({
-          layout: windowInnerDimenesionGet()
+          layout: windowInnerDimenesion
         })
       );
 
@@ -38,7 +36,7 @@ const Application__ = ({ children }) => {
     return () => {
       renderer.off('resize', onRendererResizeHandle);
     };
-  }, [renderer, stage]);
+  }, [renderer, stage, windowInnerDimenesion]);
 
   useEffect(() => {
     return () => {
@@ -64,6 +62,10 @@ const Application__ = ({ children }) => {
 const Application_ = ({ children = undefined }) => {
   const [initialized, initializedSet] = useState(false);
 
+  const { windowInnerDimenesion } = useStore(
+    useShallow(({ windowInnerDimenesion }) => ({ windowInnerDimenesion }))
+  );
+
   return (
     <Application
       resizeTo={window}
@@ -77,7 +79,7 @@ const Application_ = ({ children = undefined }) => {
           stage,
           /** @type {pixiJs.ContainerOptions} */ ({
             layout: {
-              ...windowInnerDimenesionGet(),
+              ...windowInnerDimenesion,
               alignItems: 'stretch'
             }
           })

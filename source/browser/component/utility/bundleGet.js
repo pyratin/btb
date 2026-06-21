@@ -3,28 +3,53 @@ import _ from 'lodash';
 import bundleDefinition from '#browser/component/definition/bundle.json';
 
 const textureClonedGet = (texture) => {
-  if (!texture) return texture;
+  switch (true) {
+    case !texture:
+      return texture;
 
-  // 1. Shadow-clone the main texture
-  const cloned = Object.create(texture);
+    default:
+      return Object.assign(Object.create(texture), {
+        ...(() => {
+          switch (true) {
+            case !texture.orig:
+              return {};
 
-  // 2. Shadow-clone the layout rectangles to keep original coordinates pure
-  if (texture.orig) {
-    cloned.orig = Object.create(texture.orig);
+            default:
+              return { orig: Object.create(texture.orig) };
+          }
+        })(),
+        ...(() => {
+          switch (true) {
+            case !texture.trim:
+              return {};
+
+            default:
+              return { trim: Object.create(texture.trim) };
+          }
+        })(),
+        ...(() => {
+          switch (true) {
+            case !texture.source:
+              return {};
+
+            default:
+              return {
+                source: Object.assign(Object.create(texture.source), {
+                  ...(() => {
+                    switch (true) {
+                      case !texture.source.style:
+                        return {};
+
+                      default:
+                        return { style: Object.create(texture.source.style) };
+                    }
+                  })()
+                })
+              };
+          }
+        })()
+      });
   }
-  if (texture.trim) {
-    cloned.trim = Object.create(texture.trim);
-  }
-
-  // 3. Shadow-clone the style configurations
-  if (texture.source) {
-    cloned.source = Object.create(texture.source);
-    if (texture.source.style) {
-      cloned.source.style = Object.create(texture.source.style);
-    }
-  }
-
-  return cloned;
 };
 
 const textureScaledGet = (_texture, factor) => {

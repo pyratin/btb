@@ -27,13 +27,13 @@ const windowInnerDimenesionGet = () => {
 };
 
 const textureScaleFactorGet = (windowInnerDimenesion) => {
-  const widthCollection = [400, 1920];
+  const widthCollection = [400, 1024];
 
   const { width } = windowInnerDimenesion;
 
   switch (true) {
     case width <= widthCollection[0]:
-      return 1;
+      return 1.5;
 
     case width >= widthCollection[1]:
       return 2;
@@ -245,8 +245,6 @@ const onWindowResizeHandle = (set) => {
 
     const { _bundle } = rest;
 
-    console.log('HERE>> IN', _bundle, bundleInitializedGet(_bundle));
-
     return { ...rest, ...bundleInitializedGet(_bundle) };
   });
 };
@@ -418,12 +416,16 @@ const useStore = create(
   )
 );
 
-window.addEventListener('resize', () => {
+const _onWindowResizeHandle = () => {
   const { getState } = useStore;
 
   const { onWindowResizeHandle } = getState();
 
   onWindowResizeHandle();
-});
+};
+
+window.removeEventListener('resize', _onWindowResizeHandle);
+
+window.addEventListener('resize', _onWindowResizeHandle);
 
 export default useStore;
