@@ -1,10 +1,36 @@
-import { Assets } from 'pixi.js';
 import _ from 'lodash';
 
 import bundleDefinition from '#browser/component/definition/bundle.json';
 
-const textureScaledGet = (texture, factor = 1.5) => {
+const textureClonedGet = (texture) => {
+  if (!texture) return texture;
+
+  // 1. Shadow-clone the main texture
+  const cloned = Object.create(texture);
+
+  // 2. Shadow-clone the layout rectangles to keep original coordinates pure
+  if (texture.orig) {
+    cloned.orig = Object.create(texture.orig);
+  }
+  if (texture.trim) {
+    cloned.trim = Object.create(texture.trim);
+  }
+
+  // 3. Shadow-clone the style configurations
+  if (texture.source) {
+    cloned.source = Object.create(texture.source);
+    if (texture.source.style) {
+      cloned.source.style = Object.create(texture.source.style);
+    }
+  }
+
+  return cloned;
+};
+
+const textureScaledGet = (_texture, factor) => {
   const keyCollection = ['orig', 'trim'];
+
+  const texture = textureClonedGet(_texture);
 
   keyCollection.map(
     (key) =>
@@ -13,7 +39,7 @@ const textureScaledGet = (texture, factor = 1.5) => {
         ...['width', 'height', 'x', 'y'].reduce(
           (memo, prop) => ({
             ...memo,
-            [prop]: texture[key][prop] * factor
+            [prop]: _texture[key][prop] * factor
           }),
           {}
         )
@@ -28,19 +54,19 @@ const textureScaledGet = (texture, factor = 1.5) => {
   return texture;
 };
 
-const textureHandledGet = (asset) => {
+const textureHandledGet = (asset, factor) => {
   switch (true) {
     case !asset:
       return asset;
 
     case !!asset.orig:
-      return textureScaledGet(asset);
+      return textureScaledGet(asset, factor);
 
     case _.isObject(asset):
       return Object.entries(asset).reduce((memo, [key, value]) => {
         return {
           ...memo,
-          [key]: textureScaledGet(value)
+          [key]: textureScaledGet(value, factor)
         };
       }, {});
 
@@ -49,52 +75,34 @@ const textureHandledGet = (asset) => {
   }
 };
 
-export default async () => {
-  Assets.init({
-    manifest: {
-      bundles: Object.entries(bundleDefinition).map(([name, value]) => ({
-        name,
-        assets: value.map(({ alias, src, extension, ...rest }) => ({
-          ...rest,
+export default (_bundle, factor) => {
+  return Object.entries(bundleDefinition)
+    .map(([key, value]) =>
+      Object.fromEntries(
+        value.map(({ alias, extension }) => [
           alias,
-          src: `/asset/${src}/${alias}.${extension}`
-        }))
-      }))
-    }
-  });
+          (() => {
+            const asset = _bundle[alias];
 
-  Assets.backgroundLoadBundle(Object.keys(bundleDefinition));
+            switch (key) {
+              case 'image':
+                return textureHandledGet(
+                  extension === 'json' ? asset.textures : asset,
+                  factor
+                );
 
-  return await Promise.all(
-    Object.entries(bundleDefinition).map(([key, value]) =>
-      Assets.loadBundle(key).then((bundle) =>
-        Object.fromEntries(
-          value.map(({ alias, extension }) => [
-            alias,
-            (() => {
-              const asset = bundle[alias];
-
-              switch (key) {
-                case 'image':
-                  return textureHandledGet(
-                    extension === 'json' ? asset.textures : asset
-                  );
-
-                case 'font':
-                  return asset;
-              }
-            })()
-          ])
-        )
+              case 'font':
+                return asset;
+            }
+          })()
+        ])
       )
     )
-  ).then((result) => {
-    return result.reduce(
-      (memo, _result) => ({
+    .reduce(
+      (memo, result) => ({
         ...memo,
-        ..._result
+        ...result
       }),
       {}
     );
-  });
 };

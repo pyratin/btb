@@ -7,6 +7,7 @@ import _ from 'lodash';
 
 import handTypeDefinitionCollection from '#browser/component/definition/handType.json';
 import blindTypeDefinitionCollection from '#browser/component/definition/blindType.json';
+import _bundleGet from '#browser/component/utility/_bundleGet';
 import bundleGet from '#browser/component/utility/bundleGet';
 import cardTextureGet from './utility/cardTextureGet';
 import handTypeIndexGet from '#browser/component/utility/handTypeIndexGet';
@@ -15,6 +16,54 @@ const localStorageKey = 'state';
 
 const localStorageItemGet = (key) => {
   return JSON.parse(localStorage.getItem(localStorageKey) || '{}')[key];
+};
+
+const windowInnerDimenesionGet = () => {
+  const {
+    visualViewport: { width = 0, height = 0 }
+  } = window;
+
+  return { width, height };
+};
+
+const textureScaleFactorGet = (windowInnerDimenesion) => {
+  const widthCollection = [400, 1920];
+
+  const { width } = windowInnerDimenesion;
+
+  switch (true) {
+    case width <= widthCollection[0]:
+      return 1;
+
+    case width >= widthCollection[1]:
+      return 2;
+
+    default:
+      return 1.5;
+  }
+};
+
+const cardDimensionGet = (bundle) => {
+  const { width, height } = cardTextureGet(bundle);
+
+  return { width, height };
+};
+
+const bundleInitializedGet = (_bundle) => {
+  const windowInnerDimenesion = windowInnerDimenesionGet();
+
+  const textureScaleFactor = textureScaleFactorGet(windowInnerDimenesion);
+
+  const bundle = bundleGet(_bundle, textureScaleFactor);
+
+  const cardDimension = cardDimensionGet(bundle);
+
+  return {
+    windowInnerDimenesion,
+    textureScaleFactor,
+    bundle,
+    cardDimension
+  };
 };
 
 const seedGet = () => {
@@ -152,16 +201,13 @@ const roundInitializedGet = (
   };
 };
 
-const cardDimensionGet = (bundle) => {
-  const { width, height } = cardTextureGet(bundle);
-
-  return { width, height };
-};
-
 const stateInitializedGet = async () => {
   const seed = localStorageItemGet('seed') || seedGet();
 
-  const bundle = await bundleGet();
+  const _bundle = await _bundleGet();
+
+  const { windowInnerDimenesion, textureScaleFactor, bundle, cardDimension } =
+    bundleInitializedGet(_bundle);
 
   const handSize = 8;
 
@@ -171,8 +217,11 @@ const stateInitializedGet = async () => {
 
   return {
     seed,
+    _bundle,
+    windowInnerDimenesion,
+    textureScaleFactor,
     bundle,
-    cardDimension: cardDimensionGet(bundle),
+    cardDimension,
     roundCountMaximum: 8 * blindTypeDefinitionCollection.length,
     handPlayedCountMaximum: 4,
     discardCardCountMaximun: 5,
@@ -188,6 +237,18 @@ const stateInitializedGet = async () => {
     })),
     round: roundInitializedGet(seed, handSize, handSortTypeIndex, pack)
   };
+};
+
+const onWindowResizeHandle = (set) => {
+  set((state) => {
+    const rest = current(state);
+
+    const { _bundle } = rest;
+
+    console.log('HERE>> IN', _bundle, bundleInitializedGet(_bundle));
+
+    return { ...rest, ...bundleInitializedGet(_bundle) };
+  });
 };
 
 const handSortTypeIndexSet = (handSortTypeIndex, set) => {
@@ -312,6 +373,7 @@ const useStore = create(
       immer(
         combine(await stateInitializedGet(), (set) => {
           return {
+            onWindowResizeHandle: () => onWindowResizeHandle(set),
             handSortTypeIndexSet: (handSortTypeIndex) =>
               handSortTypeIndexSet(handSortTypeIndex, set),
             handSet: (hand) => handSet(hand, set),
@@ -355,5 +417,13 @@ const useStore = create(
     }
   )
 );
+
+window.addEventListener('resize', () => {
+  const { getState } = useStore;
+
+  const { onWindowResizeHandle } = getState();
+
+  onWindowResizeHandle();
+});
 
 export default useStore;
