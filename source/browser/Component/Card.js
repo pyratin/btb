@@ -7,11 +7,17 @@ import cardTextureGet from '#browser/component/utility/cardTextureGet';
 import PerspectiveMesh from '#browser/Component/PerspectiveMesh';
 import Edition from '#browser/Component/Edition';
 
+/**
+ * @param {import('#browser/component/type/Card').CardProps} props The component
+ *   properties.
+ * @returns {import('react').ReactElement} The rendered Card React element.
+ */
 const Card = ({
   cursor = 'default',
   idle = false,
   perspectiveMeshDisableFlag = false,
-  card
+  card,
+  ref
 }) => {
   const { id, faceDownFlag, editionType } = card;
 
@@ -27,6 +33,7 @@ const Card = ({
 
   return (
     <PerspectiveMesh
+      ref={ref}
       dirtyKey={`${id}-${faceDownFlag}`}
       animating={!faceDownFlag && !!editionType}
       cursor={cursor}

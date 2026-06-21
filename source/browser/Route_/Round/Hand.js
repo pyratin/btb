@@ -10,6 +10,7 @@ import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
 import { useGSAP } from '@gsap/react';
 
 import useStore from '#browser/component/useStore';
+import useTouchTilt from '#browser/component/utility/useTouchTilt';
 import Card from '#browser/Component/Card';
 
 gsap.registerPlugin(gsapPixiPlugin, useGSAP);
@@ -357,6 +358,8 @@ const Hand = ({
 
   const handPreviousRef = useRef(undefined);
 
+  const cardsRef = useRef({});
+
   const [layoutInitializedFlag, layoutInitializedFlagSet] = useState(false);
 
   const [hand, handSet] = useState(undefined);
@@ -364,6 +367,8 @@ const Hand = ({
   const [entryTriggerFlag, entryTriggerFlagSet] = useState(true);
 
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
+
+  useTouchTilt({ hand, cardDimension, cardsRef, containerRef: ref });
 
   useEffect(() => {
     const __handSet = () =>
@@ -600,7 +605,16 @@ const Hand = ({
               alpha={1}
             />
 
-            <Card cursor={cursor} idle={true} card={card} />
+            <Card
+              ref={(cardComponent) => {
+                Object.assign(cardsRef.current, {
+                  [card.id]: cardComponent || undefined
+                });
+              }}
+              cursor={cursor}
+              idle={true}
+              card={card}
+            />
           </pixiContainer>
         );
       })}

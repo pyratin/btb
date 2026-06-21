@@ -50,9 +50,7 @@ const PerspectiveMesh = forwardRef(
   /**
    * @param {PerspectiveMeshProps & Record<string, unknown>} props The component
    *   properties.
-   * @param {import('react').ForwardedRef<
-   *   import('pixi.js').PerspectiveMesh
-   * >} ref
+   * @param {import('react').ForwardedRef<import('#browser/component/type/Card').CardRef>} ref
    *   The forwarded reference to the underlying PixiJS PerspectiveMesh.
    * @returns {import('react').ReactElement} The rendered React element.
    */
@@ -104,7 +102,20 @@ const PerspectiveMesh = forwardRef(
      */
     const wrapperRef = useRef(null);
 
-    useImperativeHandle(ref, () => meshRef.current);
+    const setTiltRef = useRef(null);
+    const resetTiltRef = useRef(null);
+
+    useImperativeHandle(ref, () => ({
+      setTilt(x, y) {
+        setTiltRef.current?.(x, y);
+      },
+      resetTilt() {
+        resetTiltRef.current?.();
+      },
+      get mesh() {
+        return meshRef.current;
+      }
+    }));
 
     const phaseOffset = useMemo(() => Math.random() * 100, []);
 
@@ -154,6 +165,18 @@ const PerspectiveMesh = forwardRef(
                   Ticker.shared.remove(tickerHandle);
                   tickerActiveFlag = false;
                 })();
+            };
+
+            setTiltRef.current = (x, y) => {
+              hoverFlag = true;
+              targetThetaX = x;
+              targetThetaY = y;
+              tickerStart();
+            };
+
+            resetTiltRef.current = () => {
+              hoverFlag = false;
+              tickerStart();
             };
 
             const pointerMoveHandle = (e) => {
@@ -332,6 +355,8 @@ const PerspectiveMesh = forwardRef(
             tickerStart();
 
             return () => {
+              setTiltRef.current = null;
+              resetTiltRef.current = null;
               wrapper.off('pointermove', pointerMoveHandle);
               wrapper.off('pointerout', pointerOutHandle);
               wrapper.off('pointerleave', pointerOutHandle);
