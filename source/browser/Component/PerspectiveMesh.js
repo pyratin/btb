@@ -136,8 +136,29 @@ const PerspectiveMesh = forwardRef(
             let widthCached = 0;
             let heightCached = 0;
 
+            const translationMatrix = new Matrix();
+
+            let tickerActiveFlag = false;
+
+            const tickerStart = () => {
+              !tickerActiveFlag &&
+                (() => {
+                  Ticker.shared.add(tickerHandle);
+                  tickerActiveFlag = true;
+                })();
+            };
+
+            const tickerStop = () => {
+              tickerActiveFlag &&
+                (() => {
+                  Ticker.shared.remove(tickerHandle);
+                  tickerActiveFlag = false;
+                })();
+            };
+
             const pointerMoveHandle = (e) => {
               hoverFlag = true;
+              tickerStart();
               (rt?.width || 0) !== 0 &&
                 (rt?.height || 0) !== 0 &&
                 (() => {
@@ -149,6 +170,7 @@ const PerspectiveMesh = forwardRef(
 
             const pointerOutHandle = () => {
               hoverFlag = false;
+              tickerStart();
             };
 
             wrapper.interactive = true;
@@ -210,7 +232,7 @@ const PerspectiveMesh = forwardRef(
                         rt = RenderTexture.create({
                           width: w,
                           height: h,
-                          resolution: renderer.resolution || window.devicePixelRatio || 1,
+                          resolution: Math.min(2, renderer.resolution || window.devicePixelRatio || 1),
                           antialias: true
                         });
                         mesh.texture = rt;
@@ -222,7 +244,7 @@ const PerspectiveMesh = forwardRef(
                           rt = RenderTexture.create({
                             width: w,
                             height: h,
-                            resolution: renderer.resolution || window.devicePixelRatio || 1,
+                            resolution: Math.min(2, renderer.resolution || window.devicePixelRatio || 1),
                             antialias: true
                           });
                           mesh.texture = rt;
@@ -243,7 +265,7 @@ const PerspectiveMesh = forwardRef(
                         renderer.render({
                           container: sourceContainer,
                           target: rt,
-                          transform: new Matrix().translate(-bounds.x, -bounds.y),
+                          transform: translationMatrix.identity().translate(-bounds.x, -bounds.y),
                           clear: true
                         });
 
@@ -261,6 +283,20 @@ const PerspectiveMesh = forwardRef(
 
                   currentThetaX += (targetThetaX - currentThetaX) * speed;
                   currentThetaY += (targetThetaY - currentThetaY) * speed;
+
+                  const settledFlag =
+                    !animating &&
+                    !renderNeedsFlag &&
+                    !hoverFlag &&
+                    !idle &&
+                    Math.abs(currentThetaX - targetThetaX) < 0.0001 &&
+                    Math.abs(currentThetaY - targetThetaY) < 0.0001;
+
+                  settledFlag &&
+                    (() => {
+                      currentThetaX = targetThetaX;
+                      currentThetaY = targetThetaY;
+                    })();
 
                   const uCollection = [-w / 2, w / 2, w / 2, -w / 2];
                   const vCollection = [-h / 2, -h / 2, h / 2, h / 2];
@@ -288,16 +324,18 @@ const PerspectiveMesh = forwardRef(
                     projectedCornerCollection[6],
                     projectedCornerCollection[7]
                   );
+
+                  settledFlag && tickerStop();
                 })();
             };
 
-            Ticker.shared.add(tickerHandle);
+            tickerStart();
 
             return () => {
               wrapper.off('pointermove', pointerMoveHandle);
               wrapper.off('pointerout', pointerOutHandle);
               wrapper.off('pointerleave', pointerOutHandle);
-              Ticker.shared.remove(tickerHandle);
+              tickerStop();
               rt &&
                 (() => {
                   mesh.texture = Texture.WHITE;
@@ -307,6 +345,8 @@ const PerspectiveMesh = forwardRef(
           })();
     }, [
       renderer,
+      renderer?.width,
+      renderer?.height,
       maxTiltX,
       maxTiltY,
       focalLength,
