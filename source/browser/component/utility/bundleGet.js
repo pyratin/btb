@@ -8,46 +8,21 @@ const textureClonedGet = (texture) => {
       return texture;
 
     default:
-      return Object.assign(Object.create(texture), {
-        ...(() => {
-          switch (true) {
-            case !texture.orig:
-              return {};
-
-            default:
-              return { orig: Object.create(texture.orig) };
-          }
-        })(),
-        ...(() => {
+      return new texture.constructor({
+        source: texture.source,
+        frame: texture.frame,
+        orig: Object.assign(Object.create(texture.orig)),
+        trim: (() => {
           switch (true) {
             case !texture.trim:
-              return {};
+              return undefined;
 
             default:
-              return { trim: Object.create(texture.trim) };
+              return Object.assign(Object.create(texture.trim));
           }
         })(),
-        ...(() => {
-          switch (true) {
-            case !texture.source:
-              return {};
-
-            default:
-              return {
-                source: Object.assign(Object.create(texture.source), {
-                  ...(() => {
-                    switch (true) {
-                      case !texture.source.style:
-                        return {};
-
-                      default:
-                        return { style: Object.create(texture.source.style) };
-                    }
-                  })()
-                })
-              };
-          }
-        })()
+        rotate: texture.rotate,
+        defaultAnchor: texture.defaultAnchor
       });
   }
 };
