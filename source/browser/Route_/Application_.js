@@ -17,26 +17,19 @@ const Application__ = ({ children }) => {
   );
 
   const {
-    app: { renderer, stage }
+    app: { stage }
   } = useApplication();
 
   const filters = useMemo(() => [new CRT()], []);
 
   useEffect(() => {
-    const onRendererResizeHandle = () =>
-      Object.assign(
-        stage,
-        /** @type {pixiJs.ContainerOptions} */ ({
-          layout: windowInnerDimenesion
-        })
-      );
-
-    renderer.on('resize', onRendererResizeHandle);
-
-    return () => {
-      renderer.off('resize', onRendererResizeHandle);
-    };
-  }, [renderer, stage, windowInnerDimenesion]);
+    Object.assign(
+      stage,
+      /** @type {pixiJs.ContainerOptions} */ ({
+        layout: windowInnerDimenesion
+      })
+    );
+  }, [stage, windowInnerDimenesion]);
 
   useEffect(() => {
     return () => {
