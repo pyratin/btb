@@ -56,7 +56,7 @@ const Round = () => {
         layout={{
           width: '100%',
           flexDirection: 'column',
-          gap: 25,
+          gap: 15,
           marginTop: 'auto',
           borderWidth: 0,
           borderColor: 0xffffff
