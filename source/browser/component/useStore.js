@@ -121,21 +121,7 @@ const cardGet = (
     suit,
     faceDownFlag,
     activeFlag,
-    editionType: (() => {
-      switch (true) {
-        case !((rankIndex + 1) % 4):
-          return 'polychrome';
-
-        case !((rankIndex + 1) % 3):
-          return 'holographic';
-
-        case !((rankIndex + 1) % 2):
-          return 'folio';
-
-        default:
-          return undefined;
-      }
-    })()
+    editionType
   };
 };
 

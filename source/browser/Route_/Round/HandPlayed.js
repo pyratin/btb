@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import * as pixiJs from 'pixi.js';
 import { Container, Sprite } from 'pixi.js';
@@ -110,9 +110,12 @@ const HandPlayed = () => {
 
   const ref = useRef(undefined);
 
+  const [layoutInitializedFlag, layoutInitializedFlagSet] = useState(false);
+
   useGSAP(
     () => {
       handPlayed &&
+        layoutInitializedFlag &&
         entryAnimationHandle(handPlayed, cardDimension, ref.current, () => {});
     },
     { dependencies: [handPlayed] }
@@ -135,6 +138,8 @@ const HandPlayed = () => {
       }}
       sortableChildren={true}
       onLayout={(event) => {
+        layoutInitializedFlagSet(true);
+
         const eventTarget = event.target;
 
         eventTarget.children

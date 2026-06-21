@@ -357,6 +357,8 @@ const Hand = ({
 
   const handPreviousRef = useRef(undefined);
 
+  const [layoutInitializedFlag, layoutInitializedFlagSet] = useState(false);
+
   const [hand, handSet] = useState(undefined);
 
   const [entryTriggerFlag, entryTriggerFlagSet] = useState(true);
@@ -441,6 +443,7 @@ const Hand = ({
   useGSAP(
     () => {
       entryTriggerFlag &&
+        layoutInitializedFlag &&
         (() => {
           return entryAnimationHandle(
             handPreviousRef.current,
@@ -540,6 +543,8 @@ const Hand = ({
       }}
       sortableChildren={true}
       onLayout={(event) => {
+        layoutInitializedFlagSet(true);
+
         const eventTarget = event.target;
 
         eventTarget.children

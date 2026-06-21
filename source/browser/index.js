@@ -11,7 +11,7 @@ createRoot(document.body).render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Route_ />}>
-          <Route index element={<Navigate to='Round' />} />
+          <Route index element={<Navigate to='Round' replace />} />
 
           <Route path='Round' element={<Round />} />
         </Route>
