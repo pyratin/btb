@@ -293,7 +293,7 @@ const handPlayedAnimationHandle = (
             y: (() => {
               const { height } = cardDimension;
 
-              return -height / 2;
+              return -height / 4;
             })(),
             angle: 0,
             alpha: 0
@@ -332,6 +332,7 @@ const Hand = ({
     cardDimension,
     discardCardCountMaximun,
     hand: _hand,
+    handPlayedFlag,
     handSet: _handSet
   } = useStore(
     useShallow(
@@ -339,13 +340,14 @@ const Hand = ({
         bundle,
         cardDimension,
         discardCardCountMaximun,
-        round: { hand },
+        round: { hand, handPlayed },
         handSet
       }) => ({
         cardShadowTexture: bundle.miscellaneous.cardShadow,
         cardDimension,
         discardCardCountMaximun,
         hand,
+        handPlayedFlag: !!handPlayed,
         handSet
       })
     )
@@ -564,7 +566,7 @@ const Hand = ({
             label={card.id}
             pivot={{ x: cardDimension.width / 2, y: cardDimension.height }}
             zIndex={index}
-            eventMode='static'
+            eventMode={!handPlayedFlag ? 'static' : 'none'}
             cursor='pointer'
             onPointerTap={() => {
               switch (true) {

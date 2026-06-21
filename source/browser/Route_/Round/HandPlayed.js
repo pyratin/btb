@@ -122,6 +122,7 @@ const HandPlayed = () => {
     <pixiLayoutContainer
       ref={ref}
       layout={{
+        width: '100%',
         // eslint-disable-next-line @eslint-react/unsupported-syntax
         height: (() => {
           const { height } = cardDimension;

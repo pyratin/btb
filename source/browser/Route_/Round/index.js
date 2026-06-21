@@ -24,6 +24,12 @@ const Round = () => {
 
   const [activeFlagClearTrigger, activeFlagClearTriggerSet] = useState(false);
 
+  const _activeFlagClearTriggerSet = () => {
+    handSet((hand) => hand.map((card) => ({ ...card, activeFlag: false })));
+
+    activeFlagClearTriggerSet(true);
+  };
+
   return (
     <pixiLayoutContainer
       layout={{
@@ -40,18 +46,11 @@ const Round = () => {
           width: '100%',
           height: '100%',
           borderWidth: 0,
-          borderColor: 0xffffff
+          borderColor: 0xff0000
         }}
-        onPointerTap={() => {
-          handSet((hand) =>
-            hand.map((card) => ({ ...card, activeFlag: false }))
-          );
-
-          activeFlagClearTriggerSet(true);
-        }}
-      >
-        <Background {...BACKGROUND_PRESETS.DEFAULT} />
-      </pixiLayoutContainer>
+        eventMode='static'
+        onPointerTap={_activeFlagClearTriggerSet}
+      ></pixiLayoutContainer>
 
       <pixiLayoutContainer
         layout={{
@@ -63,7 +62,15 @@ const Round = () => {
           borderColor: 0xffffff
         }}
       >
-        <HandPlayed />
+        <pixiLayoutContainer
+          layout={{
+            borderWidth: 0,
+            borderColor: 0xffffff
+          }}
+          onPointerTap={_activeFlagClearTriggerSet}
+        >
+          <HandPlayed />
+        </pixiLayoutContainer>
 
         <Hand
           sortTriggerFlag={sortTriggerFlag}
