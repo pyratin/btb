@@ -202,8 +202,10 @@ const holoFragment = `
 
       // Boost saturation and brightness of HSL for high-contrast visibility
       hsl.x = hsl.x + res + fac;
-      hsl.y = hsl.y * 1.3;
-      hsl.z = hsl.z * 0.6 + 0.4;
+      hsl.y = hsl.y * 1.3; // Boost saturation (optimised from simulation)
+      if (hsl.z > 0.15) {
+          hsl.z = hsl.z * 0.7 + 0.25; // Scale lightness of bright card background to bring out saturated colors (optimised)
+      }
 
       vec3 holoColor = RGB(hsl).rgb * vec3(0.9, 0.8, 1.2);
       
@@ -313,12 +315,15 @@ const polyFragment = `
       float res = 0.5 + 0.5 * cos(polychrome.x * 2.612 + (field - 0.5) * 3.14159);
       
       hsl.x = hsl.x + res + polychrome.y * 0.04;
-      hsl.y = min(0.6, hsl.y + 0.5);
+      hsl.y = min(0.85, hsl.y + 0.55); // Boost saturation (optimised from simulation)
+      if (hsl.z > 0.15) {
+          hsl.z = hsl.z * 0.8 + 0.15; // Scale lightness of bright card background to bring out saturated colors (optimised)
+      }
 
       vec3 polyColor = RGB(hsl).rgb;
 
       // Exact Balatro polychrome style with strong mix, keeping outlines crisp naturally through HSL math
-      vec3 finalRgb = mix(straightTexel.rgb, polyColor, 0.9);
+      vec3 finalRgb = mix(straightTexel.rgb, polyColor, 0.5);
 
       // Preserve clean card edges and opaque face
       finalColor = vec4(finalRgb * straightTexel.a, straightTexel.a);
