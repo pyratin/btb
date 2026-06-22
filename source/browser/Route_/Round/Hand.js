@@ -360,14 +360,15 @@ const reorderAnimationHandle = (
   });
 };
 
-const handReoderedGet = (hand, cardDimension, target) => {
+const handReoderedGet = (hand, cardDimension, target, containerElement) => {
   const { label = {} } = target;
+
   const cardId = Number(label);
 
   const { offset, cardWidth } = _cardTransformGet(
     hand,
     cardDimension,
-    target.parent.parent
+    containerElement
   );
 
   const x = target.x - cardDimension.width / 2;
@@ -397,7 +398,9 @@ const onWindowPointerMoveHandle = (
   dragInProgressFlagSet,
   reorderTriggerFlagSet
 ) => {
-  const { current: { target, offset, positionStart, _hand } = {} } = dragRef;
+  const {
+    current: { target, containerElement, offset, positionStart, _hand } = {}
+  } = dragRef;
 
   target &&
     (() => {
@@ -438,7 +441,12 @@ const onWindowPointerMoveHandle = (
         current: { ...dragRef.current, activatedFlag: true }
       });
 
-      const __hand = handReoderedGet(_hand, cardDimension, target);
+      const __hand = handReoderedGet(
+        _hand,
+        cardDimension,
+        target,
+        containerElement
+      );
 
       __hand &&
         (() => {
@@ -458,6 +466,7 @@ const onPointerDownHandle = (
   cardDimension,
   event,
   dragRef,
+  containerElement,
   dragInProgressFlagSet,
   reorderTriggerFlagSet
 ) => {
@@ -470,6 +479,7 @@ const onPointerDownHandle = (
       Object.assign(dragRef, {
         current: {
           target,
+          containerElement,
           pointerId: event.pointerId,
           offset: (() => {
             const { x, y } = event.getLocalPosition(target.parent);
@@ -707,6 +717,19 @@ const Hand = ({
       })();
   }, [activeFlagClearTrigger, activeFlagClearTriggerSet]);
 
+  // extra safety by agy
+  useEffect(() => {
+    const dragRefCurrent = dragRef.current;
+
+    return () => {
+      dragRefCurrent?.onWindowPointerMoveHandle &&
+        window.removeEventListener(
+          'pointermove',
+          dragRefCurrent.onWindowPointerMoveHandle
+        );
+    };
+  }, []);
+
   useGSAP(
     () => {
       entryTriggerFlag &&
@@ -900,12 +923,14 @@ const Hand = ({
                 cardDimension,
                 event,
                 dragRef,
+                ref.current,
                 dragInProgressFlagSet,
                 reorderTriggerFlagSet
               )
             }
             onPointerUp={_onPointerUpHandle}
             onPointerUpOutside={_onPointerUpHandle}
+            onPointerCancel={_onPointerUpHandle}
           >
             <pixiSprite
               texture={cardShadowTexture}
