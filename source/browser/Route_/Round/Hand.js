@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import _ from 'lodash';
 import * as pixiJs from 'pixi.js';
 import { Container, Sprite } from 'pixi.js';
 import '@pixi/layout';
@@ -23,7 +24,7 @@ const containerElementWidthGet = (containerElement) => {
   return width;
 };
 
-const cardTransformGet = (index, hand, cardDimension, containerElement) => {
+const _cardTransformGet = (hand, cardDimension, containerElement) => {
   const _width = containerElementWidthGet(containerElement);
 
   const cardWidthFactor = 0.75;
@@ -43,6 +44,16 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
     : 0;
 
   const offset = _offset - __offset;
+
+  return { cardWidth, offset };
+};
+
+const cardTransformGet = (index, hand, cardDimension, containerElement) => {
+  const { cardWidth, offset } = _cardTransformGet(
+    hand,
+    cardDimension,
+    containerElement
+  );
 
   const _index = (() => {
     const indexMiddle = (hand.length - 1) / 2;
@@ -316,6 +327,229 @@ const handPlayedAnimationHandle = (
   );
 };
 
+const reorderAnimationHandle = (
+  collection,
+  hand,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  collection.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    const indexCurrent = hand.findIndex(({ id }) => id === card.id);
+
+    gsapTimeline.to(
+      element,
+      {
+        pixi: cardTransformGet(
+          indexCurrent,
+          hand,
+          cardDimension,
+          containerElement
+        ),
+        duration: 0.15,
+        ease: 'back.out(0.8)',
+        onComplete: () =>
+          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
+      },
+      0
+    );
+  });
+};
+
+const handReoderedGet = (hand, cardDimension, target) => {
+  const { label = {} } = target;
+  const cardId = Number(label);
+
+  const { offset, cardWidth } = _cardTransformGet(
+    hand,
+    cardDimension,
+    target.parent.parent
+  );
+
+  const x = target.x - cardDimension.width / 2;
+
+  const index = Math.abs(
+    _.clamp(Math.round((x - offset) / (cardWidth || 1)), 0, hand.length - 1)
+  );
+
+  return (
+    index !== hand.findIndex(({ id }) => id === cardId) &&
+    (() => {
+      const _hand = hand.filter(({ id }) => id !== cardId);
+
+      return [
+        ..._hand.slice(0, index),
+        { ...hand.find(({ id }) => id === cardId), activeFlag: false },
+        ..._hand.slice(index)
+      ];
+    })()
+  );
+};
+
+const onWindowPointerMoveHandle = (
+  cardDimension,
+  event,
+  dragRef,
+  dragInProgressFlagSet,
+  reorderTriggerFlagSet
+) => {
+  const { current: { target, offset, positionStart, _hand } = {} } = dragRef;
+
+  target &&
+    (() => {
+      const { clientX, clientY } = event;
+
+      const { x, y } = positionStart;
+
+      return Math.hypot(clientX - x, clientY - y) > 10;
+    })() &&
+    (() => {
+      Object.assign(target, { zIndex: _hand.length });
+
+      Object.assign(
+        target,
+        (() => {
+          const { x, y } = /** @type {pixiJs.Container & Element} */ (
+            target.parent
+          ).toLocal(
+            (() => {
+              const { clientX = 0, clientY = 0 } = /** @type {PointerEvent} */ (
+                event
+              );
+
+              return { x: clientX, y: clientY };
+            })()
+          );
+
+          const { x: _x, y: _y } = offset;
+
+          return {
+            x: x - _x,
+            y: y - _y
+          };
+        })()
+      );
+
+      Object.assign(dragRef, {
+        current: { ...dragRef.current, activatedFlag: true }
+      });
+
+      const __hand = handReoderedGet(_hand, cardDimension, target);
+
+      __hand &&
+        (() => {
+          Object.assign(dragRef, {
+            current: { ...dragRef.current, _hand: __hand }
+          });
+
+          reorderTriggerFlagSet(true);
+
+          dragInProgressFlagSet(true);
+        })();
+    })();
+};
+
+const onPointerDownHandle = (
+  hand,
+  cardDimension,
+  event,
+  dragRef,
+  dragInProgressFlagSet,
+  reorderTriggerFlagSet
+) => {
+  !dragRef.current &&
+    (() => {
+      const target = /** @type {pixiJs.Container & Element} */ (
+        event.currentTarget
+      );
+
+      Object.assign(dragRef, {
+        current: {
+          target,
+          pointerId: event.pointerId,
+          offset: (() => {
+            const { x, y } = event.getLocalPosition(target.parent);
+
+            const { x: _x, y: _y } = target;
+
+            return {
+              x: x - _x,
+              y: y - _y
+            };
+          })(),
+          activatedFlag: false,
+          positionStart: (() => {
+            const { clientX, clientY } = event;
+
+            return { x: clientX, y: clientY };
+          })(),
+          _hand: hand,
+          onWindowPointerMoveHandle: (event) =>
+            onWindowPointerMoveHandle(
+              cardDimension,
+              event,
+              dragRef,
+              dragInProgressFlagSet,
+              reorderTriggerFlagSet
+            )
+        }
+      });
+
+      window.addEventListener(
+        'pointermove',
+        dragRef.current.onWindowPointerMoveHandle
+      );
+    })();
+};
+
+const onPointerUpHandle = (
+  hand,
+  cardDimension,
+  containerElement,
+  dragRef,
+  dragInProgressFlagSet,
+  _handSet
+) => {
+  const { current: { target, activatedFlag, onWindowPointerMoveHandle } = {} } =
+    dragRef;
+
+  Object.assign(dragRef, { current: undefined });
+
+  window.removeEventListener('pointermove', onWindowPointerMoveHandle);
+
+  const onComplete = () => {
+    dragInProgressFlagSet(false);
+
+    activatedFlag && _handSet(hand);
+  };
+
+  activatedFlag
+    ? (() => {
+        const indexCurrent = hand.findIndex(
+          ({ id }) => id === Number(target.label)
+        );
+
+        gsap.set(target, { pixi: { scale: 1 }, zIndex: indexCurrent });
+
+        gsap.to(target, {
+          pixi: cardTransformGet(
+            indexCurrent,
+            hand,
+            cardDimension,
+            containerElement
+          ),
+          duration: 0.35,
+          ease: 'back.out(0.6)',
+          onComplete: () => onComplete()
+        });
+      })()
+    : onComplete();
+};
+
 const Hand = ({
   sortTriggerFlag,
   discardTriggerFlag,
@@ -327,6 +561,8 @@ const Hand = ({
   activeFlagClearTriggerSet
 }) => {
   useExtend({ LayoutContainer, Container, Sprite });
+
+  const { contextSafe } = useGSAP();
 
   const {
     cardShadowTexture,
@@ -358,7 +594,9 @@ const Hand = ({
 
   const handPreviousRef = useRef(undefined);
 
-  const cardsRef = useRef({});
+  const dragRef = useRef(undefined);
+
+  const cardCollectionRef = useRef({});
 
   const [layoutInitializedFlag, layoutInitializedFlagSet] = useState(false);
 
@@ -368,7 +606,11 @@ const Hand = ({
 
   const [activeTriggerFlag, activeTriggerFlagSet] = useState(false);
 
-  useTouchTilt({ hand, cardDimension, cardsRef, containerRef: ref });
+  const [reorderTriggerFlag, reorderTriggerFlagSet] = useState(false);
+
+  const [dragInProgressFlag, dragInProgressFlagSet] = useState(false);
+
+  useTouchTilt({ hand, cardDimension, cardCollectionRef, containerRef: ref });
 
   useEffect(() => {
     const __handSet = () =>
@@ -425,6 +667,25 @@ const Hand = ({
 
           return handPreviousRef.current;
         });
+
+      case reorderTriggerFlag:
+        return (() => {
+          return handSet((hand) => {
+            const { current: { target, _hand } = {} } = dragRef;
+
+            return target && _hand
+              ? (() => {
+                  Object.assign(handPreviousRef, {
+                    current: hand.filter(
+                      ({ id }) => id !== Number(target.label)
+                    )
+                  });
+
+                  return _hand;
+                })()
+              : hand;
+          });
+        })();
     }
   }, [
     activeTriggerFlag,
@@ -432,6 +693,7 @@ const Hand = ({
     discardTriggerFlag,
     entryTriggerFlag,
     handPlayedTriggerFlag,
+    reorderTriggerFlag,
     _hand
   ]);
 
@@ -533,6 +795,37 @@ const Hand = ({
     { dependencies: [hand] }
   );
 
+  useGSAP(
+    () => {
+      reorderTriggerFlag &&
+        (() => {
+          reorderTriggerFlagSet(false);
+
+          return reorderAnimationHandle(
+            handPreviousRef.current,
+            hand,
+            cardDimension,
+            ref.current,
+            () => {}
+          );
+        })();
+    },
+    { dependencies: [hand] }
+  );
+
+  const _onPointerUpHandle = contextSafe(
+    () =>
+      dragRef.current &&
+      onPointerUpHandle(
+        hand,
+        cardDimension,
+        ref.current,
+        dragRef,
+        dragInProgressFlagSet,
+        _handSet
+      )
+  );
+
   return (
     <pixiLayoutContainer
       ref={ref}
@@ -582,6 +875,9 @@ const Hand = ({
             cursor={cursor}
             onPointerTap={() => {
               switch (true) {
+                case dragInProgressFlag:
+                  return;
+
                 case activeFlagSetEnabled:
                   // eslint-disable-next-line @eslint-react/unsupported-syntax
                   return (() => {
@@ -598,6 +894,18 @@ const Hand = ({
                   })();
               }
             }}
+            onPointerDown={(event) =>
+              onPointerDownHandle(
+                hand,
+                cardDimension,
+                event,
+                dragRef,
+                dragInProgressFlagSet,
+                reorderTriggerFlagSet
+              )
+            }
+            onPointerUp={_onPointerUpHandle}
+            onPointerUpOutside={_onPointerUpHandle}
           >
             <pixiSprite
               texture={cardShadowTexture}
@@ -607,7 +915,7 @@ const Hand = ({
 
             <Card
               ref={(cardComponent) => {
-                Object.assign(cardsRef.current, {
+                Object.assign(cardCollectionRef.current, {
                   [card.id]: cardComponent || undefined
                 });
               }}

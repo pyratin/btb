@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
  *   Ref to the parent layout container.
  * @property {import('react').RefObject<
  *   Record<string, import('#browser/component/type/Card.js').CardRef | null>
- * >} cardsRef
+ * >} cardCollectionRef
  *   Ref map of individual Card component instances.
  * @property {import('#browser/component/type/Card.js').Card[] | undefined} hand
  *   The current list of cards in hand.
@@ -20,7 +20,7 @@ import { useEffect, useRef } from 'react';
  *
  * @param {UseTouchTiltProps} props The hook properties.
  */
-const useTouchTilt = ({ containerRef, cardsRef, hand, cardDimension }) => {
+const useTouchTilt = ({ containerRef, cardCollectionRef, hand, cardDimension }) => {
   const isTouchActiveRef = useRef(false);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const useTouchTilt = ({ containerRef, cardsRef, hand, cardDimension }) => {
     const handlePointerUp = () => {
       isTouchActiveRef.current = false;
       hand?.forEach((card) => {
-        cardsRef.current[card.id]?.resetTilt();
+        cardCollectionRef.current[card.id]?.resetTilt();
       });
     };
 
@@ -74,12 +74,12 @@ const useTouchTilt = ({ containerRef, cardsRef, hand, cardDimension }) => {
 
           const maxTiltX = 0.3;
           const maxTiltY = 0.3;
-          cardsRef.current[card.id]?.setTilt(
+          cardCollectionRef.current[card.id]?.setTilt(
             clampedY * maxTiltX,
             -clampedX * maxTiltY
           );
         } else {
-          cardsRef.current[card.id]?.resetTilt();
+          cardCollectionRef.current[card.id]?.resetTilt();
         }
       });
     };
@@ -97,7 +97,7 @@ const useTouchTilt = ({ containerRef, cardsRef, hand, cardDimension }) => {
       container.off('pointercancel', handlePointerUp);
       container.off('globalpointermove', handleGlobalPointerMove);
     };
-  }, [containerRef, cardsRef, hand, cardDimension]);
+  }, [containerRef, cardCollectionRef, hand, cardDimension]);
 };
 
 export default useTouchTilt;
