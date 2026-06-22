@@ -43,7 +43,13 @@ const reorderAnimationHandle = (
   });
 };
 
-const handReoderedGet = (hand, cardDimension, target, containerElement, _cardTransformGet) => {
+const handReoderedGet = (
+  hand,
+  cardDimension,
+  target,
+  containerElement,
+  _cardTransformGet
+) => {
   const { label = {} } = target;
 
   const cardId = Number(label);
@@ -256,14 +262,14 @@ const useDragAndDrop = ({
 
   // Clean up globalpointermove on unmount
   useEffect(() => {
-    const container = containerRef.current;
+    const containerElement = containerRef.current;
 
     const dragCurrent = dragRef.current;
 
     return () => {
       dragCurrent?.onWindowPointerMoveHandle &&
-        container &&
-        container.off(
+        containerElement &&
+        containerElement.off(
           'globalpointermove',
           dragCurrent.onWindowPointerMoveHandle
         );
