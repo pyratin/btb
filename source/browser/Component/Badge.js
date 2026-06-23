@@ -68,7 +68,7 @@ const colorNormalizedGet = (color) => {
  */
 const Badge = ({
   borderRadius = 8,
-  borderColor = 0xffffff,
+  borderColor,
   backgroundColor = 0x3a494f,
   layout,
   children,
@@ -120,6 +120,8 @@ const Badge = ({
     [backgroundColor]
   );
 
+  const hasBorderFlag = borderColor !== undefined;
+
   const draw = useCallback(
     (g) => {
       g.clear();
@@ -137,7 +139,7 @@ const Badge = ({
       }
 
       switch (true) {
-        case _borderColor.alpha > 0:
+        case hasBorderFlag && _borderColor.alpha > 0:
           g.roundRect(1, 1, size.width - 2, size.height - 2, scaledRadius - 1);
           g.stroke({
             width: 2,
@@ -153,7 +155,8 @@ const Badge = ({
       borderRadius,
       textureScaleFactor,
       _backgroundColor,
-      _borderColor
+      _borderColor,
+      hasBorderFlag
     ]
   );
 
@@ -187,19 +190,21 @@ const Badge = ({
             }}
           />
 
-          <pixiNineSliceSprite
-            texture={borderOutlineTexture}
-            {...nineSliceSpriteOption}
-            tint={_borderColor.color}
-            alpha={_borderColor.alpha}
-            layout={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              width: '100%',
-              height: '100%'
-            }}
-          />
+          {hasBorderFlag ? (
+            <pixiNineSliceSprite
+              texture={borderOutlineTexture}
+              {...nineSliceSpriteOption}
+              tint={_borderColor.color}
+              alpha={_borderColor.alpha}
+              layout={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: '100%'
+              }}
+            />
+          ) : null}
         </>
       )}
 

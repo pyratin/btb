@@ -111,8 +111,7 @@ const Button = ({
       {/* Shadow */}
       <Badge
         borderRadius={borderRadius}
-        backgroundColor='#000000ff'
-        borderColor='#00000000'
+        backgroundColor='#00000000'
         layout={{
           position: 'absolute',
           left: 0,
@@ -129,7 +128,6 @@ const Button = ({
         position={{ x: 0, y: -5 }}
         borderRadius={borderRadius}
         backgroundColor={disableFlag ? disableColor : backgroundColor}
-        borderColor='#00000000'
         layout={{
           position: 'relative',
           justifyContent: 'center',
@@ -142,8 +140,7 @@ const Button = ({
         {hoverFlag && (
           <Badge
             borderRadius={borderRadius}
-            backgroundColor='#000000ff'
-            borderColor='#00000000'
+            backgroundColor='#00000000'
             layout={{
               position: 'absolute',
               left: 0,
