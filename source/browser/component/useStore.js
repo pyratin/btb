@@ -464,7 +464,7 @@ useStore.subscribe(
 
     const { redirectSet } = getState();
 
-    redirectSet({ pathname: '/Round' });
+    redirectSet({ pathname: '/Ante' });
   },
   { fireImmediately: true }
 );

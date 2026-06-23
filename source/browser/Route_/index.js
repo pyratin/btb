@@ -31,7 +31,8 @@ const Route_ = () => {
           const { pathname } = redirect || {};
 
           return pathname;
-        })()
+        })(),
+        { replace: true }
       );
   }, [redirect, navigate]);
 

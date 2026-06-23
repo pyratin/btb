@@ -1,4 +1,5 @@
 import { useShallow } from 'zustand/react/shallow';
+import _ from 'lodash';
 import { Texture, Sprite, BitmapText, NineSliceSprite } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
@@ -6,16 +7,20 @@ import { useExtend } from '@pixi/react';
 
 import useStore from '../component/useStore';
 import blindTypeDefinitionCollection from '#browser/component/definition/blindType.json';
+import roundScoreTargetGet from '#browser/component/utility/roundScoreTargetGet';
 import Badge from '#browser/Component/Badge';
+import Button from '#browser/Component/Button';
 
 const borderHeight = 2;
 
 const Ante = () => {
   useExtend({ LayoutContainer, Sprite, BitmapText, NineSliceSprite });
 
-  const { roundIndex } = useStore(
-    useShallow(({ round: { index } }) => ({
-      roundIndex: index
+  const { tokenTexture, roundIndex, redirectSet } = useStore(
+    useShallow(({ bundle, round: { index }, redirectSet }) => ({
+      tokenTexture: bundle.stickers['sticker-1'],
+      roundIndex: index,
+      redirectSet
     }))
   );
 
@@ -99,7 +104,7 @@ const Ante = () => {
                 />
 
                 <Badge
-                  borderRadius={16}
+                  borderRadius={4}
                   backgroundColor={backgroundColor}
                   borderColor={borderColor}
                   layout={{
@@ -112,7 +117,7 @@ const Ante = () => {
                   }}
                 >
                   <pixiBitmapText
-                    text={name}
+                    text={`${_.startCase(name)} Blind`}
                     layout={{ top: -4 }}
                     style={{
                       fontFamily: 'm6x11plus',
@@ -121,6 +126,69 @@ const Ante = () => {
                     }}
                   />
                 </Badge>
+
+                <Badge
+                  borderRadius={4}
+                  backgroundColor={0x313e41}
+                  layout={{
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 5,
+                    padding: 10,
+                    paddingTop: 5,
+                    paddingBottom: 5,
+                    borderWidth: 0,
+                    borderColor: 0xff0000
+                  }}
+                >
+                  <pixiBitmapText
+                    text='Score at least'
+                    layout={{}}
+                    style={{
+                      fontFamily: 'm6x11plus',
+                      fontSize: 24,
+                      fill: 0xffffff
+                    }}
+                  />
+
+                  <pixiLayoutContainer
+                    layout={{
+                      alignItems: 'center',
+                      gap: 10,
+                      borderWidth: 0,
+                      borderColor: 0xff0000
+                    }}
+                  >
+                    <pixiSprite texture={tokenTexture} layout={{}} />
+
+                    <pixiBitmapText
+                      text={roundScoreTargetGet(
+                        Math.floor(
+                          roundIndex / blindTypeDefinitionCollection.length
+                        ) *
+                          blindTypeDefinitionCollection.length +
+                          index
+                      )}
+                      layout={{
+                        top: -10
+                      }}
+                      style={{
+                        fontFamily: 'm6x11plus',
+                        fontSize: 48,
+                        fill: 0xfa5546
+                      }}
+                    />
+                  </pixiLayoutContainer>
+                </Badge>
+
+                <Button
+                  text='Select'
+                  fontSize={24}
+                  padding={{ padding: 20, paddingTop: 10, paddingBottom: 10 }}
+                  borderRadius={4}
+                  backgroundColor={0xf69000}
+                  onPointerTap={() => redirectSet({ pathname: '/Round' })}
+                />
               </pixiLayoutContainer>
             </pixiLayoutContainer>
           );
