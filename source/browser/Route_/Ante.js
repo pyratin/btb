@@ -1,5 +1,4 @@
 import { useShallow } from 'zustand/react/shallow';
-import _ from 'lodash';
 import { Texture, Sprite, BitmapText, NineSliceSprite } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
@@ -7,24 +6,16 @@ import { useExtend } from '@pixi/react';
 
 import useStore from '../component/useStore';
 import blindTypeDefinitionCollection from '#browser/component/definition/blindType.json';
+import Badge from '#browser/Component/Badge';
 
 const borderHeight = 2;
-
-const nineSliceSpriteOption = [
-  'leftWidth',
-  'topHeight',
-  'rightWidth',
-  'bottomHeight'
-].reduce((memo, key) => ({ ...memo, [key]: 8 }), {});
 
 const Ante = () => {
   useExtend({ LayoutContainer, Sprite, BitmapText, NineSliceSprite });
 
-  const { borderOutlineTexture, roundIndex } = useStore(
-    useShallow(({ bundle, round: { index } }) => ({
-      borderOutlineTexture: bundle.miscellaneous.borderOutline,
-      roundIndex: index,
-      texture: bundle.stickers['sticker-1']
+  const { roundIndex } = useStore(
+    useShallow(({ round: { index } }) => ({
+      roundIndex: index
     }))
   );
 
@@ -107,44 +98,29 @@ const Ante = () => {
                   tint={borderColor}
                 />
 
-                <pixiLayoutContainer
+                <Badge
+                  borderRadius={16}
+                  backgroundColor={backgroundColor}
+                  borderColor={borderColor}
                   layout={{
                     position: 'relative',
-                    flexBasis: 150,
                     justifyContent: 'center',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    padding: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10
                   }}
                 >
-                  <pixiNineSliceSprite
-                    texture={borderOutlineTexture}
-                    {...nineSliceSpriteOption}
-                    layout={{
-                      position: 'absolute',
-                      width: '100%',
-                      height: '100%'
+                  <pixiBitmapText
+                    text={name}
+                    layout={{ top: -4 }}
+                    style={{
+                      fontFamily: 'm6x11plus',
+                      fontSize: 24,
+                      fill: 0xffffff
                     }}
-                    tint={borderColor}
                   />
-
-                  <pixiLayoutContainer
-                    layout={{
-                      position: 'relative',
-                      padding: 20,
-                      paddingTop: 10,
-                      paddingBottom: 10
-                    }}
-                  >
-                    <pixiBitmapText
-                      text={`${_.startCase(name)} Blind`}
-                      layout={{ top: -6 }}
-                      style={{
-                        fontFamily: 'm6x11plus',
-                        fontSize: 32,
-                        fill: 0xffffff
-                      }}
-                    />
-                  </pixiLayoutContainer>
-                </pixiLayoutContainer>
+                </Badge>
               </pixiLayoutContainer>
             </pixiLayoutContainer>
           );
