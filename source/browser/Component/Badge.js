@@ -61,6 +61,9 @@ const colorNormalizedGet = (color) => {
  * @param {object} [props.layout] - The layout configuration.
  * @param {import('react').ReactNode} [props.children] - The child elements.
  * @param {(event: object) => void} [props.onLayout] - The layout callback.
+ * @param {number} [props.alpha] - The alpha transparency.
+ * @param {string} [props.label] - The label for the container.
+ * @param {{ x: number, y: number }} [props.position] - The position coordinates.
  * @returns {import('react').ReactElement} The Badge component.
  */
 const Badge = ({

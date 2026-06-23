@@ -1,7 +1,6 @@
 import { useRef, useMemo, useState } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import * as pixiJs from 'pixi.js';
-import { NineSliceSprite, BitmapText } from 'pixi.js';
+import { BitmapText } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
@@ -9,20 +8,35 @@ import { gsap } from 'gsap';
 import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
 import { useGSAP } from '@gsap/react';
 
-import useStore from '#browser/component/useStore';
+import Badge from '#browser/Component/Badge';
 
 gsap.registerPlugin(gsapPixiPlugin, useGSAP);
 gsapPixiPlugin.registerPIXI(pixiJs);
 
 const disableColor = 0x5d6060;
 
-const nineSliceSpriteOption = [
-  'leftWidth',
-  'topHeight',
-  'rightWidth',
-  'bottomHeight'
-].reduce((memo, key) => ({ ...memo, [key]: 4 }), {});
+/**
+ * @typedef {object} ButtonPadding
+ * @property {number} [padding] - General padding.
+ * @property {number} [paddingTop] - Top padding.
+ * @property {number} [paddingBottom] - Bottom padding.
+ * @property {number} [paddingLeft] - Left padding.
+ * @property {number} [paddingRight] - Right padding.
+ */
 
+/**
+ * Button component.
+ *
+ * @param {object} props - The component props.
+ * @param {string} props.text - The button text.
+ * @param {number} props.fontSize - The font size.
+ * @param {ButtonPadding} props.padding - The button padding configuration.
+ * @param {number} [props.borderRadius] - The border radius.
+ * @param {string | number} [props.backgroundColor] - The background color.
+ * @param {boolean} [props.disableFlag] - Disable button flag.
+ * @param {() => void} props.onPointerTap - Tap callback.
+ * @returns {import('react').ReactElement} The Button component.
+ */
 const Button = ({
   text,
   fontSize,
@@ -32,15 +46,9 @@ const Button = ({
   disableFlag = false,
   onPointerTap
 }) => {
-  useExtend({ LayoutContainer, NineSliceSprite, BitmapText });
+  useExtend({ LayoutContainer, BitmapText });
 
   const { contextSafe } = useGSAP();
-
-  const { texture } = useStore(
-    useShallow(({ bundle }) => ({
-      texture: bundle.miscellaneous.buttonBackground
-    }))
-  );
 
   const ref = useRef(undefined);
 
@@ -61,7 +69,6 @@ const Button = ({
       ref={ref}
       layout={{
         position: 'relative',
-        width: '100%',
         top: 5,
         borderWidth: 0,
         borderColor: 0x0000ff
@@ -84,53 +91,69 @@ const Button = ({
           const textContainerElement =
             eventCurrentTarget.getChildByLabel('text-container');
 
-          gsap.to(textContainerElement, {
-            pixi: { y: 0 },
-            duration: 0.2,
-            ease: 'back.out',
-            onComplete: () => {
-              animationActiveFlagSet(false);
-            }
-          });
+          gsap.timeline()
+            .to(textContainerElement, {
+              pixi: { y: 0 },
+              duration: 0.1,
+              ease: 'power1.out'
+            })
+            .to(textContainerElement, {
+              pixi: { y: -5 },
+              duration: 0.15,
+              ease: 'back.out',
+              onComplete: () => {
+                animationActiveFlagSet(false);
+              }
+            });
         })();
       }}
     >
-      <pixiNineSliceSprite
-        texture={texture}
-        {...nineSliceSpriteOption}
-        layout={{ position: 'absolute', width: '100%', height: '100%' }}
-        tint={0x000000}
+      {/* Shadow */}
+      <Badge
+        borderRadius={borderRadius}
+        backgroundColor='#000000ff'
+        borderColor='#00000000'
+        layout={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: '100%',
+          height: '100%'
+        }}
         alpha={0.25}
       />
 
-      <pixiLayoutContainer
+      {/* Button face */}
+      <Badge
         label='text-container'
         position={{ x: 0, y: -5 }}
+        borderRadius={borderRadius}
+        backgroundColor={disableFlag ? disableColor : backgroundColor}
+        borderColor='#00000000'
         layout={{
           position: 'relative',
-          width: '100%',
           justifyContent: 'center',
           alignItems: 'center',
           ...padding,
           borderWidth: 0,
-          borderColor: 0xff0000,
-          borderRadius
+          borderColor: 0xff0000
         }}
       >
-        <pixiNineSliceSprite
-          texture={texture}
-          {...nineSliceSpriteOption}
-          layout={{ position: 'absolute', width: '100%', height: '100%' }}
-          tint={disableFlag ? disableColor : backgroundColor}
-        />
-
-        <pixiNineSliceSprite
-          texture={texture}
-          {...nineSliceSpriteOption}
-          layout={{ position: 'absolute', width: '100%', height: '100%' }}
-          tint={0x000000}
-          alpha={hoverFlag ? 0.2 : 0}
-        />
+        {hoverFlag && (
+          <Badge
+            borderRadius={borderRadius}
+            backgroundColor='#000000ff'
+            borderColor='#00000000'
+            layout={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: '100%',
+              height: '100%'
+            }}
+            alpha={0.2}
+          />
+        )}
 
         <pixiBitmapText
           text={text}
@@ -142,7 +165,7 @@ const Button = ({
           }}
           alpha={disableFlag ? 0.5 : 1}
         />
-      </pixiLayoutContainer>
+      </Badge>
     </pixiLayoutContainer>
   );
 };

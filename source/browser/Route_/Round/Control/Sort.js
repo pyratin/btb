@@ -26,7 +26,6 @@ const Sort = ({ onSortTrigger }) => {
     <pixiLayoutContainer
       ref={ref}
       layout={{
-        flexBasis: '150%',
         borderWidth: 0,
         borderColor: 0xff0000
       }}
@@ -71,7 +70,7 @@ const Sort = ({ onSortTrigger }) => {
               key={key}
               text={_.capitalize(key)}
               fontSize={24}
-              padding={{ padding: 5, paddingTop: 2, paddingBottom: 2 }}
+              padding={{ padding: 10, paddingTop: 5, paddingBottom: 5 }}
               borderRadius={4}
               backgroundColor={0xf69000}
               disableFlag={handPlayedFlag}
