@@ -28,7 +28,8 @@ const HandPlayedTrigger = ({ onHandPlayedTrigger }) => {
       <Button
         text='Play Hand'
         fontSize={24}
-        padding={{ padding: 12 }}
+        padding={{ padding: 20, paddingTop: 10, paddingBottom: 10 }}
+        borderRadius={4}
         backgroundColor={0xf69000}
         disableFlag={disableFlag}
         onPointerTap={() => {

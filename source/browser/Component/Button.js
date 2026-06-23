@@ -16,25 +16,10 @@ gsapPixiPlugin.registerPIXI(pixiJs);
 const disableColor = 0x5d6060;
 
 /**
- * @typedef {object} ButtonPadding
- * @property {number} [padding] - General padding.
- * @property {number} [paddingTop] - Top padding.
- * @property {number} [paddingBottom] - Bottom padding.
- * @property {number} [paddingLeft] - Left padding.
- * @property {number} [paddingRight] - Right padding.
- */
-
-/**
  * Button component.
  *
- * @param {object} props - The component props.
- * @param {string} props.text - The button text.
- * @param {number} props.fontSize - The font size.
- * @param {ButtonPadding} props.padding - The button padding configuration.
- * @param {number} [props.borderRadius] - The border radius.
- * @param {string | number} [props.backgroundColor] - The background color.
- * @param {boolean} [props.disableFlag] - Disable button flag.
- * @param {() => void} props.onPointerTap - Tap callback.
+ * @param {import('#browser/component/type/Button').ButtonProps} props The
+ *   component props.
  * @returns {import('react').ReactElement} The Button component.
  */
 const Button = ({
@@ -91,7 +76,8 @@ const Button = ({
           const textContainerElement =
             eventCurrentTarget.getChildByLabel('text-container');
 
-          gsap.timeline()
+          gsap
+            .timeline()
             .to(textContainerElement, {
               pixi: { y: 0 },
               duration: 0.1,

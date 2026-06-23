@@ -36,7 +36,8 @@ const DiscardTrigger = ({ onDiscardTrigger }) => {
       <Button
         text='Discard'
         fontSize={24}
-        padding={{ padding: 12 }}
+        padding={{ padding: 20, paddingTop: 10, paddingBottom: 10 }}
+        borderRadius={4}
         backgroundColor={0xf7473d}
         disableFlag={disableFlag}
         onPointerTap={() => {
