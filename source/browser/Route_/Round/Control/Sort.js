@@ -7,26 +7,18 @@ import { useExtend } from '@pixi/react';
 import _ from 'lodash';
 
 import useStore from '#browser/component/useStore';
+import Badge from '#browser/Component/Badge';
 import Button from '#browser/Component/Button';
-
-const nineSliceSpriteOption = [
-  'leftWidth',
-  'topHeight',
-  'rightWidth',
-  'bottomHeight'
-].reduce((memo, key) => ({ ...memo, [key]: 16 }), {});
 
 const Sort = ({ onSortTrigger }) => {
   useExtend({ LayoutContainer, NineSliceSprite, BitmapText });
 
-  const { borderOutlineTexture, handPlayedFlag, handSortTypeIndexSet } =
-    useStore(
-      useShallow(({ bundle, round: { handPlayed }, handSortTypeIndexSet }) => ({
-        borderOutlineTexture: bundle.miscellaneous.borderOutline,
-        handPlayedFlag: !!handPlayed,
-        handSortTypeIndexSet
-      }))
-    );
+  const { handPlayedFlag, handSortTypeIndexSet } = useStore(
+    useShallow(({ round: { handPlayed }, handSortTypeIndexSet }) => ({
+      handPlayedFlag: !!handPlayed,
+      handSortTypeIndexSet
+    }))
+  );
 
   const ref = useRef(undefined);
 
@@ -39,15 +31,10 @@ const Sort = ({ onSortTrigger }) => {
         borderColor: 0xff0000
       }}
     >
-      <pixiNineSliceSprite
-        texture={borderOutlineTexture}
-        {...nineSliceSpriteOption}
-        layout={{ position: 'absolute', width: '100%', height: '100%' }}
-        tint={0xffffff}
-        alpha={0.25}
-      />
-
-      <pixiLayoutContainer
+      <Badge
+        borderRadius={8}
+        backgroundColor='#000000ff'
+        borderColor='#ffffffaa'
         layout={{
           flexDirection: 'column',
           gap: 5,
@@ -96,7 +83,7 @@ const Sort = ({ onSortTrigger }) => {
             />
           ))}
         </pixiLayoutContainer>
-      </pixiLayoutContainer>
+      </Badge>
     </pixiLayoutContainer>
   );
 };
