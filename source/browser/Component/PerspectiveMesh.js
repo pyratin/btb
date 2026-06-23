@@ -263,7 +263,7 @@ const PerspectiveMesh = forwardRef(
                       })()
                     : rt.width !== w || rt.height !== h
                       ? (() => {
-                          rt.destroy(true);
+                          rt.destroy();
                           rt = RenderTexture.create({
                             width: w,
                             height: h,
@@ -364,7 +364,7 @@ const PerspectiveMesh = forwardRef(
               rt &&
                 (() => {
                   mesh.texture = Texture.WHITE;
-                  rt.destroy(true);
+                  rt.destroy();
                 })();
             };
           })();
