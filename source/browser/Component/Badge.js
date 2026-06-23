@@ -52,12 +52,16 @@ const colorNormalizedGet = (color) => {
 };
 
 /**
- * @param {object} props
- * @param {number} [props.borderRadius]
- * @param {string|number} [props.borderColor]
- * @param {string|number} [props.backgroundColor]
- * @param {object} [props.layout]
- * @param {import('react').ReactNode} [props.children]
+ * Badge component.
+ *
+ * @param {object} props - The component props.
+ * @param {number} [props.borderRadius] - The border radius.
+ * @param {string | number} [props.borderColor] - The border color.
+ * @param {string | number} [props.backgroundColor] - The background color.
+ * @param {object} [props.layout] - The layout configuration.
+ * @param {import('react').ReactNode} [props.children] - The child elements.
+ * @param {(event: object) => void} [props.onLayout] - The layout callback.
+ * @returns {import('react').ReactElement} The Badge component.
  */
 const Badge = ({
   borderRadius = 8,
@@ -70,13 +74,14 @@ const Badge = ({
 }) => {
   useExtend({ LayoutContainer, Sprite, NineSliceSprite, Graphics });
 
-  const { borderOutlineTexture, buttonBackgroundTexture, textureScaleFactor } = useStore(
-    useShallow(({ bundle, textureScaleFactor }) => ({
-      borderOutlineTexture: bundle.miscellaneous.borderOutline,
-      buttonBackgroundTexture: bundle.miscellaneous.buttonBackground,
-      textureScaleFactor
-    }))
-  );
+  const { borderOutlineTexture, buttonBackgroundTexture, textureScaleFactor } =
+    useStore(
+      useShallow(({ bundle, textureScaleFactor }) => ({
+        borderOutlineTexture: bundle.miscellaneous.borderOutline,
+        buttonBackgroundTexture: bundle.miscellaneous.buttonBackground,
+        textureScaleFactor
+      }))
+    );
 
   const [size, sizeSet] = useState({ width: 0, height: 0 });
 
@@ -121,18 +126,32 @@ const Badge = ({
       switch (true) {
         case _backgroundColor.alpha > 0:
           g.roundRect(1, 1, size.width - 2, size.height - 2, scaledRadius - 1);
-          g.fill({ color: _backgroundColor.color, alpha: _backgroundColor.alpha });
+          g.fill({
+            color: _backgroundColor.color,
+            alpha: _backgroundColor.alpha
+          });
           break;
       }
 
       switch (true) {
         case _borderColor.alpha > 0:
           g.roundRect(1, 1, size.width - 2, size.height - 2, scaledRadius - 1);
-          g.stroke({ width: 2, color: _borderColor.color, alpha: _borderColor.alpha });
+          g.stroke({
+            width: 2,
+            color: _borderColor.color,
+            alpha: _borderColor.alpha
+          });
           break;
       }
     },
-    [size.width, size.height, borderRadius, textureScaleFactor, _backgroundColor, _borderColor]
+    [
+      size.width,
+      size.height,
+      borderRadius,
+      textureScaleFactor,
+      _backgroundColor,
+      _borderColor
+    ]
   );
 
   const isSmallRadiusFlag = borderRadius < 16;
