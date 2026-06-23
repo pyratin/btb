@@ -1,10 +1,10 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import _ from 'lodash';
 import { Sprite, NineSliceSprite, Graphics } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
-import { useExtend } from '@pixi/react';
+import { useExtend, useApplication } from '@pixi/react';
 
 import useStore from '../component/useStore';
 
@@ -51,6 +51,50 @@ const colorNormalizedGet = (color) => {
   }
 };
 
+const textureCache = new Map();
+
+const textureGet = (renderer, radius, strokeFlag) => {
+  const key = `${radius}-${strokeFlag}`;
+
+  const rendererCache =
+    textureCache.get(renderer) ||
+    textureCache.set(renderer, new Map()).get(renderer);
+
+  return (
+    rendererCache.get(key) ||
+    rendererCache
+      .set(
+        key,
+        (() => {
+          const g = new Graphics();
+
+          const size = radius * 2 + 6;
+
+          strokeFlag
+            ? (() => {
+                g.roundRect(1, 1, size - 2, size - 2, radius);
+
+                g.stroke({ width: 2, color: 0xffffff });
+              })()
+            : (() => {
+                g.roundRect(0, 0, size, size, radius);
+
+                g.fill({ color: 0xffffff });
+              })();
+
+          const texture = (
+            renderer.textureGenerator || renderer
+          ).generateTexture({ target: g });
+
+          g.destroy();
+
+          return texture;
+        })()
+      )
+      .get(key)
+  );
+};
+
 /**
  * Badge component.
  *
@@ -69,38 +113,29 @@ const Badge = ({
 }) => {
   useExtend({ LayoutContainer, Sprite, NineSliceSprite, Graphics });
 
-  const { borderOutlineTexture, buttonBackgroundTexture, textureScaleFactor } =
-    useStore(
-      useShallow(({ bundle, textureScaleFactor }) => ({
-        borderOutlineTexture: bundle.miscellaneous.borderOutline,
-        buttonBackgroundTexture: bundle.miscellaneous.buttonBackground,
-        textureScaleFactor
-      }))
-    );
+  const {
+    app: { renderer }
+  } = useApplication();
 
-  const [size, sizeSet] = useState({ width: 0, height: 0 });
-
-  const onLayoutHandle = useCallback(
-    (event) => {
-      const { width, height } = event.target.layout._computedLayout;
-
-      sizeSet({ width, height });
-
-      switch (true) {
-        case !!onLayout:
-          onLayout(event);
-          break;
-      }
-    },
-    [onLayout]
+  const { textureScaleFactor } = useStore(
+    useShallow(({ textureScaleFactor }) => ({
+      textureScaleFactor
+    }))
   );
 
-  const nineSliceSpriteOption = useMemo(() => {
-    return ['leftWidth', 'topHeight', 'rightWidth', 'bottomHeight'].reduce(
-      (memo, key) => ({ ...memo, [key]: borderRadius * textureScaleFactor }),
-      {}
-    );
-  }, [borderRadius, textureScaleFactor]);
+  const scaledRadius = borderRadius * textureScaleFactor;
+
+  const nineSliceSpriteOption = useMemo(
+    () =>
+      ['leftWidth', 'topHeight', 'rightWidth', 'bottomHeight'].reduce(
+        (memo, key) => ({
+          ...memo,
+          [key]: scaledRadius + 2
+        }),
+        {}
+      ),
+    [scaledRadius]
+  );
 
   const _borderColor = useMemo(
     () => colorNormalizedGet(borderColor),
@@ -112,48 +147,6 @@ const Badge = ({
     [backgroundColor]
   );
 
-  const hasBorderFlag = borderColor !== undefined;
-
-  const draw = useCallback(
-    (g) => {
-      g.clear();
-
-      const scaledRadius = borderRadius * textureScaleFactor;
-
-      switch (true) {
-        case _backgroundColor.alpha > 0:
-          g.roundRect(1, 1, size.width - 2, size.height - 2, scaledRadius - 1);
-          g.fill({
-            color: _backgroundColor.color,
-            alpha: _backgroundColor.alpha
-          });
-          break;
-      }
-
-      switch (true) {
-        case hasBorderFlag && _borderColor.alpha > 0:
-          g.roundRect(1, 1, size.width - 2, size.height - 2, scaledRadius - 1);
-          g.stroke({
-            width: 2,
-            color: _borderColor.color,
-            alpha: _borderColor.alpha
-          });
-          break;
-      }
-    },
-    [
-      size.width,
-      size.height,
-      borderRadius,
-      textureScaleFactor,
-      _backgroundColor,
-      _borderColor,
-      hasBorderFlag
-    ]
-  );
-
-  const isSmallRadiusFlag = borderRadius < 16;
-
   return (
     <pixiLayoutContainer
       layout={{
@@ -161,44 +154,38 @@ const Badge = ({
         borderRadius,
         ...layout
       }}
-      onLayout={onLayoutHandle}
+      onLayout={onLayout}
       {...rest}
     >
-      {isSmallRadiusFlag ? (
-        <pixiGraphics draw={draw} />
-      ) : (
-        <>
-          <pixiNineSliceSprite
-            texture={buttonBackgroundTexture}
-            {...nineSliceSpriteOption}
-            tint={_backgroundColor.color}
-            alpha={_backgroundColor.alpha}
-            layout={{
-              position: 'absolute',
-              left: 1,
-              top: 1,
-              right: 1,
-              bottom: 1
-            }}
-          />
+      <pixiNineSliceSprite
+        texture={textureGet(renderer, scaledRadius, false)}
+        {...nineSliceSpriteOption}
+        tint={_backgroundColor.color}
+        alpha={_backgroundColor.alpha}
+        layout={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: '100%',
+          height: '100%'
+        }}
+      />
 
-          {hasBorderFlag ? (
-            <pixiNineSliceSprite
-              texture={borderOutlineTexture}
-              {...nineSliceSpriteOption}
-              tint={_borderColor.color}
-              alpha={_borderColor.alpha}
-              layout={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                width: '100%',
-                height: '100%'
-              }}
-            />
-          ) : null}
-        </>
-      )}
+      {borderColor && _borderColor.alpha > 0 ? (
+        <pixiNineSliceSprite
+          texture={textureGet(renderer, scaledRadius, true)}
+          {...nineSliceSpriteOption}
+          tint={_borderColor.color}
+          alpha={_borderColor.alpha}
+          layout={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%'
+          }}
+        />
+      ) : null}
 
       {children}
     </pixiLayoutContainer>

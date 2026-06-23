@@ -16,9 +16,8 @@ const Route_ = () => {
   const navigate = useNavigate();
 
   const { redirect, redirectSet } = useStore(
-    useShallow(({ redirect, _redirect, redirectSet }) => ({
+    useShallow(({ redirect, redirectSet }) => ({
       redirect,
-      _redirect,
       redirectSet
     }))
   );

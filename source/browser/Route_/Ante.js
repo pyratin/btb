@@ -60,9 +60,7 @@ const Ante = () => {
                   width: '100%',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: 20,
-                  paddingTop: 10,
-                  paddingBottom: 10,
+                  padding: 5,
                   borderWidth: 0,
                   borderColor: 0xff0000
                 }}
@@ -111,9 +109,9 @@ const Ante = () => {
                     position: 'relative',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    padding: 20,
-                    paddingTop: 10,
-                    paddingBottom: 10
+                    padding: 10,
+                    paddingTop: 5,
+                    paddingBottom: 5
                   }}
                 >
                   <pixiBitmapText
@@ -170,11 +168,11 @@ const Ante = () => {
                           index
                       )}
                       layout={{
-                        top: -10
+                        top: -6
                       }}
                       style={{
                         fontFamily: 'm6x11plus',
-                        fontSize: 48,
+                        fontSize: 32,
                         fill: 0xfa5546
                       }}
                     />
@@ -184,7 +182,7 @@ const Ante = () => {
                 <Button
                   text='Select'
                   fontSize={24}
-                  padding={{ padding: 20, paddingTop: 10, paddingBottom: 10 }}
+                  padding={{ padding: 10, paddingTop: 5, paddingBottom: 5 }}
                   borderRadius={4}
                   backgroundColor={0xf69000}
                   onPointerTap={() => redirectSet({ pathname: '/Round' })}
