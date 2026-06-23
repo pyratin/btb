@@ -251,7 +251,8 @@ const stateInitializedGet = async () => {
       level: 1,
       count: 0
     })),
-    round: roundInitializedGet(seed, handSize, handSortTypeIndex, pack)
+    round: roundInitializedGet(seed, handSize, handSortTypeIndex, pack),
+    redirect: undefined
   };
 };
 
@@ -262,6 +263,17 @@ const onWindowResizeHandle = (set) => {
     const { _bundle } = rest;
 
     return { ...rest, ...bundleInitializedGet(_bundle) };
+  });
+};
+
+const redirectSet = (redirect, set) => {
+  set((state) => {
+    const { round, ...rest } = current(state);
+
+    return {
+      ...rest,
+      redirect
+    };
   });
 };
 
@@ -388,6 +400,7 @@ const useStore = create(
         combine(await stateInitializedGet(), (set) => {
           return {
             onWindowResizeHandle: () => onWindowResizeHandle(set),
+            redirectSet: (redirect) => redirectSet(redirect, set),
             handSortTypeIndexSet: (handSortTypeIndex) =>
               handSortTypeIndexSet(handSortTypeIndex, set),
             handSet: (hand) => handSet(hand, set),
@@ -443,5 +456,17 @@ const _onWindowResizeHandle = () => {
 window.removeEventListener('resize', _onWindowResizeHandle);
 
 window.addEventListener('resize', _onWindowResizeHandle);
+
+useStore.subscribe(
+  ({ round: { index } }) => index,
+  () => {
+    const { getState } = useStore;
+
+    const { redirectSet } = getState();
+
+    redirectSet({ pathname: '/Ante' });
+  },
+  { fireImmediately: true }
+);
 
 export default useStore;
