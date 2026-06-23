@@ -157,7 +157,11 @@ const Ante = () => {
                       borderColor: 0xff0000
                     }}
                   >
-                    <pixiSprite texture={tokenTexture} layout={{}} />
+                    <pixiSprite
+                      texture={tokenTexture}
+                      layout={{}}
+                      scale={0.85}
+                    />
 
                     <pixiBitmapText
                       text={roundScoreTargetGet(
