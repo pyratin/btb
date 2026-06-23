@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useNavigate, useLocation, Outlet } from 'react-router';
+import { useNavigate, Outlet } from 'react-router';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
@@ -15,35 +15,29 @@ const Route_ = () => {
 
   const navigate = useNavigate();
 
-  const { pathname } = useLocation();
-
   const { redirect, redirectSet } = useStore(
-    useShallow(({ redirect, redirectSet }) => ({
+    useShallow(({ redirect, _redirect, redirectSet }) => ({
       redirect,
+      _redirect,
       redirectSet
     }))
   );
 
   useEffect(() => {
     redirect &&
-      navigate(
-        (() => {
-          const { pathname } = redirect || {};
-
-          return pathname;
-        })(),
-        { replace: true }
-      );
-  }, [redirect, navigate]);
-
-  useEffect(() => {
-    pathname ===
       (() => {
-        const { pathname } = redirect || {};
+        navigate(
+          (() => {
+            const { pathname } = redirect || {};
 
-        return pathname;
-      })() && redirectSet(undefined);
-  }, [pathname, redirect, redirectSet]);
+            return pathname;
+          })(),
+          { replace: true }
+        );
+
+        redirectSet(undefined);
+      })();
+  }, [redirect, navigate, redirectSet]);
 
   return (
     <Application_>
