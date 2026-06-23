@@ -61,6 +61,8 @@ const Ante = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: 5,
+                  paddingTop: 10,
+                  paddingBottom: 10,
                   borderWidth: 0,
                   borderColor: 0xff0000
                 }}
