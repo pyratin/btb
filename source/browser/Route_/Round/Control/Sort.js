@@ -32,8 +32,9 @@ const Sort = ({ onSortTrigger }) => {
     >
       <Badge
         borderRadius={4}
-        backgroundColor='#000000ff'
-        borderColor='#ffffffaa'
+        backgroundAlpha={0}
+        borderColor={0xffffff}
+        borderAlpha={0.5}
         layout={{
           flexDirection: 'column',
           gap: 5,

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import _ from 'lodash';
 import { Sprite, NineSliceSprite, Graphics } from 'pixi.js';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
@@ -8,91 +7,44 @@ import { useExtend, useApplication } from '@pixi/react';
 
 import useStore from '../component/useStore';
 
-const colorNormalizedGet = (color) => {
-  switch (true) {
-    case _.isString(color) && color.startsWith('#'): {
-      const hex = color.slice(1);
-
-      switch (hex.length) {
-        case 8:
-          return {
-            color: parseInt(hex.slice(0, 6), 16),
-            alpha: 1.0 - parseInt(hex.slice(6, 8), 16) / 255
-          };
-
-        case 6:
-          return {
-            color: parseInt(hex, 16),
-            alpha: 1.0
-          };
-
-        default:
-          return { color: 0xffffff, alpha: 1.0 };
-      }
-    }
-
-    case _.isNumber(color) && color > 0xffffff:
-      return {
-        color: (color >>> 8) & 0xffffff,
-        alpha: 1.0 - (color & 0xff) / 255
-      };
-
-    case _.isNumber(color):
-      return {
-        color,
-        alpha: 1.0
-      };
-
-    default:
-      return {
-        color: 0xffffff,
-        alpha: 1.0
-      };
-  }
-};
-
-const textureCache = new Map();
-
 const textureGet = (renderer, radius, strokeFlag) => {
   const key = `${radius}-${strokeFlag}`;
 
-  const rendererCache =
-    textureCache.get(renderer) ||
-    textureCache.set(renderer, new Map()).get(renderer);
+  renderer.badgeTextureCache = renderer.badgeTextureCache || {};
 
-  return (
-    rendererCache.get(key) ||
-    rendererCache
-      .set(
-        key,
-        (() => {
-          const g = new Graphics();
+  const cachedTexture = renderer.badgeTextureCache[key];
 
-          const size = radius * 2 + 6;
+  const activeCachedTextureFlag = !!cachedTexture;
 
-          strokeFlag
-            ? (() => {
-                g.roundRect(1, 1, size - 2, size - 2, radius);
+  return activeCachedTextureFlag
+    ? cachedTexture
+    : (() => {
+        const g = new Graphics();
 
-                g.stroke({ width: 2, color: 0xffffff });
-              })()
-            : (() => {
-                g.roundRect(0, 0, size, size, radius);
+        const size = radius * 2 + 6;
 
-                g.fill({ color: 0xffffff });
-              })();
+        strokeFlag
+          ? (() => {
+              g.roundRect(1, 1, size - 2, size - 2, radius);
 
-          const texture = (
-            renderer.textureGenerator || renderer
-          ).generateTexture({ target: g });
+              g.stroke({ width: 2, color: 0xffffff });
+            })()
+          : (() => {
+              g.roundRect(0, 0, size, size, radius);
 
-          g.destroy();
+              g.fill({ color: 0xffffff });
+            })();
 
-          return texture;
-        })()
-      )
-      .get(key)
-  );
+        const texture = (renderer.textureGenerator || renderer).generateTexture(
+          { target: g }
+        );
+
+        g.destroy();
+
+        renderer.badgeTextureCache[key] = texture;
+
+        return texture;
+      })();
 };
 
 /**
@@ -105,7 +57,9 @@ const textureGet = (renderer, radius, strokeFlag) => {
 const Badge = ({
   borderRadius = 8,
   borderColor,
+  borderAlpha = 1.0,
   backgroundColor = 0x3a494f,
+  backgroundAlpha = 1.0,
   layout,
   children,
   onLayout,
@@ -137,15 +91,7 @@ const Badge = ({
     [scaledRadius]
   );
 
-  const _borderColor = useMemo(
-    () => colorNormalizedGet(borderColor),
-    [borderColor]
-  );
-
-  const _backgroundColor = useMemo(
-    () => colorNormalizedGet(backgroundColor),
-    [backgroundColor]
-  );
+  const showBorderFlag = !!(borderColor && borderAlpha > 0);
 
   return (
     <pixiLayoutContainer
@@ -160,8 +106,8 @@ const Badge = ({
       <pixiNineSliceSprite
         texture={textureGet(renderer, scaledRadius, false)}
         {...nineSliceSpriteOption}
-        tint={_backgroundColor.color}
-        alpha={_backgroundColor.alpha}
+        tint={backgroundColor}
+        alpha={backgroundAlpha}
         layout={{
           position: 'absolute',
           left: 0,
@@ -171,12 +117,12 @@ const Badge = ({
         }}
       />
 
-      {borderColor && _borderColor.alpha > 0 ? (
+      {showBorderFlag ? (
         <pixiNineSliceSprite
           texture={textureGet(renderer, scaledRadius, true)}
           {...nineSliceSpriteOption}
-          tint={_borderColor.color}
-          alpha={_borderColor.alpha}
+          tint={borderColor}
+          alpha={borderAlpha}
           layout={{
             position: 'absolute',
             left: 0,
