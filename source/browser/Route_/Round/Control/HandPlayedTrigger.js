@@ -1,5 +1,4 @@
 import { useShallow } from 'zustand/react/shallow';
-import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
@@ -27,10 +26,18 @@ const HandPlayedTrigger = ({ onHandPlayedTrigger }) => {
     >
       <Button
         text='Play Hand'
-        fontSize={24}
-        padding={{ padding: 20, paddingTop: 10, paddingBottom: 10 }}
-        borderRadius={4}
-        backgroundColor={0xf69000}
+        layout={{
+          padding: 20,
+          paddingTop: 10,
+          paddingBottom: 10,
+          borderRadius: 4,
+          backgroundColor: 0xf69000
+        }}
+        style={{
+          fontFamily: 'm6x11plus',
+          fontSize: 24,
+          fill: 0xffffff
+        }}
         disableFlag={disableFlag}
         onPointerTap={() => {
           onHandPlayedTriggerHandle();

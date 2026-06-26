@@ -1,6 +1,5 @@
 import { useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import '@pixi/layout';
 import { NineSliceSprite, BitmapText } from 'pixi.js';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
@@ -30,19 +29,30 @@ const Sort = ({ onSortTrigger }) => {
         borderColor: 0xff0000
       }}
     >
-      <Badge
-        borderRadius={4}
-        backgroundAlpha={0}
-        borderColor={0xffffff}
-        borderAlpha={0.5}
+      <pixiLayoutContainer
         layout={{
+          position: 'relative',
           flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
           gap: 5,
           padding: 10,
           borderWidth: 0,
-          borderColor: 0x00ff00
+          borderColor: 0xff0000
         }}
       >
+        <Badge
+          layout={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            borderWidth: 2,
+            borderColor: 0xffffff,
+            borderRadius: 4
+          }}
+          alpha={0.25}
+        />
+
         <pixiLayoutContainer
           layout={{
             alignItems: 'center',
@@ -53,7 +63,7 @@ const Sort = ({ onSortTrigger }) => {
         >
           <pixiBitmapText
             text='Sort Hand'
-            layout={{ top: -4 }}
+            layout={{ top: -6 }}
             style={{ fontFamily: 'm6x11plus', fontSize: 24, fill: 0xffffff }}
             alpha={0.8}
           />
@@ -61,7 +71,7 @@ const Sort = ({ onSortTrigger }) => {
 
         <pixiLayoutContainer
           layout={{
-            gap: 5,
+            gap: 10,
             borderWidth: 0,
             borderColor: 0xff0000
           }}
@@ -70,10 +80,18 @@ const Sort = ({ onSortTrigger }) => {
             <Button
               key={key}
               text={_.capitalize(key)}
-              fontSize={24}
-              padding={{ padding: 10, paddingTop: 5, paddingBottom: 5 }}
-              borderRadius={4}
-              backgroundColor={0xf69000}
+              layout={{
+                padding: 5,
+                paddingTop: 2,
+                paddingBottom: 2,
+                borderRadius: 4,
+                backgroundColor: 0xf69000
+              }}
+              style={{
+                fontFamily: 'm6x11plus',
+                fontSize: 24,
+                fill: 0xffffff
+              }}
               disableFlag={handPlayedFlag}
               onPointerTap={() => {
                 handSortTypeIndexSet(index);
@@ -83,7 +101,7 @@ const Sort = ({ onSortTrigger }) => {
             />
           ))}
         </pixiLayoutContainer>
-      </Badge>
+      </pixiLayoutContainer>
     </pixiLayoutContainer>
   );
 };

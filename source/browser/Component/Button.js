@@ -83,29 +83,25 @@ const Button = ({ text, layout, style, disableFlag, onPointerTap }) => {
       }}
     >
       <Badge
-        layout={
-          /** @type {pixiLayout.LayoutOptions} */ ({
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            ...layout,
-            borderWidth: 0,
-            borderColor: 0xff0000,
-            backgroundColor: 0x000000
-          })
-        }
+        layout={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          ...layout,
+          borderWidth: 0,
+          borderColor: 0xff0000,
+          backgroundColor: 0x000000
+        }}
         alpha={0.25}
       />
 
       <Badge
         label='text-container'
         position={{ x: 0, y: -5 }}
-        layout={
-          /** @type {pixiLayout.LayoutOptions} */ ({
-            ...layout,
-            ...(disableFlag && { backgroundColor: disableColor })
-          })
-        }
+        layout={{
+          ...layout,
+          ...(disableFlag && { backgroundColor: disableColor })
+        }}
         tint={hoverFlag ? 0xdddddd : 0xffffff}
       >
         <pixiBitmapText

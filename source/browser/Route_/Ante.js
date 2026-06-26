@@ -1,8 +1,6 @@
 import { useShallow } from 'zustand/react/shallow';
 import _ from 'lodash';
-import * as pixiJs from 'pixi.js';
 import { Texture, Sprite, BitmapText, NineSliceSprite } from 'pixi.js';
-import * as pixiLayout from '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
@@ -111,17 +109,15 @@ const Ante = () => {
                   }}
                 >
                   <Badge
-                    layout={
-                      /** @type {pixiLayout.LayoutOptions} */ ({
-                        padding: 10,
-                        paddingTop: 5,
-                        paddingBottom: 5,
-                        borderWidth: 2,
-                        borderColor,
-                        borderRadius: 4,
-                        backgroundColor
-                      })
-                    }
+                    layout={{
+                      padding: 10,
+                      paddingTop: 5,
+                      paddingBottom: 5,
+                      borderWidth: 2,
+                      borderColor,
+                      borderRadius: 4,
+                      backgroundColor
+                    }}
                   >
                     <pixiBitmapText
                       text={`${_.startCase(name)} Blind`}
@@ -142,18 +138,16 @@ const Ante = () => {
                   }}
                 >
                   <Badge
-                    layout={
-                      /** @type {pixiLayout.LayoutOptions} */ ({
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 5,
-                        padding: 10,
-                        paddingTop: 5,
-                        paddingBottom: 5,
-                        borderRadius: 4,
-                        backgroundColor: 0x313e41
-                      })
-                    }
+                    layout={{
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: 10,
+                      paddingTop: 5,
+                      paddingBottom: 5,
+                      borderRadius: 4,
+                      backgroundColor: 0x313e41
+                    }}
                   >
                     <pixiBitmapText
                       text='Score at least'
@@ -201,22 +195,18 @@ const Ante = () => {
                 >
                   <Button
                     text='Select'
-                    layout={
-                      /** @type {pixiLayout.LayoutOptions} */ {
-                        padding: 10,
-                        paddingTop: 5,
-                        paddingBottom: 5,
-                        borderRadius: 4,
-                        backgroundColor: 0xf69000
-                      }
-                    }
-                    style={
-                      /** @type {pixiJs.TextStyleOptions} */ ({
-                        fontFamily: 'm6x11plus',
-                        fontSize: 24,
-                        fill: 0xffffff
-                      })
-                    }
+                    layout={{
+                      padding: 10,
+                      paddingTop: 5,
+                      paddingBottom: 5,
+                      borderRadius: 4,
+                      backgroundColor: 0xf69000
+                    }}
+                    style={{
+                      fontFamily: 'm6x11plus',
+                      fontSize: 24,
+                      fill: 0xffffff
+                    }}
                     onPointerTap={() => redirectSet({ pathname: '/Round' })}
                   />
                 </pixiLayoutContainer>

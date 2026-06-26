@@ -8,7 +8,7 @@ import { useExtend } from '@pixi/react';
 /**
  * @type {(
  *   props: {
- *     layout: pixiLayout.LayoutOptions;
+ *     layout: Omit<pixiLayout.LayoutOptions, 'target'>;
  *     children?: React.ReactNode;
  *   } & Omit<pixiJs.ContainerOptions, 'children'>
  * ) => React.ReactElement}
