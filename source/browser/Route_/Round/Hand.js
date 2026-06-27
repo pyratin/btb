@@ -606,7 +606,7 @@ const Hand = ({
 
   const dragRef = useRef(undefined);
 
-  const cardCollectionRef = useRef({});
+  const cardCollectionRef = useRef(undefined);
 
   const [layoutInitializedFlag, layoutInitializedFlagSet] = useState(false);
 
@@ -940,8 +940,11 @@ const Hand = ({
 
             <Card
               ref={(cardComponent) => {
-                Object.assign(cardCollectionRef.current, {
-                  [card.id]: cardComponent || undefined
+                Object.assign(cardCollectionRef, {
+                  current: {
+                    ...cardCollectionRef.current,
+                    [card.id]: cardComponent || undefined
+                  }
                 });
               }}
               cursor={cursor}
