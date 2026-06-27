@@ -50,5 +50,3 @@ const HandPlayedTrigger = ({ onHandPlayedTrigger }) => {
 };
 
 export default HandPlayedTrigger;
-
-console.log('HERE> ERROR');
