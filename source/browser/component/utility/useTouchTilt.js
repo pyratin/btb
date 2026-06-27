@@ -20,88 +20,120 @@ import { useEffect, useRef } from 'react';
  *
  * @param {UseTouchTiltProps} props The hook properties.
  */
-const useTouchTilt = ({
-  containerRef,
-  cardCollectionRef,
-  hand,
-  cardDimension
-}) => {
-  const isTouchActiveRef = useRef(false);
+const useTouchTilt = ({ containerRef, cardCollectionRef, hand, cardDimension }) => {
+  const touchActiveFlagRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
 
-    container.eventMode = 'static';
+    switch (true) {
+      case !container:
+        return;
 
-    const handlePointerDown = (e) => {
-      if (e.pointerType === 'touch') {
-        isTouchActiveRef.current = true;
+      default: {
+        Object.assign(container, { eventMode: 'static' });
+
+        const handlePointerDownHandle = (e) => {
+          switch (true) {
+            case e.pointerType === 'touch':
+              Object.assign(touchActiveFlagRef, { current: true });
+
+              break;
+          }
+        };
+
+        const handlePointerUpHandle = () => {
+          Object.assign(touchActiveFlagRef, { current: false });
+
+          (hand || []).map((card) => {
+            cardCollectionRef.current?.[card.id]?.resetTilt();
+          });
+        };
+
+        const handleGlobalPointerMoveHandle = (e) => {
+          switch (true) {
+            case !touchActiveFlagRef.current:
+              return;
+
+            default: {
+              const globalPos = e.global;
+
+              const activeCard = [...(hand || [])]
+                .reverse()
+                .find((card) => {
+                  const cardContainer = container.getChildByLabel(card.id);
+
+                  return (
+                    cardContainer &&
+                    cardContainer.getBounds().containsPoint(globalPos.x, globalPos.y)
+                  );
+                });
+
+              const activeCardId = activeCard?.id;
+
+              (hand || []).map((card) => {
+                switch (true) {
+                  case card.id === activeCardId: {
+                    const cardContainer = container.getChildByLabel(card.id);
+
+                    const localPos = cardContainer.toLocal(globalPos);
+
+                    const halfW = cardDimension.width / 2;
+
+                    const halfH = cardDimension.height / 2;
+
+                    const relativeX = (localPos.x - halfW) / halfW;
+
+                    const relativeY = (localPos.y - halfH) / halfH;
+
+                    const clampedX = Math.max(-1, Math.min(1, relativeX));
+
+                    const clampedY = Math.max(-1, Math.min(1, relativeY));
+
+                    const maxTiltX = 0.3;
+
+                    const maxTiltY = 0.3;
+
+                    cardCollectionRef.current?.[card.id]?.setTilt(
+                      clampedY * maxTiltX,
+                      -clampedX * maxTiltY
+                    );
+
+                    break;
+                  }
+                  default:
+                    cardCollectionRef.current?.[card.id]?.resetTilt();
+
+                    break;
+                }
+              });
+            }
+          }
+        };
+
+        container.on('pointerdown', handlePointerDownHandle);
+
+        container.on('pointerup', handlePointerUpHandle);
+
+        container.on('pointerupoutside', handlePointerUpHandle);
+
+        container.on('pointercancel', handlePointerUpHandle);
+
+        container.on('globalpointermove', handleGlobalPointerMoveHandle);
+
+        return () => {
+          container.off('pointerdown', handlePointerDownHandle);
+
+          container.off('pointerup', handlePointerUpHandle);
+
+          container.off('pointerupoutside', handlePointerUpHandle);
+
+          container.off('pointercancel', handlePointerUpHandle);
+
+          container.off('globalpointermove', handleGlobalPointerMoveHandle);
+        };
       }
-    };
-
-    const handlePointerUp = () => {
-      isTouchActiveRef.current = false;
-      hand?.forEach((card) => {
-        cardCollectionRef.current?.[card.id]?.resetTilt();
-      });
-    };
-
-    const handleGlobalPointerMove = (e) => {
-      if (!isTouchActiveRef.current) return;
-
-      const globalPos = e.global;
-      let activeCardId = null;
-
-      // Find the topmost card (highest index/zIndex) that contains the touch point
-      for (let i = (hand?.length || 0) - 1; i >= 0; i--) {
-        const card = hand[i];
-        const cardContainer = container.getChildByLabel(card.id);
-        if (!cardContainer) continue;
-
-        const bounds = cardContainer.getBounds();
-        if (bounds.containsPoint(globalPos.x, globalPos.y)) {
-          activeCardId = card.id;
-          break;
-        }
-      }
-
-      hand?.forEach((card) => {
-        if (card.id === activeCardId) {
-          const cardContainer = container.getChildByLabel(card.id);
-          const localPos = cardContainer.toLocal(globalPos);
-          const halfW = cardDimension.width / 2;
-          const halfH = cardDimension.height / 2;
-          const relativeX = (localPos.x - halfW) / halfW;
-          const relativeY = (localPos.y - halfH) / halfH;
-          const clampedX = Math.max(-1, Math.min(1, relativeX));
-          const clampedY = Math.max(-1, Math.min(1, relativeY));
-
-          const maxTiltX = 0.3;
-          const maxTiltY = 0.3;
-          cardCollectionRef.current?.[card.id]?.setTilt(
-            clampedY * maxTiltX,
-            -clampedX * maxTiltY
-          );
-        } else {
-          cardCollectionRef.current?.[card.id]?.resetTilt();
-        }
-      });
-    };
-
-    container.on('pointerdown', handlePointerDown);
-    container.on('pointerup', handlePointerUp);
-    container.on('pointerupoutside', handlePointerUp);
-    container.on('pointercancel', handlePointerUp);
-    container.on('globalpointermove', handleGlobalPointerMove);
-
-    return () => {
-      container.off('pointerdown', handlePointerDown);
-      container.off('pointerup', handlePointerUp);
-      container.off('pointerupoutside', handlePointerUp);
-      container.off('pointercancel', handlePointerUp);
-      container.off('globalpointermove', handleGlobalPointerMove);
-    };
+    }
   }, [containerRef, cardCollectionRef, hand, cardDimension]);
 };
 
