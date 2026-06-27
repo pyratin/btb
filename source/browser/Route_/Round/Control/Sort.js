@@ -36,7 +36,9 @@ const Sort = ({ onSortTrigger }) => {
           alignItems: 'center',
           justifyContent: 'center',
           gap: 5,
-          padding: 10,
+          padding: 20,
+          paddingTop: 10,
+          paddingBottom: 10,
           borderWidth: 0,
           borderColor: 0xff0000
         }}
@@ -81,7 +83,7 @@ const Sort = ({ onSortTrigger }) => {
               key={key}
               text={_.capitalize(key)}
               layout={{
-                padding: 5,
+                padding: 10,
                 paddingTop: 2,
                 paddingBottom: 2,
                 borderRadius: 4,

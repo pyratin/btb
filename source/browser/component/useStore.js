@@ -462,9 +462,14 @@ useStore.subscribe(
   () => {
     const { getState } = useStore;
 
-    const { redirectSet } = getState();
+    const {
+      round: { index },
+      redirectSet
+    } = getState();
 
-    redirectSet({ pathname: '/Ante' });
+    !index &&
+      window.location.pathname.match(/^\/$/) &&
+      redirectSet({ pathname: '/Ante' });
   },
   { fireImmediately: true }
 );
