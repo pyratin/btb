@@ -65,7 +65,6 @@ const Application_ = ({ children = undefined }) => {
       antialias
       resolution={Math.round(window.devicePixelRatio) || 1}
       autoDensity={true}
-      useBackBuffer
       backgroundColor={0xaaaaaa}
       onInit={({ stage }) => {
         Object.assign(
