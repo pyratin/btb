@@ -33,13 +33,13 @@ const textureScaleFactorGet = (windowInnerDimenesion) => {
 
   switch (true) {
     case width <= widthCollection[0]:
-      return 2;
+      return 1;
 
     case width >= widthCollection[1]:
-      return 2;
+      return 1;
 
     default:
-      return 2;
+      return 1;
   }
 };
 
