@@ -20,7 +20,12 @@ import { useEffect, useRef } from 'react';
  *
  * @param {UseTouchTiltProps} props The hook properties.
  */
-const useTouchTilt = ({ containerRef, cardCollectionRef, hand, cardDimension }) => {
+const useTouchTilt = ({
+  containerRef,
+  cardCollectionRef,
+  hand,
+  cardDimension
+}) => {
   const isTouchActiveRef = useRef(false);
 
   useEffect(() => {
@@ -38,7 +43,7 @@ const useTouchTilt = ({ containerRef, cardCollectionRef, hand, cardDimension }) 
     const handlePointerUp = () => {
       isTouchActiveRef.current = false;
       hand?.forEach((card) => {
-        cardCollectionRef.current?.[card.id].resetTilt();
+        cardCollectionRef.current?.[card.id]?.resetTilt();
       });
     };
 
@@ -74,12 +79,12 @@ const useTouchTilt = ({ containerRef, cardCollectionRef, hand, cardDimension }) 
 
           const maxTiltX = 0.3;
           const maxTiltY = 0.3;
-          cardCollectionRef.current?.[card.id].setTilt(
+          cardCollectionRef.current?.[card.id]?.setTilt(
             clampedY * maxTiltX,
             -clampedX * maxTiltY
           );
         } else {
-          cardCollectionRef.current?.[card.id].resetTilt();
+          cardCollectionRef.current?.[card.id]?.resetTilt();
         }
       });
     };
