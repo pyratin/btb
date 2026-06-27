@@ -36,9 +36,7 @@ const Sort = ({ onSortTrigger }) => {
           alignItems: 'center',
           justifyContent: 'center',
           gap: 5,
-          padding: 20,
-          paddingTop: 10,
-          paddingBottom: 10,
+          padding: 10,
           borderWidth: 0,
           borderColor: 0xff0000
         }}
