@@ -5,6 +5,7 @@ import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore.js';
+import Status from './Status';
 import Hand from './Hand';
 import Control from './Control';
 import HandPlayed from './HandPlayed';
@@ -49,6 +50,15 @@ const Round = () => {
         eventMode='static'
         onPointerTap={_activeFlagClearTriggerSet}
       ></pixiLayoutContainer>
+
+      <pixiLayoutContainer
+        layout={{
+          borderWidth: 0,
+          borderColor: 0xffffff
+        }}
+      >
+        <Status />
+      </pixiLayoutContainer>
 
       <pixiLayoutContainer
         layout={{

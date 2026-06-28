@@ -318,7 +318,7 @@ const handSet = (__hand, set) => {
         return {
           ...rest,
           hand: _hand,
-          handTypeIndex: handTypeIndexGet(hand)
+          handTypeIndex: handTypeIndexGet(_hand)
         };
       })(round)
     };

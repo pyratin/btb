@@ -26,7 +26,7 @@ declare module 'react' {
       pixiBitmapText: import('@pixi/react').PixiReactElementProps<
         typeof import('pixi.js').BitmapText
       > &
-        import('pixi.js').BitmapTextOptions;
+        import('pixi.js').TextOptions;
     }
   }
 }
