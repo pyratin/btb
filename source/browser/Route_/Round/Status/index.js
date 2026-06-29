@@ -17,12 +17,12 @@ const Status = () => {
         borderColor: 0xff0000
       }}
     >
-      <pixiLayoutContainer layout={{ borderWidth: 0, borderColor: 0x00ff00 }}>
-        <HandType />
-      </pixiLayoutContainer>
-
       <pixiLayoutContainer layout={{ borderWidth: 0, borderColor: 0x0000ff }}>
         <Round />
+      </pixiLayoutContainer>
+
+      <pixiLayoutContainer layout={{ borderWidth: 0, borderColor: 0x00ff00 }}>
+        <HandType />
       </pixiLayoutContainer>
     </pixiLayoutContainer>
   );

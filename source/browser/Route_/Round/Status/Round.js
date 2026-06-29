@@ -83,40 +83,6 @@ const Round = () => {
   return (
     <>
       <pixiLayoutContainer layout={__layout}>
-        <pixiLayoutContainer layout={{}}>
-          <pixiBitmapText text='Ante' layout={_layout} style={style} />
-        </pixiLayoutContainer>
-
-        <Badge layout={layout}>
-          <pixiHTMLText
-            text={`<highlight>${
-              Math.floor(index / blindTypeDefinitionCollection.length) + 1
-            }</highlight> / ${
-              roundCountMaximum / blindTypeDefinitionCollection.length
-            }`}
-            layout={{}}
-            style={_style}
-            resolution={1}
-          />
-        </Badge>
-      </pixiLayoutContainer>
-
-      <pixiLayoutContainer layout={__layout}>
-        <pixiLayoutContainer>
-          <pixiBitmapText text='Round' layout={_layout} style={style} />
-        </pixiLayoutContainer>
-
-        <Badge layout={layout}>
-          <pixiHTMLText
-            text={`<highlight>${index + 1}</highlight>`}
-            layout={{}}
-            style={_style}
-            resolution={1}
-          />
-        </Badge>
-      </pixiLayoutContainer>
-
-      <pixiLayoutContainer layout={__layout}>
         <pixiLayoutContainer>
           <pixiBitmapText text='Hands' layout={_layout} style={style} />
         </pixiLayoutContainer>
@@ -150,6 +116,40 @@ const Round = () => {
         <Badge layout={layout}>
           <pixiHTMLText
             text={`<highlight>$ ${cash}</highlight>`}
+            layout={{}}
+            style={_style}
+            resolution={1}
+          />
+        </Badge>
+      </pixiLayoutContainer>
+
+      <pixiLayoutContainer layout={__layout}>
+        <pixiLayoutContainer layout={{}}>
+          <pixiBitmapText text='Ante' layout={_layout} style={style} />
+        </pixiLayoutContainer>
+
+        <Badge layout={layout}>
+          <pixiHTMLText
+            text={`<highlight>${
+              Math.floor(index / blindTypeDefinitionCollection.length) + 1
+            }</highlight> / ${
+              roundCountMaximum / blindTypeDefinitionCollection.length
+            }`}
+            layout={{}}
+            style={_style}
+            resolution={1}
+          />
+        </Badge>
+      </pixiLayoutContainer>
+
+      <pixiLayoutContainer layout={__layout}>
+        <pixiLayoutContainer>
+          <pixiBitmapText text='Round' layout={_layout} style={style} />
+        </pixiLayoutContainer>
+
+        <Badge layout={layout}>
+          <pixiHTMLText
+            text={`<highlight>${index + 1}</highlight>`}
             layout={{}}
             style={_style}
             resolution={1}
