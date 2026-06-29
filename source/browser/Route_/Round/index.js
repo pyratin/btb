@@ -13,7 +13,12 @@ import HandPlayed from './HandPlayed';
 const Round = () => {
   useExtend({ LayoutContainer });
 
-  const { handSet } = useStore(useShallow(({ handSet }) => ({ handSet })));
+  const { handPlayedFlag, handSet } = useStore(
+    useShallow(({ round: { handPlayed }, handSet }) => ({
+      handPlayedFlag: !!handPlayed,
+      handSet
+    }))
+  );
 
   const [sortTriggerFlag, sortTriggerFlagSet] = useState(false);
 
@@ -24,9 +29,12 @@ const Round = () => {
   const [activeFlagClearTrigger, activeFlagClearTriggerSet] = useState(false);
 
   const _activeFlagClearTriggerSet = () => {
-    handSet((hand) => hand.map((card) => ({ ...card, activeFlag: false })));
+    !handPlayedFlag &&
+      (() => {
+        handSet((hand) => hand.map((card) => ({ ...card, activeFlag: false })));
 
-    activeFlagClearTriggerSet(true);
+        activeFlagClearTriggerSet(true);
+      })();
   };
 
   return (

@@ -18,7 +18,7 @@ const disableColor = 0x5d6060;
 /**
  * @type {(props: {
  *   text: string;
- *   layout: Omit<pixiLayout.LayoutOptions, 'target'>;
+ *   layout: pixiLayout.LayoutStyles;
  *   style: pixiJs.TextStyleOptions;
  *   disableFlag?: boolean;
  *   onPointerTap: () => void;
