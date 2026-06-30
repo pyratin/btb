@@ -2,7 +2,7 @@ import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
-import HandType from './HandType';
+import Hand from './Hand';
 import Round from './Round';
 
 const Status = () => {
@@ -22,7 +22,7 @@ const Status = () => {
       </pixiLayoutContainer>
 
       <pixiLayoutContainer layout={{ borderWidth: 0, borderColor: 0x00ff00 }}>
-        <HandType />
+        <Hand />
       </pixiLayoutContainer>
     </pixiLayoutContainer>
   );

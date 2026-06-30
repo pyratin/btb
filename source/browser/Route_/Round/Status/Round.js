@@ -1,4 +1,5 @@
 import { useShallow } from 'zustand/react/shallow';
+import * as pixiJs from 'pixi.js';
 import { BitmapText, HTMLText } from 'pixi.js';
 import * as pixiLayout from '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
@@ -8,8 +9,7 @@ import useStore from '#browser/component/useStore.js';
 import blindTypeDefinitionCollection from '#browser/component/definition/blindType.json';
 import Badge from '#browser/Component/Badge';
 
-/** @type {pixiLayout.LayoutStyles} */
-const __layout = {
+const __layout = /** @type {pixiLayout.LayoutStyles} */ ({
   flex: 1,
   flexDirection: 'column',
   alignItems: 'center',
@@ -18,11 +18,11 @@ const __layout = {
   borderWidth: 0,
   borderColor: 0xff0000,
   backgroundColor: 0x283235
-};
+});
 
-const _layout = { top: -6 };
+const _layout = /** @type {pixiLayout.LayoutStyles} */ ({ top: -6 });
 
-const layout = {
+const layout = /** @type {pixiLayout.LayoutStyles} */ ({
   padding: 10,
   paddingTop: 5,
   paddingBottom: 5,
@@ -30,15 +30,15 @@ const layout = {
   borderWidth: 0,
   borderColor: 0xff0000,
   backgroundColor: 0x3e494c
-};
+});
 
-const style = {
+const style = /** @type {pixiJs.TextStyleOptions} */ ({
   fontFamily: 'm6x11plus',
   fontSize: 24,
   fill: 0xffffff
-};
+});
 
-const _style = {
+const _style = /** @type {pixiJs.TextStyleOptions} */ ({
   fontFamily: 'm6x11plus_',
   fontSize: 24,
   fill: 0xffffff,
@@ -47,7 +47,7 @@ const _style = {
     info: { fill: '#53b0ff' },
     danger: { fill: '#fa5546' }
   }
-};
+});
 
 const Round = () => {
   useExtend({ LayoutContainer, BitmapText, HTMLText });
