@@ -10,7 +10,7 @@ import blindTypeDefinitionCollection from '#browser/component/definition/blindTy
 import _bundleGet from '#browser/component/utility/_bundleGet';
 import bundleGet from '#browser/component/utility/bundleGet';
 import cardTextureGet from './utility/cardTextureGet';
-import handTypeIndexGet from '#browser/component/utility/handTypeIndexGet';
+import handScoredDetailGet from '#browser/component/utility/handScoredDetailGet';
 
 const localStorageKey = 'state';
 
@@ -301,7 +301,7 @@ const handSortTypeIndexSet = (handSortTypeIndex, set) => {
   });
 };
 
-const handSet = (__hand, set) => {
+const handSet = (___hand, set) => {
   set((state) => {
     const { round, ...rest } = current(state);
 
@@ -313,12 +313,14 @@ const handSet = (__hand, set) => {
             current(round)
           );
 
-        const _hand = _.isFunction(__hand) ? __hand(hand) : __hand;
+        const __hand = _.isFunction(___hand) ? ___hand(hand) : ___hand;
+
+        const { hand: _hand, handTypeIndex } = handScoredDetailGet(__hand);
 
         return {
           ...rest,
           hand: _hand,
-          handTypeIndex: handTypeIndexGet(_hand)
+          handTypeIndex
         };
       })(round)
     };
