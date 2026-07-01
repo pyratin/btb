@@ -88,7 +88,7 @@ const entryAnimationHandle = (
         }
       },
       {
-        pixi: cardTransform,
+        pixi: { ...cardTransform, y: 0 },
         duration: 0.4,
         ease: 'back.out(1.4)',
         onComplete: () =>
@@ -172,7 +172,7 @@ const HandPlayed = () => {
           () => {}
         );
     },
-    { dependencies: [handPlayed] }
+    { dependencies: [scoringAnimationTriggerFlag, handPlayed] }
   );
 
   return (
