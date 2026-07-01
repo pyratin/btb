@@ -43,11 +43,11 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
 
   const offset = _offset - __offset;
 
-  const { scoredFlag } = hand[index];
+  const { scoringFlag } = hand[index];
 
   return {
     x: offset + cardWidth * index + cardDimension.width / 2,
-    y: 0 + scoredFlag ? -40 : 0
+    y: 0 + scoringFlag ? -40 : 0
   };
 };
 

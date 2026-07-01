@@ -88,8 +88,10 @@ const cardGet = (
   suitIndex,
   packIndex = _rankIndex + suitIndex * rankLength,
   faceDownFlag = true,
-  activeFlag = false
-  // editionType = undefined
+  activeFlag = false,
+  // editionType = undefined,
+  scoringFlag = false,
+  scoringActiveFlag = false
 ) => {
   const rankIndex = _rankIndex + 1;
 
@@ -135,7 +137,9 @@ const cardGet = (
         default:
           return undefined;
       }
-    })()
+    })(),
+    scoringFlag,
+    scoringActiveFlag
   };
 };
 

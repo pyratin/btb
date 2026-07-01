@@ -141,7 +141,7 @@ export default (hand) => {
   const _hand = hand.map((card) => {
     return {
       ...card,
-      scoredFlag: result.scoringCardCollection.some(({ id }) => id === card.id)
+      scoringFlag: result.scoringCardCollection.some(({ id }) => id === card.id)
     };
   });
 
