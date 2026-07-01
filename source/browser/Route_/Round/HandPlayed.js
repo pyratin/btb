@@ -43,9 +43,11 @@ const cardTransformGet = (index, hand, cardDimension, containerElement) => {
 
   const offset = _offset - __offset;
 
+  const { scoredFlag } = hand[index];
+
   return {
     x: offset + cardWidth * index + cardDimension.width / 2,
-    y: 0
+    y: 0 + scoredFlag ? -40 : 0
   };
 };
 
@@ -97,6 +99,38 @@ const entryAnimationHandle = (
   });
 };
 
+const scoringAnimationHandle = (
+  collection,
+  cardDimension,
+  containerElement,
+  onComplete
+) => {
+  const gsapTimeline = gsap.timeline();
+
+  collection?.map((card, index, collection) => {
+    const element = containerElement.getChildByLabel(card.id);
+
+    const cardTransform = cardTransformGet(
+      index,
+      collection,
+      cardDimension,
+      containerElement
+    );
+
+    gsapTimeline.to(
+      element,
+      {
+        pixi: cardTransform,
+        duration: 0.4,
+        ease: 'back.out(1.4)',
+        onComplete: () =>
+          onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
+      },
+      index * 0.08
+    );
+  });
+};
+
 const HandPlayed = () => {
   useExtend({ LayoutContainer, Container, Sprite });
 
@@ -112,11 +146,31 @@ const HandPlayed = () => {
 
   const [layoutInitializedFlag, layoutInitializedFlagSet] = useState(false);
 
+  const [scoringAnimationTriggerFlag, scoringAnimationTriggerFlagSet] =
+    useState(false);
+
   useGSAP(
     () => {
       handPlayed &&
         layoutInitializedFlag &&
-        entryAnimationHandle(handPlayed, cardDimension, ref.current, () => {});
+        (() => {
+          entryAnimationHandle(handPlayed, cardDimension, ref.current, () => {
+            scoringAnimationTriggerFlagSet(true);
+          });
+        })();
+    },
+    { dependencies: [handPlayed] }
+  );
+
+  useGSAP(
+    () => {
+      scoringAnimationTriggerFlag &&
+        scoringAnimationHandle(
+          handPlayed,
+          cardDimension,
+          ref.current,
+          () => {}
+        );
     },
     { dependencies: [handPlayed] }
   );
