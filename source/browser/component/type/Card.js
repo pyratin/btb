@@ -21,6 +21,7 @@
  * @property {string} [cursor] The cursor style when hovering over the card.
  * @property {boolean} [idle] Whether the card should play the idle perspective wobble.
  * @property {boolean} [perspectiveMeshDisableFlag] Whether to disable the 3D warp perspective effect.
+ * @property {Omit<import('pixi.js').ContainerOptions, 'children'>} [shadowConfiguration] The shadow configuration.
  * @property {Card} card The card data object.
  * @property {import('react').Ref<CardRef>} [ref] Ref handle to trigger card tilt.
  */

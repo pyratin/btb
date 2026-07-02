@@ -575,7 +575,6 @@ const Hand = ({
   const { contextSafe } = useGSAP();
 
   const {
-    cardShadowTexture,
     cardDimension,
     discardCardCountMaximun,
     hand: _hand,
@@ -584,13 +583,11 @@ const Hand = ({
   } = useStore(
     useShallow(
       ({
-        bundle,
         cardDimension,
         discardCardCountMaximun,
         round: { hand, handPlayed },
         handSet
       }) => ({
-        cardShadowTexture: bundle.miscellaneous.cardShadow,
         cardDimension,
         discardCardCountMaximun,
         hand,
@@ -932,12 +929,6 @@ const Hand = ({
             onPointerUpOutside={_onPointerUpHandle}
             onPointerCancel={_onPointerUpHandle}
           >
-            <pixiSprite
-              texture={cardShadowTexture}
-              position={{ x: -10, y: -10 }}
-              alpha={1}
-            />
-
             <Card
               ref={(cardComponent) => {
                 Object.assign(cardCollectionRef, {
@@ -949,6 +940,11 @@ const Hand = ({
               }}
               cursor={cursor}
               idle={true}
+              shadowConfiguration={{
+                position: { x: -1, y: 5 },
+                tint: 0x000000,
+                alpha: 0.25
+              }}
               card={card}
             />
           </pixiContainer>

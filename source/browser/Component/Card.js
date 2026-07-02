@@ -16,6 +16,7 @@ const Card = ({
   cursor = 'default',
   idle = false,
   perspectiveMeshDisableFlag = false,
+  shadowConfiguration,
   card,
   ref
 }) => {
@@ -32,22 +33,26 @@ const Card = ({
   );
 
   return (
-    <PerspectiveMesh
-      ref={ref}
-      dirtyKey={`${id}-${faceDownFlag}`}
-      animating={!faceDownFlag && !!editionType}
-      cursor={cursor}
-      idle={idle}
-      disableFlag={perspectiveMeshDisableFlag}
-    >
-      <Edition type={!faceDownFlag && editionType}>
-        <pixiContainer>
-          <pixiSprite texture={backgroundTexture} />
+    <pixiContainer>
+      <pixiSprite texture={backgroundTexture} {...shadowConfiguration} />
 
-          <pixiSprite texture={texture} />
-        </pixiContainer>
-      </Edition>
-    </PerspectiveMesh>
+      <PerspectiveMesh
+        ref={ref}
+        dirtyKey={`${id}-${faceDownFlag}`}
+        animating={!faceDownFlag && !!editionType}
+        cursor={cursor}
+        idle={idle}
+        disableFlag={perspectiveMeshDisableFlag}
+      >
+        <Edition type={!faceDownFlag && editionType}>
+          <pixiContainer>
+            <pixiSprite texture={backgroundTexture} />
+
+            <pixiSprite texture={texture} />
+          </pixiContainer>
+        </Edition>
+      </PerspectiveMesh>
+    </pixiContainer>
   );
 };
 

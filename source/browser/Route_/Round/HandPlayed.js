@@ -103,6 +103,7 @@ const scoringAnimationHandle = (
   collection,
   cardDimension,
   containerElement,
+  shadowDefinitionSet,
   onComplete
 ) => {
   const gsapTimeline = gsap.timeline();
@@ -117,26 +118,49 @@ const scoringAnimationHandle = (
       containerElement
     );
 
+    const option = /** @type {gsap.TweenVars} */ ({
+      duration: 0.4,
+      ease: 'back.out(1.4)'
+    });
+
+    const timelinePosition = index * 0.08;
+
     gsapTimeline.to(
       element,
       {
         pixi: cardTransform,
-        duration: 0.4,
-        ease: 'back.out(1.4)',
+        ...option,
         onComplete: () =>
           onCardCollectionAnimationCompleteHandle(index, collection, onComplete)
       },
-      index * 0.08
+      timelinePosition
     );
+
+    const _shadowDefinition = { [index]: 0 };
+
+    card.scoringFlag &&
+      gsapTimeline.to(
+        _shadowDefinition,
+        {
+          [index]: 20,
+          ...option,
+          onUpdate: () => {
+            shadowDefinitionSet((shadowDefinition) => ({
+              ...shadowDefinition,
+              ..._shadowDefinition
+            }));
+          }
+        },
+        timelinePosition
+      );
   });
 };
 
 const HandPlayed = () => {
   useExtend({ LayoutContainer, Container, Sprite });
 
-  const { cardShadowTexture, cardDimension, handPlayed } = useStore(
-    useShallow(({ bundle, cardDimension, round: { handPlayed } }) => ({
-      cardShadowTexture: bundle.miscellaneous.cardShadow,
+  const { cardDimension, handPlayed } = useStore(
+    useShallow(({ cardDimension, round: { handPlayed } }) => ({
       handPlayed,
       cardDimension
     }))
@@ -148,6 +172,8 @@ const HandPlayed = () => {
 
   const [scoringAnimationTriggerFlag, scoringAnimationTriggerFlagSet] =
     useState(false);
+
+  const [shadowDefinition, shadowDefinitionSet] = useState(undefined);
 
   useGSAP(
     () => {
@@ -169,6 +195,7 @@ const HandPlayed = () => {
           handPlayed,
           cardDimension,
           ref.current,
+          shadowDefinitionSet,
           () => {}
         );
     },
@@ -214,13 +241,15 @@ const HandPlayed = () => {
             pivot={{ x: cardDimension.width / 2, y: 0 }}
             zIndex={index}
           >
-            <pixiSprite
-              texture={cardShadowTexture}
-              position={{ x: -10, y: -10 }}
-              alpha={1}
+            <Card
+              perspectiveMeshDisableFlag={true}
+              shadowConfiguration={{
+                position: { x: -1, y: shadowDefinition?.[index] || 5 },
+                tint: 0x000000,
+                alpha: 0.25
+              }}
+              card={card}
             />
-
-            <Card perspectiveMeshDisableFlag={true} card={card} />
           </pixiContainer>
         );
       })}
