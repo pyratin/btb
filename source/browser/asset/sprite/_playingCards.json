@@ -100,7 +100,7 @@
         "h": 95
       }
     },
-    "_playingCard-5": {
+    "_playingCard-stone": {
       "frame": {
         "x": 355,
         "y": 0,
@@ -120,7 +120,7 @@
         "h": 95
       }
     },
-    "_playingCard-6": {
+    "_playingCard-gold": {
       "frame": {
         "x": 426,
         "y": 0,
@@ -160,7 +160,7 @@
         "h": 95
       }
     },
-    "_playingCard-8": {
+    "_playingCard-combo": {
       "frame": {
         "x": 71,
         "y": 95,
@@ -180,7 +180,7 @@
         "h": 95
       }
     },
-    "_playingCard-9": {
+    "_playingCard-mult": {
       "frame": {
         "x": 142,
         "y": 95,
@@ -200,7 +200,7 @@
         "h": 95
       }
     },
-    "_playingCard-10": {
+    "_playingCard-wild": {
       "frame": {
         "x": 213,
         "y": 95,
@@ -220,7 +220,7 @@
         "h": 95
       }
     },
-    "_playingCard-11": {
+    "_playingCard-lucky": {
       "frame": {
         "x": 284,
         "y": 95,
@@ -240,7 +240,7 @@
         "h": 95
       }
     },
-    "_playingCard-12": {
+    "_playingCard-glass": {
       "frame": {
         "x": 355,
         "y": 95,
@@ -260,7 +260,7 @@
         "h": 95
       }
     },
-    "_playingCard-13": {
+    "_playingCard-steel": {
       "frame": {
         "x": 426,
         "y": 95,

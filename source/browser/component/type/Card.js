@@ -1,12 +1,22 @@
 /**
  * @typedef {object} Card
  * @property {string} id The unique identifier of the card.
+ * @property {number} packIndex The pack index of the card.
+ * @property {number} rankIndex The rank index of the card.
+ * @property {number[]} rankIndexCollection The collection of rank indices.
+ * @property {string | number} rank The rank of the card.
+ * @property {number} suitIndex The suit index of the card.
+ * @property {number[]} suitIndexCollection The collection of suit indices.
+ * @property {string} suit The suit of the card.
  * @property {boolean} faceDownFlag Whether the card is face down.
- * @property {string} [editionType] The visual shader edition type of the card (e.g., 'foil', 'holographic', 'polychrome').
  * @property {boolean} [discardFlag] Whether the card is marked for discard.
  * @property {boolean} [playedFlag] Whether the card has been played.
  * @property {boolean} [entryFlag] Whether the card is performing its entry animation.
  * @property {boolean} [activeFlag] Whether the card is selected/active in hand.
+ * @property {string} [editionType] The visual shader edition type of the card (e.g., 'foil', 'holographic', 'polychrome').
+ * @property {string} [enhancementType] The enhancement type of the card (e.g., 'stone', 'gold', 'combo', 'mult', 'wild', 'lucky', 'glass', 'steel').
+ * @property {boolean} [scoringFlag] Whether the card is scoring.
+ * @property {boolean} [scoringActiveFlag] Whether the card is active in scoring.
  */
 
 /**

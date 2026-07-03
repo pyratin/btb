@@ -24,11 +24,12 @@ const Card = ({
 
   useExtend({ Container, Sprite });
 
-  const { texture, backgroundTexture } = useStore(
-    useShallow(({ bundle, cardDimension }) => ({
-      texture: cardTextureGet(bundle, card),
+  const { backgroundTexture, texture, enhancementTexture } = useStore(
+    useShallow(({ bundle }) => ({
       backgroundTexture: bundle._playingCards['_playingCard-1'],
-      cardDimension
+      texture: cardTextureGet(bundle, card),
+      enhancementTexture:
+        bundle._playingCards[`_playingCard-${card.enhancementType}`]
     }))
   );
 
@@ -49,6 +50,8 @@ const Card = ({
             <pixiSprite texture={backgroundTexture} />
 
             <pixiSprite texture={texture} />
+
+            <pixiSprite texture={enhancementTexture} />
           </pixiContainer>
         </Edition>
       </PerspectiveMesh>
