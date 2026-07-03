@@ -47,11 +47,15 @@ const Card = ({
       >
         <Edition type={!faceDownFlag && editionType}>
           <pixiContainer>
-            <pixiSprite texture={backgroundTexture} />
+            <pixiSprite
+              texture={
+                (!faceDownFlag && enhancementTexture) || backgroundTexture
+              }
+            />
 
-            <pixiSprite texture={texture} />
-
-            <pixiSprite texture={enhancementTexture} />
+            {card.enhancementType !== 'stone' && (
+              <pixiSprite texture={texture} />
+            )}
           </pixiContainer>
         </Edition>
       </PerspectiveMesh>
