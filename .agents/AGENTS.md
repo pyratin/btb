@@ -8,3 +8,8 @@
 - do not use "if" statements; always use "switch (true)" or ternary operators.
 - follow boolean naming convention: append "Flag" to boolean variable names (e.g. `cardActiveFlag`, `disableFlag`).
 - do not use "forEach" loops; prefer functional programming methods like `map`, `reduce`, and `filter`.
+- do not declare a variable that is consumed only once.
+- suffix react state hook setters with `Set` (e.g., `[hoverFlag, hoverFlagSet]`).
+- prefer arrow functions for components and helpers.
+
+

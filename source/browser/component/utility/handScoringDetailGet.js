@@ -139,11 +139,9 @@ export default (hand) => {
   })();
 
   const _hand = hand.map((card) => {
-    const stoneScoringFlag = card.activeFlag && card.enhancementType === 'stone';
-
     return {
       ...card,
-      scoringFlag: stoneScoringFlag
+      scoringFlag: card.activeFlag && card.enhancementType === 'stone'
         ? true
         : result.scoringCardCollection.some(({ id }) => id === card.id)
     };
