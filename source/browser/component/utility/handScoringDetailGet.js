@@ -2,7 +2,7 @@ import handTypeDefinitionCollection from '#browser/component/definition/handType
 
 /**
  * Evaluates the played hand and returns the index of the hand type from
- * handtype.json and the hand with scored flags.
+ * handtype.json and the hand with scoring flags.
  *
  * @param {Array} hand - List of card objects.
  * @returns {{ handTypeIndex: number | undefined; hand: Array }} Details of the
@@ -139,9 +139,13 @@ export default (hand) => {
   })();
 
   const _hand = hand.map((card) => {
+    const stoneScoringFlag = card.activeFlag && card.enhancementType === 'stone';
+
     return {
       ...card,
-      scoringFlag: result.scoringCardCollection.some(({ id }) => id === card.id)
+      scoringFlag: stoneScoringFlag
+        ? true
+        : result.scoringCardCollection.some(({ id }) => id === card.id)
     };
   });
 

@@ -10,7 +10,7 @@ import blindTypeDefinitionCollection from '#browser/component/definition/blindTy
 import _bundleGet from '#browser/component/utility/_bundleGet';
 import bundleGet from '#browser/component/utility/bundleGet';
 import cardTextureGet from './utility/cardTextureGet';
-import handScoredDetailGet from '#browser/component/utility/handScoredDetailGet';
+import handScoringDetailGet from '#browser/component/utility/handScoringDetailGet';
 
 const localStorageKey = 'state';
 
@@ -353,7 +353,7 @@ const handSet = (___hand, set) => {
 
         const __hand = _.isFunction(___hand) ? ___hand(hand) : ___hand;
 
-        const { hand: _hand, handTypeIndex } = handScoredDetailGet(__hand);
+        const { hand: _hand, handTypeIndex } = handScoringDetailGet(__hand);
 
         return {
           ...rest,
