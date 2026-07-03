@@ -112,6 +112,53 @@ const cardGet = (
 
   const suit = ['heart', 'club', 'diamond', 'spade'][suitIndexCollection[0]];
 
+  const editionType = (() => {
+    switch (true) {
+      case !((rankIndex + 1) % 4):
+        return 'polychrome';
+
+      case !((rankIndex + 1) % 3):
+        return 'holographic';
+
+      case !((rankIndex + 1) % 2):
+        return 'folio';
+
+      default:
+        return undefined;
+    }
+  })();
+
+  const enhancementType = (() => {
+    switch (true) {
+      case !((rankIndex + 1) % 9):
+        return 'luck';
+
+      case !((rankIndex + 1) % 8):
+        return 'gold';
+
+      case !((rankIndex + 1) % 7):
+        return 'stone';
+
+      case !((rankIndex + 1) % 6):
+        return 'steel';
+
+      case !((rankIndex + 1) % 5):
+        return 'glass';
+
+      case !((rankIndex + 1) % 4):
+        return 'wild';
+
+      case !((rankIndex + 1) % 3):
+        return 'mult';
+
+      case !((rankIndex + 1) % 2):
+        return 'bonus';
+
+      default:
+        return undefined;
+    }
+  })();
+
   return {
     id: packIndex,
     packIndex,
@@ -123,21 +170,8 @@ const cardGet = (
     suit,
     faceDownFlag,
     activeFlag,
-    editionType: (() => {
-      switch (true) {
-        case !((rankIndex + 1) % 4):
-          return 'polychrome';
-
-        case !((rankIndex + 1) % 3):
-          return 'holographic';
-
-        case !((rankIndex + 1) % 2):
-          return 'folio';
-
-        default:
-          return undefined;
-      }
-    })(),
+    editionType,
+    enhancementType,
     scoringFlag,
     scoringActiveFlag
   };
