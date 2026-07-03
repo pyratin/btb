@@ -131,7 +131,7 @@ const cardGet = (
   const enhancementType = (() => {
     switch (true) {
       case !((rankIndex + 1) % 9):
-        return 'luck';
+        return 'lucky';
 
       case !((rankIndex + 1) % 8):
         return 'gold';

@@ -51,6 +51,7 @@ const Card = ({
               texture={
                 (!faceDownFlag && enhancementTexture) || backgroundTexture
               }
+              tint={0xeeeeee}
             />
 
             {card.enhancementType !== 'stone' && (
