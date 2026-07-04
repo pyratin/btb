@@ -7,28 +7,28 @@ import { useExtend } from '@pixi/react';
 import useStore from '#browser/component/useStore';
 import Badge from '../Badge';
 
-const Tooltip = ({ card: { rank, suit, firstFlag, lastFlag } }) => {
+const Tooltip = ({ card: { rank, suit, lastFlag } }) => {
   useExtend({ LayoutContainer, HTMLText });
 
-  const { smallScreenFlag, bottom } = useStore(
-    useShallow(({ smallScreenFlag, cardDimension: { height } }) => ({
-      smallScreenFlag,
+  const { screenSmallFlag, width, bottom } = useStore(
+    useShallow(({ screenSmallFlag, cardDimension: { width, height } }) => ({
+      screenSmallFlag,
+      width,
       bottom: height + 10
     }))
   );
-
-  console.log('HERE>', firstFlag, lastFlag, smallScreenFlag);
 
   return (
     <Badge
       layout={{
         position: 'absolute',
+        ...(screenSmallFlag && lastFlag && { right: width / 2.5 }),
         width: '100%',
         bottom,
         justifyContent: 'center',
         padding: 2,
-        borderWidth: 1,
-        borderColor: 0xff0000,
+        borderWidth: 2,
+        borderColor: 0xffffff,
         borderRadius: 8,
         backgroundColor: 0x283235
       }}

@@ -60,7 +60,7 @@ const bundleInitializedGet = (_bundle) => {
 
   return {
     windowInnerDimenesion,
-    smallScreenFlag:
+    screenSmallFlag:
       windowInnerDimenesion.width <= widthBreakpointCollection[1],
     textureScaleFactor,
     bundle,
@@ -287,7 +287,7 @@ const stateInitializedGet = async () => {
 
   const {
     windowInnerDimenesion,
-    smallScreenFlag,
+    screenSmallFlag,
     textureScaleFactor,
     bundle,
     cardDimension
@@ -303,7 +303,7 @@ const stateInitializedGet = async () => {
     seed,
     _bundle,
     windowInnerDimenesion,
-    smallScreenFlag,
+    screenSmallFlag,
     textureScaleFactor,
     bundle,
     cardDimension,
