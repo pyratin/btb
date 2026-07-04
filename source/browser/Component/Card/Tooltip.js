@@ -22,7 +22,7 @@ const Tooltip = ({ lastFlag, card: { rank, suit } }) => {
     <Badge
       layout={{
         position: 'absolute',
-        ...(screenSmallFlag && lastFlag && { right: width / 2.5 }),
+        ...(screenSmallFlag && lastFlag && { right: width / 2 }),
         width: '100%',
         bottom,
         justifyContent: 'center',
