@@ -17,6 +17,7 @@ import Tooltip from './Tooltip';
  * @returns {import('react').ReactElement} The rendered Card React element.
  */
 const Card = ({
+  lastFlag = false,
   cursor = 'default',
   idle = false,
   perspectiveMeshDisableFlag = false,
@@ -55,7 +56,7 @@ const Card = ({
       onPointerUpOutside={onPointerEnterLeaveHandle}
       onPointerCancel={onPointerEnterLeaveHandle}
     >
-      {hoverFlag && <Tooltip card={card} />}
+      {hoverFlag && <Tooltip lastFlag={lastFlag} card={card} />}
 
       <pixiLayoutContainer layout={{}}>
         <pixiSprite texture={backgroundTexture} {...shadowConfiguration} />

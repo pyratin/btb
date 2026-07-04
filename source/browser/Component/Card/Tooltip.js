@@ -7,7 +7,7 @@ import { useExtend } from '@pixi/react';
 import useStore from '#browser/component/useStore';
 import Badge from '../Badge';
 
-const Tooltip = ({ card: { rank, suit, lastFlag } }) => {
+const Tooltip = ({ lastFlag, card: { rank, suit } }) => {
   useExtend({ LayoutContainer, HTMLText });
 
   const { screenSmallFlag, width, bottom } = useStore(

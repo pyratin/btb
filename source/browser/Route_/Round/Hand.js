@@ -938,6 +938,7 @@ const Hand = ({
                   }
                 });
               }}
+              lastFlag={index === collection.length - 1}
               cursor={cursor}
               idle={true}
               shadowConfiguration={{

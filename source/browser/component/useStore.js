@@ -95,8 +95,6 @@ export const cardGet = (
   enhancementType = undefined,
   scoringFlag = false,
   scoringActiveFlag = false,
-  firstFlag = undefined,
-  lastFlag = undefined,
   entryFlag = undefined,
   discardFlag = undefined,
   playedFlag = undefined
@@ -182,8 +180,6 @@ export const cardGet = (
     enhancementType,
     scoringFlag,
     scoringActiveFlag,
-    firstFlag,
-    lastFlag,
     entryFlag,
     discardFlag,
     playedFlag
@@ -211,36 +207,24 @@ const collectionSuffledGet = (seed, collection) => {
 const handSortedGet = (handSortTypeIndex, hand) => {
   const keyCollection = ['rankIndexCollection', 'suitIndexCollection'];
 
-  return [...hand]
-    .sort((a, b) => {
-      const fn = (object) => {
-        return object[keyCollection[handSortTypeIndex]][0];
-      };
+  return [...hand].sort((a, b) => {
+    const fn = (object) => {
+      return object[keyCollection[handSortTypeIndex]][0];
+    };
 
-      const _fn = (object) => object[keyCollection[1 - handSortTypeIndex]][0];
+    const _fn = (object) => object[keyCollection[1 - handSortTypeIndex]][0];
 
-      const _collection = [a, b];
+    const _collection = [a, b];
 
-      const collection = !handSortTypeIndex
-        ? _collection
-        : [..._collection].reverse();
+    const collection = !handSortTypeIndex
+      ? _collection
+      : [..._collection].reverse();
 
-      return (
-        fn(collection[1]) - fn(collection[0]) ||
-        _fn(collection[0]) - _fn(collection[1])
-      );
-    })
-    .reduce(
-      (memo, card, index, collection) => [
-        ...memo,
-        {
-          ...card,
-          firstFlag: !index,
-          lastFlag: index === collection.length - 1
-        }
-      ],
-      []
+    return (
+      fn(collection[1]) - fn(collection[0]) ||
+      _fn(collection[0]) - _fn(collection[1])
     );
+  });
 };
 
 const handCardGet = (card) => {
