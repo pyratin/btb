@@ -91,8 +91,8 @@ export const cardGet = (
   packIndex = _rankIndex + suitIndex * rankLength,
   faceDownFlag = true,
   activeFlag = false,
-  // editionType = undefined,
-  // enhancementType= undefined,
+  editionType = undefined,
+  enhancementType = undefined,
   scoringFlag = false,
   scoringActiveFlag = false,
   firstFlag = undefined,
@@ -120,7 +120,7 @@ export const cardGet = (
 
   const suit = ['heart', 'club', 'diamond', 'spade'][suitIndexCollection[0]];
 
-  const editionType = (() => {
+  /* const editionType = (() => {
     switch (true) {
       case !((rankIndex + 1) % 4):
         return 'polychrome';
@@ -134,9 +134,9 @@ export const cardGet = (
       default:
         return undefined;
     }
-  })();
+  })(); */
 
-  const enhancementType = (() => {
+  /* const enhancementType = (() => {
     switch (true) {
       case !((rankIndex + 1) % 9):
         return 'lucky';
@@ -165,7 +165,7 @@ export const cardGet = (
       default:
         return undefined;
     }
-  })();
+  })(); */
 
   return {
     id: packIndex,

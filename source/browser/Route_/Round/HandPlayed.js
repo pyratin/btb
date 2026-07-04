@@ -218,6 +218,7 @@ const HandPlayed = () => {
         borderColor: 0xff0000
       }}
       sortableChildren={true}
+      eventMode='none'
       onLayout={(event) => {
         layoutInitializedFlagSet(true);
 

@@ -14,7 +14,7 @@ const Tooltip = ({ card: { rank, suit, lastFlag } }) => {
     useShallow(({ screenSmallFlag, cardDimension: { width, height } }) => ({
       screenSmallFlag,
       width,
-      bottom: height + 10
+      bottom: height + 20
     }))
   );
 
