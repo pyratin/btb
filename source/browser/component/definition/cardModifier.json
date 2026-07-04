@@ -1,0 +1,80 @@
+{
+  "enhancement": {
+    "bonus": {
+      "name": "Bonus Card",
+      "config": {
+        "bonus": 30
+      }
+    },
+    "mult": {
+      "name": "Mult Card",
+      "config": {
+        "mult": 4
+      }
+    },
+    "wild": {
+      "name": "Wild Card",
+      "config": {}
+    },
+    "glass": {
+      "name": "Glass Card",
+      "config": {
+        "xMult": 2,
+        "destroyChance": 4
+      }
+    },
+    "steel": {
+      "name": "Steel Card",
+      "config": {
+        "xMultHand": 1.5
+      }
+    },
+    "stone": {
+      "name": "Stone Card",
+      "config": {
+        "bonus": 50
+      }
+    },
+    "gold": {
+      "name": "Gold Card",
+      "config": {
+        "dollarsHand": 3
+      }
+    },
+    "lucky": {
+      "name": "Lucky Card",
+      "config": {
+        "multChance": 5,
+        "mult": 20,
+        "dollarsChance": 15,
+        "dollars": 20
+      }
+    }
+  },
+  "edition": {
+    "folio": {
+      "name": "Folio",
+      "config": {
+        "bonus": 30
+      }
+    },
+    "holographic": {
+      "name": "Holographic",
+      "config": {
+        "mult": 10
+      }
+    },
+    "polychrome": {
+      "name": "Polychrome",
+      "config": {
+        "xMult": 1.5
+      }
+    },
+    "negative": {
+      "name": "Negative",
+      "config": {
+        "jokerSlot": 1
+      }
+    }
+  }
+}
