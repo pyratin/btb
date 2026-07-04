@@ -18,6 +18,8 @@ const localStorageItemGet = (key) => {
   return JSON.parse(localStorage.getItem(localStorageKey) || '{}')[key];
 };
 
+const widthBreakpointCollection = [400, 707];
+
 const windowInnerDimenesionGet = () => {
   const {
     visualViewport: { width = 0, height = 0 }
@@ -27,15 +29,13 @@ const windowInnerDimenesionGet = () => {
 };
 
 const textureScaleFactorGet = (windowInnerDimenesion) => {
-  const widthCollection = [400, 707];
-
   const { width } = windowInnerDimenesion;
 
   switch (true) {
-    case width <= widthCollection[0]:
+    case width <= widthBreakpointCollection[0]:
       return 1.25;
 
-    case width >= widthCollection[1]:
+    case width >= widthBreakpointCollection[1]:
       return 2;
 
     default:
@@ -60,6 +60,8 @@ const bundleInitializedGet = (_bundle) => {
 
   return {
     windowInnerDimenesion,
+    smallScreenFlag:
+      windowInnerDimenesion.width <= widthBreakpointCollection[1],
     textureScaleFactor,
     bundle,
     cardDimension
@@ -83,15 +85,21 @@ const seedGet = () => {
 
 const rankLength = 13;
 
-const cardGet = (
+export const cardGet = (
   _rankIndex,
   suitIndex,
   packIndex = _rankIndex + suitIndex * rankLength,
   faceDownFlag = true,
   activeFlag = false,
   // editionType = undefined,
+  // enhancementType= undefined,
   scoringFlag = false,
-  scoringActiveFlag = false
+  scoringActiveFlag = false,
+  firstFlag = undefined,
+  lastFlag = undefined,
+  entryFlag = undefined,
+  discardFlag = undefined,
+  playedFlag = undefined
 ) => {
   const rankIndex = _rankIndex + 1;
 
@@ -173,7 +181,12 @@ const cardGet = (
     editionType,
     enhancementType,
     scoringFlag,
-    scoringActiveFlag
+    scoringActiveFlag,
+    firstFlag,
+    lastFlag,
+    entryFlag,
+    discardFlag,
+    playedFlag
   };
 };
 
@@ -198,24 +211,36 @@ const collectionSuffledGet = (seed, collection) => {
 const handSortedGet = (handSortTypeIndex, hand) => {
   const keyCollection = ['rankIndexCollection', 'suitIndexCollection'];
 
-  return [...hand].sort((a, b) => {
-    const fn = (object) => {
-      return object[keyCollection[handSortTypeIndex]][0];
-    };
+  return [...hand]
+    .sort((a, b) => {
+      const fn = (object) => {
+        return object[keyCollection[handSortTypeIndex]][0];
+      };
 
-    const _fn = (object) => object[keyCollection[1 - handSortTypeIndex]][0];
+      const _fn = (object) => object[keyCollection[1 - handSortTypeIndex]][0];
 
-    const _collection = [a, b];
+      const _collection = [a, b];
 
-    const collection = !handSortTypeIndex
-      ? _collection
-      : [..._collection].reverse();
+      const collection = !handSortTypeIndex
+        ? _collection
+        : [..._collection].reverse();
 
-    return (
-      fn(collection[1]) - fn(collection[0]) ||
-      _fn(collection[0]) - _fn(collection[1])
+      return (
+        fn(collection[1]) - fn(collection[0]) ||
+        _fn(collection[0]) - _fn(collection[1])
+      );
+    })
+    .reduce(
+      (memo, card, index, collection) => [
+        ...memo,
+        {
+          ...card,
+          firstFlag: !index,
+          lastFlag: index === collection.length - 1
+        }
+      ],
+      []
     );
-  });
 };
 
 const handCardGet = (card) => {
@@ -260,8 +285,13 @@ const stateInitializedGet = async () => {
 
   const _bundle = await _bundleGet();
 
-  const { windowInnerDimenesion, textureScaleFactor, bundle, cardDimension } =
-    bundleInitializedGet(_bundle);
+  const {
+    windowInnerDimenesion,
+    smallScreenFlag,
+    textureScaleFactor,
+    bundle,
+    cardDimension
+  } = bundleInitializedGet(_bundle);
 
   const handSize = 8;
 
@@ -273,6 +303,7 @@ const stateInitializedGet = async () => {
     seed,
     _bundle,
     windowInnerDimenesion,
+    smallScreenFlag,
     textureScaleFactor,
     bundle,
     cardDimension,

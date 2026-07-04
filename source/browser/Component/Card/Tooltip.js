@@ -5,36 +5,44 @@ import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
+import Badge from '../Badge';
 
-const Tooltip = ({ card: { rank, suit } }) => {
+const Tooltip = ({ card: { rank, suit, firstFlag, lastFlag } }) => {
   useExtend({ LayoutContainer, HTMLText });
 
-  const { bottom } = useStore(
-    useShallow(({ cardDimension: { height } }) => ({
+  const { smallScreenFlag, bottom } = useStore(
+    useShallow(({ smallScreenFlag, cardDimension: { height } }) => ({
+      smallScreenFlag,
       bottom: height + 10
     }))
   );
 
+  console.log('HERE>', firstFlag, lastFlag, smallScreenFlag);
+
   return (
-    <pixiLayoutContainer
+    <Badge
       layout={{
         position: 'absolute',
         width: '100%',
         bottom,
         justifyContent: 'center',
         padding: 2,
-        borderWidth: 0,
+        borderWidth: 1,
         borderColor: 0xff0000,
+        borderRadius: 8,
         backgroundColor: 0x283235
       }}
     >
-      <pixiLayoutContainer
+      <Badge
         layout={{
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
           padding: 5,
+          paddingTop: 0,
+          paddingBottom: 0,
           borderWidth: 0,
+          borderRadius: 8,
           borderColor: 0xff0000,
           backgroundColor: 0xeeeeee
         }}
@@ -49,8 +57,8 @@ const Tooltip = ({ card: { rank, suit } }) => {
             tagStyles: {}
           }}
         />
-      </pixiLayoutContainer>
-    </pixiLayoutContainer>
+      </Badge>
+    </Badge>
   );
 };
 
