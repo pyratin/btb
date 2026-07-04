@@ -40,7 +40,7 @@ const Card = ({
   const [hoverFlag, hoverFlagSet] = useState(false);
 
   const onPointerEnterLeaveHandle = ({ type }) =>
-    hoverFlagSet(type === 'pointerenter');
+    hoverFlagSet(type.match(/pointerenter|pointerdown/));
 
   return (
     <pixiLayoutContainer
@@ -50,6 +50,10 @@ const Card = ({
       eventMode='static'
       onPointerEnter={onPointerEnterLeaveHandle}
       onPointerLeave={onPointerEnterLeaveHandle}
+      onPointerDown={onPointerEnterLeaveHandle}
+      onPointerUp={onPointerEnterLeaveHandle}
+      onPointerUpOutside={onPointerEnterLeaveHandle}
+      onPointerCancel={onPointerEnterLeaveHandle}
     >
       {hoverFlag && <Tooltip card={card} />}
 
