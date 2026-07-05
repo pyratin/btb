@@ -5,7 +5,7 @@ import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
-import Badge from '../Badge';
+import Badge from '#browser/Component/Badge';
 
 const Tooltip = ({ lastFlag, card: { rank, suit } }) => {
   useExtend({ LayoutContainer, HTMLText });
@@ -23,7 +23,6 @@ const Tooltip = ({ lastFlag, card: { rank, suit } }) => {
       layout={{
         position: 'absolute',
         ...(screenSmallFlag && lastFlag && { right: width / 2 }),
-        width: '100%',
         bottom,
         justifyContent: 'center',
         padding: 2,

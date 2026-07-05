@@ -13,7 +13,6 @@
  * @property {string} [cursor] The cursor style when hovering over the card.
  * @property {boolean} [idle] Whether the card should play the idle perspective
  *   wobble.
- * @property {boolean} [lastFlag] whether the card is the last card.
  * @property {boolean} [perspectiveMeshDisableFlag] Whether to disable the 3D
  *   warp perspective effect.
  * @property {Omit<import('pixi.js').ContainerOptions, 'children'>} [shadowConfiguration]

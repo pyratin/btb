@@ -617,6 +617,8 @@ const Hand = ({
 
   const [dragInProgressFlag, dragInProgressFlagSet] = useState(false);
 
+  const [hoverCardIndex, hoverCardIndexSet] = useState(undefined);
+
   useTouchTilt({ hand, cardDimension, cardCollectionRef, containerRef: ref });
 
   useEffect(() => {
@@ -833,9 +835,17 @@ const Hand = ({
     { dependencies: [hand] }
   );
 
-  const _onPointerUpHandle = contextSafe(
-    () =>
-      dragRef.current &&
+  const onPointerEnterLeaveHandle = ({ type, currentTarget }) => {
+    hoverCardIndexSet(
+      type.match(/pointerenter|pointerdown/) &&
+        Number(currentTarget['data-index'])
+    );
+  };
+
+  const _onPointerUpHandle = contextSafe((event) => {
+    onPointerEnterLeaveHandle(event);
+
+    dragRef.current &&
       onPointerUpHandle(
         hand,
         cardDimension,
@@ -843,8 +853,8 @@ const Hand = ({
         dragRef,
         dragInProgressFlagSet,
         _handSet
-      )
-  );
+      );
+  });
 
   return (
     <pixiLayoutContainer
@@ -888,11 +898,14 @@ const Hand = ({
         return (
           <pixiContainer
             key={card.id}
+            data-index={index}
             label={card.id}
             pivot={{ x: cardDimension.width / 2, y: cardDimension.height }}
             zIndex={index}
             eventMode={!handPlayedFlag ? 'static' : 'none'}
             cursor={cursor}
+            onPointerEnter={onPointerEnterLeaveHandle}
+            onPointerLeave={onPointerEnterLeaveHandle}
             onPointerTap={() => {
               switch (true) {
                 case dragInProgressFlag:
@@ -938,7 +951,6 @@ const Hand = ({
                   }
                 });
               }}
-              lastFlag={index === collection.length - 1}
               cursor={cursor}
               idle={true}
               shadowConfiguration={{
