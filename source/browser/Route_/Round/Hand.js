@@ -13,6 +13,7 @@ import { useGSAP } from '@gsap/react';
 import useStore from '#browser/component/useStore';
 import useTouchTilt from '#browser/component/utility/useTouchTilt';
 import Card from '#browser/Component/Card';
+import HandCardTooltip from '#browser/Component/HandCardTooltip';
 
 gsap.registerPlugin(gsapPixiPlugin, useGSAP);
 gsapPixiPlugin.registerPIXI(pixiJs);
@@ -857,113 +858,142 @@ const Hand = ({
   });
 
   return (
-    <pixiLayoutContainer
-      ref={ref}
-      layout={{
-        // eslint-disable-next-line @eslint-react/unsupported-syntax
-        height: (() => {
-          const { height } = cardDimension;
+    <>
+      <pixiLayoutContainer
+        ref={ref}
+        layout={{
+          // eslint-disable-next-line @eslint-react/unsupported-syntax
+          height: (() => {
+            const { height } = cardDimension;
 
-          return height;
-        })(),
-        borderWidth: 0,
-        borderColor: 0xff0000
-      }}
-      sortableChildren={true}
-      onLayout={(event) => {
-        layoutInitializedFlagSet(true);
+            return height;
+          })(),
+          borderWidth: 0,
+          borderColor: 0xff0000
+        }}
+        sortableChildren={true}
+        onLayout={(event) => {
+          layoutInitializedFlagSet(true);
 
-        const eventTarget = event.target;
+          const eventTarget = event.target;
 
-        eventTarget.children
-          .find(({ children }) => children.length)
-          ?.children.map((container, index) => {
-            Object.assign(
-              container,
-              cardTransformGet(index, hand, cardDimension, eventTarget)
-            );
-          });
-      }}
-    >
-      {hand?.map((card, index, collection) => {
-        // eslint-disable-next-line @eslint-react/unsupported-syntax
-        const activeFlagSetEnabled = (() =>
-          collection
-            .filter(({ id }) => id !== card.id)
-            .filter(({ activeFlag }) => activeFlag).length <
-          discardCardCountMaximun)();
+          eventTarget.children
+            .find(({ children }) => children.length)
+            ?.children.map((container, index) => {
+              Object.assign(
+                container,
+                cardTransformGet(index, hand, cardDimension, eventTarget)
+              );
+            });
+        }}
+      >
+        {hand?.map((card, index, collection) => {
+          // eslint-disable-next-line @eslint-react/unsupported-syntax
+          const activeFlagSetEnabled = (() =>
+            collection
+              .filter(({ id }) => id !== card.id)
+              .filter(({ activeFlag }) => activeFlag).length <
+            discardCardCountMaximun)();
 
-        const cursor = activeFlagSetEnabled ? 'pointer' : undefined;
+          const cursor = activeFlagSetEnabled ? 'pointer' : undefined;
 
-        return (
-          <pixiContainer
-            key={card.id}
-            data-index={index}
-            label={card.id}
-            pivot={{ x: cardDimension.width / 2, y: cardDimension.height }}
-            zIndex={index}
-            eventMode={!handPlayedFlag ? 'static' : 'none'}
-            cursor={cursor}
-            onPointerEnter={onPointerEnterLeaveHandle}
-            onPointerLeave={onPointerEnterLeaveHandle}
-            onPointerTap={() => {
-              switch (true) {
-                case dragInProgressFlag:
-                  return;
-
-                case activeFlagSetEnabled:
-                  // eslint-disable-next-line @eslint-react/unsupported-syntax
-                  return (() => {
-                    _handSet([
-                      ...hand.slice(0, index),
-                      {
-                        ...card,
-                        activeFlag: !card.activeFlag
-                      },
-                      ...hand.slice(index + 1)
-                    ]);
-
-                    activeTriggerFlagSet(true);
-                  })();
-              }
-            }}
-            onPointerDown={(event) =>
-              onPointerDownHandle(
-                hand,
-                cardDimension,
-                event,
-                dragRef,
-                ref.current,
-                dragInProgressFlagSet,
-                reorderTriggerFlagSet
-              )
-            }
-            onPointerUp={_onPointerUpHandle}
-            onPointerUpOutside={_onPointerUpHandle}
-            onPointerCancel={_onPointerUpHandle}
-          >
-            <Card
-              ref={(cardComponent) => {
-                Object.assign(cardCollectionRef, {
-                  current: {
-                    ...cardCollectionRef.current,
-                    [card.id]: cardComponent || undefined
-                  }
-                });
-              }}
+          return (
+            <pixiContainer
+              key={card.id}
+              data-index={index}
+              label={card.id}
+              pivot={{ x: cardDimension.width / 2, y: cardDimension.height }}
+              zIndex={index}
+              eventMode={!handPlayedFlag ? 'static' : 'none'}
               cursor={cursor}
-              idle={true}
-              shadowConfiguration={{
-                position: { x: -1, y: 5 },
-                tint: 0x000000,
-                alpha: 0.25
+              onPointerEnter={onPointerEnterLeaveHandle}
+              onPointerLeave={onPointerEnterLeaveHandle}
+              onPointerTap={() => {
+                switch (true) {
+                  case dragInProgressFlag:
+                    return;
+
+                  case activeFlagSetEnabled:
+                    // eslint-disable-next-line @eslint-react/unsupported-syntax
+                    return (() => {
+                      _handSet([
+                        ...hand.slice(0, index),
+                        {
+                          ...card,
+                          activeFlag: !card.activeFlag
+                        },
+                        ...hand.slice(index + 1)
+                      ]);
+
+                      activeTriggerFlagSet(true);
+                    })();
+                }
               }}
-              card={card}
-            />
-          </pixiContainer>
-        );
-      })}
-    </pixiLayoutContainer>
+              onPointerDown={(event) =>
+                onPointerDownHandle(
+                  hand,
+                  cardDimension,
+                  event,
+                  dragRef,
+                  ref.current,
+                  dragInProgressFlagSet,
+                  reorderTriggerFlagSet
+                )
+              }
+              onPointerUp={_onPointerUpHandle}
+              onPointerUpOutside={_onPointerUpHandle}
+              onPointerCancel={_onPointerUpHandle}
+            >
+              <Card
+                ref={(cardComponent) => {
+                  Object.assign(cardCollectionRef, {
+                    current: {
+                      ...cardCollectionRef.current,
+                      [card.id]: cardComponent || undefined
+                    }
+                  });
+                }}
+                cursor={cursor}
+                idle={true}
+                shadowConfiguration={{
+                  position: { x: -1, y: 5 },
+                  tint: 0x000000,
+                  alpha: 0.25
+                }}
+                card={card}
+              />
+            </pixiContainer>
+          );
+        })}
+      </pixiLayoutContainer>
+
+      {_.isFinite(hoverCardIndex) && (
+        <pixiLayoutContainer
+          layout={{
+            position: 'absolute',
+            width: cardDimension.width,
+            borderWidth: 0,
+            borderColor: 0xff0000
+          }}
+          // eslint-disable-next-line @eslint-react/unsupported-syntax
+          {...(() => {
+            const { x, y } = cardTransformGet(
+              hoverCardIndex,
+              hand,
+              cardDimension,
+              ref.current
+            );
+
+            const { width, height } = cardDimension;
+
+            return { x: x - width / 2, y: y - height / 5 };
+          })()}
+          angle={0}
+        >
+          <HandCardTooltip card={hand[hoverCardIndex]} />
+        </pixiLayoutContainer>
+      )}
+    </>
   );
 };
 
