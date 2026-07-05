@@ -971,7 +971,7 @@ const Hand = ({
         <pixiLayoutContainer
           layout={{
             position: 'absolute',
-            width: cardDimension.width,
+            minWidth: cardDimension.width,
             borderWidth: 0,
             borderColor: 0xff0000
           }}
