@@ -24,7 +24,6 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
 
   return (
     <pixiLayoutContainer
-      key={id}
       layout={{
         right,
         flex: 1,

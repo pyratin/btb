@@ -70,6 +70,7 @@ const Round = () => {
 
       <pixiLayoutContainer
         layout={{
+          position: 'relative',
           width: '100%',
           flexDirection: 'column',
           gap: 10,

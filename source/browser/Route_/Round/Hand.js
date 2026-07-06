@@ -836,10 +836,10 @@ const Hand = ({
     { dependencies: [hand] }
   );
 
-  const onPointerEnterLeaveHandle = ({ type, currentTarget }) => {
+  const onPointerEnterLeaveHandle = ({ type, currentTarget: { label } }) => {
     hoverCardIndexSet(
       type.match(/pointerenter|pointerdown/) &&
-        Number(currentTarget['data-index'])
+        Number(hand.findIndex(({ id }) => id === label))
     );
   };
 
@@ -856,6 +856,8 @@ const Hand = ({
         _handSet
       );
   });
+
+  console.log('HERE>', dragInProgressFlag);
 
   return (
     <>
@@ -967,8 +969,9 @@ const Hand = ({
         })}
       </pixiLayoutContainer>
 
-      {_.isFinite(hoverCardIndex) && (
+      {_.isFinite(hoverCardIndex) && !dragInProgressFlag && (
         <pixiLayoutContainer
+          key={hoverCardIndex}
           layout={{
             position: 'absolute',
             minWidth: cardDimension.width,
