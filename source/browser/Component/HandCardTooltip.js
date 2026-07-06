@@ -11,10 +11,9 @@ import Badge from '#browser/Component/Badge';
 const HandCardTooltip = ({ card: { id, rank, suit } }) => {
   useExtend({ LayoutContainer, HTMLText });
 
-  const { windowInnerDimenesion, cardDimension } = useStore(
-    useShallow(({ windowInnerDimenesion, cardDimension }) => ({
-      windowInnerDimenesion,
-      cardDimension
+  const { windowInnerDimenesion } = useStore(
+    useShallow(({ windowInnerDimenesion }) => ({
+      windowInnerDimenesion
     }))
   );
 
@@ -33,11 +32,13 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
         id !== cardIdRef.current &&
           // eslint-disable-next-line @eslint-react/unsupported-syntax
           (() => {
-            rightSet(
-              event.target.getBounds().right > windowInnerDimenesion.width
-                ? cardDimension.width / 3
-                : 0
-            );
+            rightSet(() => {
+              const { right } = event.target.getBounds();
+
+              const { width } = windowInnerDimenesion;
+
+              return right > width ? right - width : 0;
+            });
 
             Object.assign(cardIdRef, { current: id });
           })();
