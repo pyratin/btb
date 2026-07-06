@@ -26,7 +26,6 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
     <pixiLayoutContainer
       layout={{
         right,
-        flex: 1,
         borderWidth: 0,
         borderColor: 0xff0000
       }}
@@ -46,7 +45,6 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
     >
       <Badge
         layout={{
-          flex: 1,
           justifyContent: 'center',
           padding: 2,
           borderWidth: 2,
@@ -57,7 +55,6 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
       >
         <Badge
           layout={{
-            flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
             padding: 5,
