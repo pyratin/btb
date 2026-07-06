@@ -838,7 +838,7 @@ const Hand = ({
 
   const onPointerEnterLeaveHandle = ({ type, currentTarget: { label } }) => {
     hoverCardIndexSet(
-      type.match(/pointerenter|pointerdown/) &&
+      type.match(/pointerenter|pointerdown|pointerup/) &&
         Number(hand.findIndex(({ id }) => id === label))
     );
   };
@@ -972,8 +972,7 @@ const Hand = ({
           key={hoverCardIndex}
           layout={{
             position: 'absolute',
-            minWidth: cardDimension.width,
-            borderWidth: 0,
+            borderWidth: 1,
             borderColor: 0xff0000
           }}
           // eslint-disable-next-line @eslint-react/unsupported-syntax
@@ -985,9 +984,9 @@ const Hand = ({
               ref.current
             );
 
-            const { width, height } = cardDimension;
+            const { width } = cardDimension;
 
-            return { x: x - width / 2, y: y - height / 5 };
+            return { x: x - width / 2, y: y };
           })()}
           angle={0}
         >

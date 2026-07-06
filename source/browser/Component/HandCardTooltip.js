@@ -8,23 +8,26 @@ import { useExtend } from '@pixi/react';
 import useStore from '#browser/component/useStore';
 import Badge from '#browser/Component/Badge';
 
-const HandCardTooltip = ({ card: { id, rank, suit } }) => {
+const HandCardTooltip = ({ card: { id, rank, suit, suitIndex } }) => {
   useExtend({ LayoutContainer, HTMLText });
 
-  const { windowInnerDimenesion } = useStore(
-    useShallow(({ windowInnerDimenesion }) => ({
-      windowInnerDimenesion
+  const { windowInnerDimenesion, minWidth } = useStore(
+    useShallow(({ windowInnerDimenesion, cardDimension: { width } }) => ({
+      windowInnerDimenesion,
+      minWidth: width
     }))
   );
 
   const cardIdRef = useRef(undefined);
 
-  const [right, rightSet] = useState(undefined);
+  const [marginLeft, marginLeftSet] = useState(undefined);
 
   return (
     <pixiLayoutContainer
       layout={{
-        right,
+        position: 'absolute',
+        bottom: 0,
+        marginLeft,
         borderWidth: 0,
         borderColor: 0xff0000
       }}
@@ -32,12 +35,12 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
         id !== cardIdRef.current &&
           // eslint-disable-next-line @eslint-react/unsupported-syntax
           (() => {
-            rightSet(() => {
+            marginLeftSet(() => {
               const { right } = event.target.getBounds();
 
               const { width } = windowInnerDimenesion;
 
-              return right > width ? right - width : 0;
+              return right > width ? -(right - width) : 0;
             });
 
             Object.assign(cardIdRef, { current: id });
@@ -46,7 +49,10 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
     >
       <Badge
         layout={{
+          minWidth,
+          flexDirection: 'column',
           justifyContent: 'center',
+          gap: 4,
           padding: 2,
           borderWidth: 2,
           borderColor: 0xffffff,
@@ -56,6 +62,7 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
       >
         <Badge
           layout={{
+            flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
             padding: 5,
@@ -68,7 +75,55 @@ const HandCardTooltip = ({ card: { id, rank, suit } }) => {
           }}
         >
           <pixiHTMLText
-            text={`${rank} of ${suit}`}
+            text={`${rank} of <highlight>${suit}</highlight>`}
+            layout={{}}
+            style={{
+              fontFamily: 'm6x11plus_',
+              fontSize: 24,
+              fill: 0x000000,
+              tagStyles: {
+                highlight: {
+                  // eslint-disable-next-line @eslint-react/unsupported-syntax
+                  fill: (() => {
+                    switch (suitIndex) {
+                      case 0:
+                        return 0xd01d11;
+
+                      case 1:
+                        return 0x007bc7;
+
+                      case 2:
+                        return 0xc77f00;
+
+                      case 3:
+                        return 0x374649;
+
+                      default:
+                        return 0x000000;
+                    }
+                  })()
+                }
+              }
+            }}
+          />
+        </Badge>
+
+        <Badge
+          layout={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 5,
+            paddingTop: 0,
+            paddingBottom: 0,
+            borderWidth: 0,
+            borderRadius: 8,
+            borderColor: 0xff0000,
+            backgroundColor: 0xeeeeee
+          }}
+        >
+          <pixiHTMLText
+            text={`value`}
             layout={{}}
             style={{
               fontFamily: 'm6x11plus_',
