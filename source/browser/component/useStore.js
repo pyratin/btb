@@ -106,12 +106,27 @@ export const cardGet = (
     ...(_rankIndex === rankLength - 1 ? [0] : [])
   ];
 
-  const rank = (() => {
-    const faceCardIndexMinimum = 10;
+  const [rank, faceFlag, chip] = (() => {
+    const rankIndexFaceCardMinimum = 10;
 
-    return rankIndex < faceCardIndexMinimum
-      ? rankIndex + 1
-      : ['Jack', 'Queen', 'King', 'Ace'][rankIndex - faceCardIndexMinimum];
+    switch (true) {
+      case rankIndex < rankIndexFaceCardMinimum:
+        return (() => {
+          const rank = rankIndex + 1;
+
+          return [rank, false, rank];
+        })();
+
+      case rankIndex === 13:
+        return ['Ace', false, rankIndexFaceCardMinimum + 1];
+
+      default:
+        return [
+          ['jack', 'queen', 'king'][rankIndex - rankIndexFaceCardMinimum],
+          true,
+          rankIndexFaceCardMinimum
+        ];
+    }
   })();
 
   const suitIndexCollection = [suitIndex];
@@ -171,6 +186,8 @@ export const cardGet = (
     rankIndex,
     rankIndexCollection,
     rank,
+    faceFlag,
+    chip,
     suitIndex,
     suitIndexCollection,
     suit,

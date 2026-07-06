@@ -972,7 +972,7 @@ const Hand = ({
           key={hoverCardIndex}
           layout={{
             position: 'absolute',
-            borderWidth: 1,
+            borderWidth: 0,
             borderColor: 0xff0000
           }}
           // eslint-disable-next-line @eslint-react/unsupported-syntax
