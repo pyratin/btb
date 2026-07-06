@@ -442,6 +442,8 @@ const onWindowPointerMoveHandle = (
         current: { ...dragRef.current, activatedFlag: true }
       });
 
+      dragInProgressFlagSet(true);
+
       const __hand = handReoderedGet(
         _hand,
         cardDimension,
@@ -456,8 +458,6 @@ const onWindowPointerMoveHandle = (
           });
 
           reorderTriggerFlagSet(true);
-
-          dragInProgressFlagSet(true);
         })();
     })();
 };
@@ -856,8 +856,6 @@ const Hand = ({
         _handSet
       );
   });
-
-  console.log('HERE>', dragInProgressFlag);
 
   return (
     <>
