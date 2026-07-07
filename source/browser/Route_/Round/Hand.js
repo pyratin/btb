@@ -969,7 +969,7 @@ const Hand = ({
 
       {_.isFinite(hoverCardIndex) && !dragInProgressFlag && (
         <pixiLayoutContainer
-          key={hoverCardIndex}
+          key={hand[hoverCardIndex].id}
           layout={{
             position: 'absolute',
             borderWidth: 0,
