@@ -2,14 +2,45 @@ import { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import _ from 'lodash';
 import { HTMLText } from 'pixi.js';
-import '@pixi/layout';
+import * as pixiLayout from '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
 import Badge from '#browser/Component/Badge';
 
-const HandCardTooltip = ({ card: { id, rank, chip, suitIndex, suit } }) => {
+/** @type {Omit<pixiLayout.LayoutOptions, 'target'>} */
+const layout = {
+  flex: 1,
+  flexDirection: 'column',
+  justifyContent: 'center',
+  gap: 2,
+  borderWidth: 0,
+  borderColor: 0xff0000,
+  borderRadius: 8,
+  backgroundColor: 0xeeeeee
+};
+
+/** @type {Omit<pixiLayout.LayoutOptions, 'target'>} */
+const _layout = {
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 5,
+  paddingTop: 0,
+  paddingBottom: 0,
+  borderWidth: 0,
+  borderColor: 0xff0000
+};
+
+const style = {
+  fontFamily: 'm6x11plus_',
+  fontSize: 24,
+  fill: 0x000000
+};
+
+const HandCardTooltip = ({
+  card: { id, rank, chip, suitIndex, suit, enhancementType }
+}) => {
   useExtend({ LayoutContainer, HTMLText });
 
   const { windowInnerDimenesion, minWidth } = useStore(
@@ -51,6 +82,7 @@ const HandCardTooltip = ({ card: { id, rank, chip, suitIndex, suit } }) => {
       <Badge
         layout={{
           minWidth,
+          flexDirection: 'column',
           gap: 4,
           padding: 2,
           borderWidth: 2,
@@ -59,90 +91,67 @@ const HandCardTooltip = ({ card: { id, rank, chip, suitIndex, suit } }) => {
           backgroundColor: 0x283235
         }}
       >
-        <pixiLayoutContainer
-          layout={{
-            flex: 1,
-            flexDirection: 'column',
-            justifyContent: 'center',
-            gap: 2,
-            borderWidth: 0,
-            borderColor: 0xff0000
-          }}
-        >
-          <Badge
-            layout={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: 5,
-              paddingTop: 0,
-              paddingBottom: 0,
-              borderWidth: 0,
-              borderRadius: 8,
-              borderColor: 0xff0000,
-              backgroundColor: 0xeeeeee
-            }}
-          >
-            <pixiHTMLText
-              text={`${_.startCase(rank)} of <highlight>${suit}</highlight>`}
-              layout={{}}
-              style={{
-                fontFamily: 'm6x11plus_',
-                fontSize: 24,
-                fill: 0x000000,
-                tagStyles: {
-                  highlight: {
-                    // eslint-disable-next-line @eslint-react/unsupported-syntax
-                    fill: (() => {
-                      switch (suitIndex) {
-                        case 0:
-                          return 0xd01d11;
+        {enhancementType && (
+          <Badge layout={layout}>
+            <Badge layout={_layout}>
+              <pixiHTMLText
+                text={`${_.startCase(enhancementType)} Card`}
+                layout={{}}
+                style={{ ...style }}
+              />
+            </Badge>
+          </Badge>
+        )}
 
-                        case 1:
-                          return 0x007bc7;
+        {enhancementType !== 'stone' && (
+          <Badge layout={layout}>
+            <Badge layout={_layout}>
+              <pixiHTMLText
+                text={`${_.startCase(rank)} of <highlight>${suit}</highlight>`}
+                layout={{}}
+                style={{
+                  ...style,
+                  tagStyles: {
+                    highlight: {
+                      // eslint-disable-next-line @eslint-react/unsupported-syntax
+                      fill: (() => {
+                        switch (suitIndex) {
+                          case 0:
+                            return 0xd01d11;
 
-                        case 2:
-                          return 0xc77f00;
+                          case 1:
+                            return 0x007bc7;
 
-                        case 3:
-                          return 0x374649;
+                          case 2:
+                            return 0xc77f00;
 
-                        default:
-                          return 0x000000;
-                      }
-                    })()
+                          case 3:
+                            return 0x374649;
+
+                          default:
+                            return 0x000000;
+                        }
+                      })()
+                    }
                   }
-                }
-              }}
-            />
-          </Badge>
+                }}
+              />
+            </Badge>
 
-          <Badge
-            layout={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: 5,
-              paddingTop: 0,
-              paddingBottom: 0,
-              borderWidth: 0,
-              borderRadius: 8,
-              borderColor: 0xff0000,
-              backgroundColor: 0xeeeeee
-            }}
-          >
-            <pixiHTMLText
-              text={`<highlight>+${chip}</highlight> chips`}
-              layout={{}}
-              style={{
-                fontFamily: 'm6x11plus_',
-                fontSize: 24,
-                fill: 0x000000,
-                tagStyles: {
-                  highlight: { fill: 0x007bc7 }
-                }
-              }}
-            />
+            <Badge layout={_layout}>
+              <pixiHTMLText
+                text={`<highlight>+${chip}</highlight> chips`}
+                layout={{}}
+                style={{
+                  ...style,
+                  tagStyles: {
+                    highlight: { fill: 0x007bc7 }
+                  }
+                }}
+              />
+            </Badge>
           </Badge>
-        </pixiLayoutContainer>
+        )}
       </Badge>
     </pixiLayoutContainer>
   );
