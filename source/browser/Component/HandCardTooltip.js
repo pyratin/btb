@@ -25,6 +25,8 @@ const layout = {
 const _layout = {
   justifyContent: 'center',
   alignItems: 'center',
+  margin: 2,
+  borderRadius: 8,
   padding: 5,
   paddingTop: 0,
   paddingBottom: 0,
@@ -111,11 +113,16 @@ const HandCardTooltip = ({
       >
         {enhancementType && (
           <Badge layout={layout}>
-            <Badge layout={_layout}>
+            <Badge
+              layout={{
+                ..._layout,
+                backgroundColor: 0x8689e9
+              }}
+            >
               <pixiHTMLText
                 text={`${_.startCase(enhancementType)} Card`}
                 layout={{}}
-                style={{ ...style }}
+                style={{ ...style, fill: 0xffffff }}
               />
             </Badge>
 

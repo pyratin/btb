@@ -18,10 +18,15 @@ declare module 'react' {
       > &
         import('pixi.js').CanvasTextOptions;
       /** Registered at runtime via `@pixi/react` useExtend */
-      pixiHTMLText: import('@pixi/react').PixiReactElementProps<
-        typeof import('pixi.js').HTMLText
-      > &
-        import('pixi.js').HTMLTextOptions;
+      pixiHTMLText: Omit<
+        import('@pixi/react').PixiReactElementProps<
+          typeof import('pixi.js').HTMLText
+        > &
+          import('pixi.js').HTMLTextOptions,
+        'style'
+      > & {
+        style?: any;
+      };
       /** Registered at runtime via `@pixi/react` useExtend */
       pixiBitmapText: import('@pixi/react').PixiReactElementProps<
         typeof import('pixi.js').BitmapText
