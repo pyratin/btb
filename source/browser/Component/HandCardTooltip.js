@@ -14,7 +14,6 @@ const layout = {
   flex: 1,
   flexDirection: 'column',
   justifyContent: 'center',
-  gap: 2,
   borderWidth: 0,
   borderColor: 0xff0000,
   borderRadius: 8,
@@ -103,7 +102,7 @@ const HandCardTooltip = ({
         layout={{
           minWidth,
           flexDirection: 'column',
-          gap: 4,
+          gap: 2,
           padding: 2,
           borderWidth: 2,
           borderColor: 0xffffff,
