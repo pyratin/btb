@@ -35,7 +35,25 @@ const _layout = {
 const style = {
   fontFamily: 'm6x11plus_',
   fontSize: 24,
-  fill: 0x000000
+  fill: 0x000000,
+  align: 'center'
+};
+
+const enhancementTextGet = (type) => {
+  return (
+    {
+      bonus: '<chip>+30</chip> extra chips',
+      mult: '<mult>+4</mult> Mult',
+      wild: 'Can be used<br />as any suit',
+      glass:
+        '<mult>X2</mult> Mult<br /><green>1 in 4</green> chance to<br />destroy card',
+      steel: '<mult>X1.5</mult> Mult<br />while this card<br />stays in hand',
+      stone: '<chip>+50</chip> Chips<br />no rank or suit',
+      gold: '<money>$3</money> if this card<br />is held in hand<br />at end of round',
+      lucky:
+        '<green>1 in 5</green> chance<br />for <mult>+20</mult> Mult<br /><green>1 in 15</green> chance<br />to win <money>$20</money>'
+    }[type] || ''
+  );
 };
 
 const HandCardTooltip = ({
@@ -98,6 +116,22 @@ const HandCardTooltip = ({
                 text={`${_.startCase(enhancementType)} Card`}
                 layout={{}}
                 style={{ ...style }}
+              />
+            </Badge>
+
+            <Badge layout={_layout}>
+              <pixiHTMLText
+                text={enhancementTextGet(enhancementType)}
+                layout={{}}
+                style={{
+                  ...style,
+                  tagStyles: {
+                    chip: { fill: 0x007bc7 },
+                    mult: { fill: 0xfe5f55 },
+                    money: { fill: 0xfecb52 },
+                    green: { fill: 0x47b247 }
+                  }
+                }}
               />
             </Badge>
           </Badge>
