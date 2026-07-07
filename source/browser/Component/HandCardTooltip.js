@@ -7,6 +7,7 @@ import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
 
 import useStore from '#browser/component/useStore';
+import cardModifierConfig from '#browser/component/definition/cardModifier.json';
 import Badge from '#browser/Component/Badge';
 
 /** @type {Omit<pixiLayout.LayoutOptions, 'target'>} */
@@ -41,18 +42,18 @@ const style = {
 };
 
 const enhancementTextGet = (type) => {
+  const config = cardModifierConfig.enhancement[type]?.config || {};
+
   return (
     {
-      bonus: '<chip>+30</chip> extra chips',
-      mult: '<mult>+4</mult> Mult',
+      bonus: `<chips>+${config.bonus}</chips> extra chips`,
+      mult: `<mult>+${config.mult}</mult> Mult`,
       wild: 'Can be used<br />as any suit',
-      glass:
-        '<mult>X2</mult> Mult<br /><green>1 in 4</green> chance to<br />destroy card',
-      steel: '<mult>X1.5</mult> Mult<br />while this card<br />stays in hand',
-      stone: '<chip>+50</chip> Chips<br />no rank or suit',
-      gold: '<money>$3</money> if this card<br />is held in hand<br />at end of round',
-      lucky:
-        '<green>1 in 5</green> chance<br />for <mult>+20</mult> Mult<br /><green>1 in 15</green> chance<br />to win <money>$20</money>'
+      glass: `<mult>X${config.xMult}</mult> Mult<br /><green>1 in ${config.destroyChance}</green> chance to<br />destroy card`,
+      steel: `<mult>X${config.xMultHand}</mult> Mult<br />while this card<br />stays in hand`,
+      stone: `<chips>+${config.bonus}</chips> Chips<br />no rank or suit`,
+      gold: `<money>$${config.dollarsHand}</money> if this card<br />is held in hand<br />at end of round`,
+      lucky: `<green>1 in ${config.multChance}</green> chance<br />for <mult>+${config.mult}</mult> Mult<br /><green>1 in ${config.dollarsChance}</green> chance<br />to win <money>$${config.dollars}</money>`
     }[type] || ''
   );
 };
