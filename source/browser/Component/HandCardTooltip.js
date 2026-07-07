@@ -112,7 +112,7 @@ const HandCardTooltip = ({
         }}
       >
         {enhancementType && (
-          <Badge layout={layout}>
+          <Badge key='enhancement' layout={layout}>
             <Badge
               layout={{
                 ..._layout,
@@ -145,7 +145,7 @@ const HandCardTooltip = ({
         )}
 
         {enhancementType !== 'stone' && (
-          <Badge layout={layout}>
+          <Badge key='base' layout={layout}>
             <Badge layout={_layout}>
               <pixiHTMLText
                 text={`${_.startCase(rank)} of <highlight>${suit}</highlight>`}
