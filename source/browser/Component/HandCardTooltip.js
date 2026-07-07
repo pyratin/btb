@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import _ from 'lodash';
-import { HTMLText } from 'pixi.js';
+import { HTMLText, Text } from 'pixi.js';
 import * as pixiLayout from '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
@@ -37,7 +37,11 @@ const _layout = {
 const style = {
   fontFamily: 'm6x11plus_',
   fontSize: 24,
-  fill: 0x000000,
+  fill: 0x000000
+};
+
+const _style = {
+  ...style,
   align: 'center'
 };
 
@@ -61,7 +65,7 @@ const enhancementTextGet = (type) => {
 const HandCardTooltip = ({
   card: { id, rank, chip, suitIndex, suit, enhancementType }
 }) => {
-  useExtend({ LayoutContainer, HTMLText });
+  useExtend({ LayoutContainer, HTMLText, Text });
 
   const { windowInnerDimenesion, minWidth } = useStore(
     useShallow(({ windowInnerDimenesion, cardDimension: { width } }) => ({
@@ -119,7 +123,7 @@ const HandCardTooltip = ({
                 backgroundColor: 0x8689e9
               }}
             >
-              <pixiHTMLText
+              <pixiText
                 text={`${_.startCase(enhancementType)} Card`}
                 layout={{}}
                 style={{ ...style, fill: 0xffffff }}
@@ -131,7 +135,7 @@ const HandCardTooltip = ({
                 text={enhancementTextGet(enhancementType)}
                 layout={{}}
                 style={{
-                  ...style,
+                  ..._style,
                   tagStyles: {
                     chip: { fill: 0x007bc7 },
                     mult: { fill: 0xfe5f55 },
@@ -151,7 +155,7 @@ const HandCardTooltip = ({
                 text={`${_.startCase(rank)} of <highlight>${suit}</highlight>`}
                 layout={{}}
                 style={{
-                  ...style,
+                  ..._style,
                   tagStyles: {
                     highlight: {
                       // eslint-disable-next-line @eslint-react/unsupported-syntax
@@ -184,7 +188,7 @@ const HandCardTooltip = ({
                 text={`<highlight>+${chip}</highlight> chips`}
                 layout={{}}
                 style={{
-                  ...style,
+                  ..._style,
                   tagStyles: {
                     highlight: { fill: 0x007bc7 }
                   }
