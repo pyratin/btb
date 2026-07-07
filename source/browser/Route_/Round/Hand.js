@@ -366,15 +366,17 @@ const handReoderedGet = (hand, cardDimension, target, containerElement) => {
 
   const cardId = Number(label);
 
-  const index = (() => {
-    const distances = hand.map((_, i) =>
-      Math.abs(
-        target.x - cardTransformGet(i, hand, cardDimension, containerElement).x
-      )
-    );
+  const { offset, cardWidth } = _cardTransformGet(
+    hand,
+    cardDimension,
+    containerElement
+  );
 
-    return distances.indexOf(Math.min(...distances));
-  })();
+  const x = target.x - cardDimension.width / 2;
+
+  const index = Math.abs(
+    _.clamp(Math.round((x - offset) / (cardWidth || 1)), 0, hand.length - 1)
+  );
 
   return (
     index !== hand.findIndex(({ id }) => id === cardId) &&
