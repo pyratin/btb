@@ -142,8 +142,8 @@ const HandCardTooltip = ({
 
       gsap.to(refCurrent, {
         pixi: { alpha: 1 },
-        delay: 1,
-        duration: 2,
+        delay: 0.5,
+        duration: 1,
         ease: 'none'
       });
     },
