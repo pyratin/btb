@@ -75,7 +75,16 @@ const enhancementTextGet = (type) => {
 };
 
 const editionTextGet = (type) => {
-  return '';
+  const config = cardModifierConfig.edition[type]?.config || {};
+
+  return (
+    {
+      folio: `<chips>+${config.bonus}</chips> chips`,
+      holographic: `<mult>+${config.mult}</mult> Mult`,
+      polychrome: `<mult>X${config.xMult}</mult> Mult`,
+      negative: `<negative>+${config.jokerSlot}</negative> Joker slot`
+    }[type] || ''
+  );
 };
 
 const HandCardTooltip = ({
@@ -222,7 +231,7 @@ const HandCardTooltip = ({
               <Badge
                 layout={{
                   ...__layout,
-                  backgroundColor: 0x8689e9
+                  backgroundColor: 0x6a61ff
                 }}
               >
                 <pixiText
@@ -239,7 +248,11 @@ const HandCardTooltip = ({
                   layout={{}}
                   style={{
                     ..._style,
-                    tagStyles: {}
+                    tagStyles: {
+                      chip: { fill: 0x007bc7 },
+                      mult: { fill: 0xfe5f55 },
+                      negative: { fill: 0x5d59a1 }
+                    }
                   }}
                 />
               </Badge>
