@@ -92,7 +92,7 @@ export const cardGet = (
   faceDownFlag = true,
   activeFlag = false,
   // enhancementType = undefined,
-  editionType = undefined,
+  // editionType = undefined,
   scoringFlag = false,
   scoringActiveFlag = false,
   entryFlag = undefined,
@@ -164,7 +164,7 @@ export const cardGet = (
     }
   })();
 
-  /* const editionType = (() => {
+  const editionType = (() => {
     switch (true) {
       case !((rankIndex + 1) % 4):
         return 'polychrome';
@@ -178,7 +178,7 @@ export const cardGet = (
       default:
         return undefined;
     }
-  })(); */
+  })();
 
   return {
     id: packIndex,

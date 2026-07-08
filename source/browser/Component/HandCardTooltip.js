@@ -12,6 +12,18 @@ import Badge from '#browser/Component/Badge';
 
 /** @type {Omit<pixiLayout.LayoutOptions, 'target'>} */
 const layout = {
+  flexDirection: 'column',
+  alignSelf: 'flex-end',
+  gap: 2,
+  padding: 2,
+  borderWidth: 2,
+  borderColor: 0xffffff,
+  borderRadius: 8,
+  backgroundColor: 0x283235
+};
+
+/** @type {Omit<pixiLayout.LayoutOptions, 'target'>} */
+const _layout = {
   flex: 1,
   flexDirection: 'column',
   justifyContent: 'center',
@@ -22,7 +34,7 @@ const layout = {
 };
 
 /** @type {Omit<pixiLayout.LayoutOptions, 'target'>} */
-const _layout = {
+const __layout = {
   justifyContent: 'center',
   alignItems: 'center',
   margin: 2,
@@ -62,8 +74,12 @@ const enhancementTextGet = (type) => {
   );
 };
 
+const editionTextGet = (type) => {
+  return '';
+};
+
 const HandCardTooltip = ({
-  card: { id, rank, chip, suitIndex, suit, enhancementType }
+  card: { id, rank, chip, suitIndex, suit, enhancementType, editionType }
 }) => {
   useExtend({ LayoutContainer, HTMLText, Text });
 
@@ -77,6 +93,12 @@ const HandCardTooltip = ({
   const cardIdRef = useRef(undefined);
 
   const [marginLeft, marginLeftSet] = useState(undefined);
+
+  const baseRenderFlag = enhancementType !== 'stone';
+
+  const enhancementRenderFlag = !!enhancementType;
+
+  const editionRenderFlag = !!editionType;
 
   return (
     <pixiLayoutContainer
@@ -103,104 +125,128 @@ const HandCardTooltip = ({
           })();
       }}
     >
-      <Badge
-        layout={{
-          minWidth,
-          flexDirection: 'column',
-          gap: 2,
-          padding: 2,
-          borderWidth: 2,
-          borderColor: 0xffffff,
-          borderRadius: 8,
-          backgroundColor: 0x283235
-        }}
-      >
-        {enhancementType && (
-          <Badge key='enhancement' layout={layout}>
-            <Badge
-              layout={{
-                ..._layout,
-                backgroundColor: 0x8689e9
-              }}
-            >
-              <pixiText
-                text={`${_.startCase(enhancementType)} Card`}
-                layout={{}}
-                style={{ ...style, fill: 0xffffff }}
-              />
-            </Badge>
-
-            <Badge layout={_layout}>
-              <pixiHTMLText
-                key={enhancementType}
-                text={enhancementTextGet(enhancementType)}
-                layout={{}}
-                style={{
-                  ..._style,
-                  tagStyles: {
-                    chip: { fill: 0x007bc7 },
-                    mult: { fill: 0xfe5f55 },
-                    money: { fill: 0xfecb52 },
-                    green: { fill: 0x47b247 }
-                  }
+      {(baseRenderFlag || enhancementRenderFlag) && (
+        <Badge layout={{ minWidth, ...layout }}>
+          {enhancementRenderFlag && (
+            <Badge key='enhancement' layout={_layout}>
+              <Badge
+                layout={{
+                  ...__layout,
+                  backgroundColor: 0x8689e9
                 }}
-              />
-            </Badge>
-          </Badge>
-        )}
+              >
+                <pixiText
+                  text={`${_.startCase(enhancementType)} Card`}
+                  layout={{}}
+                  style={{ ...style, fill: 0xffffff }}
+                />
+              </Badge>
 
-        {enhancementType !== 'stone' && (
-          <Badge key='base' layout={layout}>
-            <Badge layout={_layout}>
-              <pixiHTMLText
-                key={`${rank}-${suit}`}
-                text={`${_.startCase(rank)} of <highlight>${suit}</highlight>`}
-                layout={{}}
-                style={{
-                  ..._style,
-                  tagStyles: {
-                    highlight: {
-                      // eslint-disable-next-line @eslint-react/unsupported-syntax
-                      fill: (() => {
-                        switch (suitIndex) {
-                          case 0:
-                            return 0xd01d11;
-
-                          case 1:
-                            return 0x007bc7;
-
-                          case 2:
-                            return 0xc77f00;
-
-                          case 3:
-                            return 0x374649;
-
-                          default:
-                            return 0x000000;
-                        }
-                      })()
+              <Badge layout={__layout}>
+                <pixiHTMLText
+                  key={enhancementType}
+                  text={enhancementTextGet(enhancementType)}
+                  layout={{}}
+                  style={{
+                    ..._style,
+                    tagStyles: {
+                      chip: { fill: 0x007bc7 },
+                      mult: { fill: 0xfe5f55 },
+                      money: { fill: 0xfecb52 },
+                      green: { fill: 0x47b247 }
                     }
-                  }
-                }}
-              />
+                  }}
+                />
+              </Badge>
             </Badge>
+          )}
 
-            <Badge layout={_layout}>
-              <pixiHTMLText
-                key={chip}
-                text={`<highlight>+${chip}</highlight> chips`}
-                layout={{}}
-                style={{
-                  ..._style,
-                  tagStyles: {
-                    highlight: { fill: 0x007bc7 }
-                  }
-                }}
-              />
+          {baseRenderFlag && (
+            <Badge key='base' layout={_layout}>
+              <Badge layout={__layout}>
+                <pixiHTMLText
+                  key={`${rank}-${suit}`}
+                  text={`${_.startCase(rank)} of <highlight>${suit}</highlight>`}
+                  layout={{}}
+                  style={{
+                    ..._style,
+                    tagStyles: {
+                      highlight: {
+                        // eslint-disable-next-line @eslint-react/unsupported-syntax
+                        fill: (() => {
+                          switch (suitIndex) {
+                            case 0:
+                              return 0xd01d11;
+
+                            case 1:
+                              return 0x007bc7;
+
+                            case 2:
+                              return 0xc77f00;
+
+                            case 3:
+                              return 0x374649;
+
+                            default:
+                              return 0x000000;
+                          }
+                        })()
+                      }
+                    }
+                  }}
+                />
+              </Badge>
+
+              <Badge layout={__layout}>
+                <pixiHTMLText
+                  key={chip}
+                  text={`<highlight>+${chip}</highlight> chips`}
+                  layout={{}}
+                  style={{
+                    ..._style,
+                    tagStyles: {
+                      highlight: { fill: 0x007bc7 }
+                    }
+                  }}
+                />
+              </Badge>
             </Badge>
-          </Badge>
-        )}
-      </Badge>
+          )}
+        </Badge>
+      )}
+
+      {editionRenderFlag && (
+        <Badge layout={{ minWidth, ...layout }}>
+          {editionRenderFlag && (
+            <Badge key='edition' layout={_layout}>
+              <Badge
+                layout={{
+                  ...__layout,
+                  backgroundColor: 0x8689e9
+                }}
+              >
+                <pixiText
+                  text={_.startCase(editionType)}
+                  layout={{}}
+                  style={{ ...style, fill: 0xffffff }}
+                />
+              </Badge>
+
+              <Badge layout={__layout}>
+                <pixiHTMLText
+                  key={enhancementType}
+                  text={editionTextGet(editionType)}
+                  layout={{}}
+                  style={{
+                    ..._style,
+                    tagStyles: {}
+                  }}
+                />
+              </Badge>
+            </Badge>
+          )}
+        </Badge>
+      )}
     </pixiLayoutContainer>
   );
 };
