@@ -76,5 +76,27 @@
         "jokerSlot": 1
       }
     }
+  },
+  "seal": {
+    "gold": {
+      "name": "Gold Seal",
+      "config": {
+        "dollars": 3
+      }
+    },
+    "purple": {
+      "name": "Purple Seal",
+      "config": {}
+    },
+    "red": {
+      "name": "Red Seal",
+      "config": {
+        "retrigger": 1
+      }
+    },
+    "blue": {
+      "name": "Blue Seal",
+      "config": {}
+    }
   }
 }
