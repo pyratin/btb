@@ -26,14 +26,16 @@ const Card = ({
 
   useExtend({ LayoutContainer, Container, Sprite });
 
-  const { backgroundTexture, texture, enhancementTexture } = useStore(
-    useShallow(({ bundle }) => ({
-      backgroundTexture: bundle._playingCards['_playingCard-1'],
-      texture: cardTextureGet(bundle, card),
-      enhancementTexture:
-        bundle._playingCards[`_playingCard-${card.enhancementType}`]
-    }))
-  );
+  const { backgroundTexture, texture, enhancementTexture, sealTexture } =
+    useStore(
+      useShallow(({ bundle }) => ({
+        backgroundTexture: bundle._playingCards['_playingCard-1'],
+        texture: cardTextureGet(bundle, card),
+        enhancementTexture:
+          bundle._playingCards[`_playingCard-${card.enhancementType}`],
+        sealTexture: bundle._playingCards[`_playingCard-${card.sealType}-seal`]
+      }))
+    );
 
   return (
     <pixiLayoutContainer
@@ -66,6 +68,8 @@ const Card = ({
             )}
           </pixiContainer>
         </Edition>
+
+        {card.sealType && <pixiSprite texture={sealTexture} />}
       </PerspectiveMesh>
     </pixiLayoutContainer>
   );

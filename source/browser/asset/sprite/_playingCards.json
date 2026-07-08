@@ -60,7 +60,7 @@
         "h": 95
       }
     },
-    "_playingCard-gold-seal": {
+    "_playingCard-3": {
       "frame": {
         "x": 213,
         "y": 0,
@@ -480,7 +480,7 @@
         "h": 95
       }
     },
-    "_playingCard-blue-seal": {
+    "_playingCard-24": {
       "frame": {
         "x": 213,
         "y": 285,
@@ -640,6 +640,86 @@
         "h": 95
       }
     },
+    "_playingCard-32": {
+      "frame": {
+        "x": 284,
+        "y": 380,
+        "w": 71,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 71,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 71,
+        "h": 95
+      }
+    },
+    "_playingCard-33": {
+      "frame": {
+        "x": 355,
+        "y": 380,
+        "w": 71,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 71,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 71,
+        "h": 95
+      }
+    },
+    "_playingCard-34": {
+      "frame": {
+        "x": 426,
+        "y": 380,
+        "w": 71,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 71,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 71,
+        "h": 95
+      }
+    },
+    "_playingCard-gold-seal": {
+      "frame": {
+        "x": 142,
+        "y": 0,
+        "w": 71,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 71,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 71,
+        "h": 95
+      }
+    },
     "_playingCard-purple-seal": {
       "frame": {
         "x": 284,
@@ -680,10 +760,30 @@
         "h": 95
       }
     },
-    "_playingCard-34": {
+    "_playingCard-blue-seal": {
       "frame": {
         "x": 426,
         "y": 380,
+        "w": 71,
+        "h": 95
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 71,
+        "h": 95
+      },
+      "sourceSize": {
+        "w": 71,
+        "h": 95
+      }
+    },
+    "_playingCard-bonus": {
+      "frame": {
+        "x": 71,
+        "y": 95,
         "w": 71,
         "h": 95
       },

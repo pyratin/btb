@@ -93,6 +93,7 @@ export const cardGet = (
   activeFlag = false,
   // enhancementType = undefined,
   // editionType = undefined,
+  // sealType = undefined,
   scoringFlag = false,
   scoringActiveFlag = false,
   entryFlag = undefined,
@@ -180,6 +181,25 @@ export const cardGet = (
     }
   })();
 
+  const sealType = (() => {
+    switch (true) {
+      case !((rankIndex + 1) % 5):
+        return 'gold';
+
+      case !((rankIndex + 1) % 4):
+        return 'purple';
+
+      case !((rankIndex + 1) % 3):
+        return 'red';
+
+      case !((rankIndex + 1) % 2):
+        return 'blue';
+
+      default:
+        return undefined;
+    }
+  })();
+
   return {
     id: packIndex,
     packIndex,
@@ -194,6 +214,7 @@ export const cardGet = (
     faceDownFlag,
     activeFlag,
     editionType,
+    sealType,
     enhancementType,
     scoringFlag,
     scoringActiveFlag,
