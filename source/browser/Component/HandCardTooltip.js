@@ -87,8 +87,30 @@ const editionTextGet = (type) => {
   );
 };
 
+const sealTextGet = (type) => {
+  const config = cardModifierConfig.seal[type]?.config || {};
+
+  return (
+    {
+      gold: `Earn <money>$${config.dollars}</money> when this<br />card is played<br />and scores`,
+      purple: `Creates a <tarot>Tarot</tarot> card<br />when <attention>discarded</attention><br /><inactive>(Must have room)</inactive>`,
+      red: `Retrigger this<br />card <attention>${config.retrigger}</attention> time`,
+      blue: `Creates the <planet>Planet</planet> card<br />for final played <attention>poker hand</attention><br />of round if <attention>held</attention> in hand<br /><inactive>(Must have room)</inactive>`
+    }[type] || ''
+  );
+};
+
 const HandCardTooltip = ({
-  card: { id, rank, chip, suitIndex, suit, enhancementType, editionType }
+  card: {
+    id,
+    rank,
+    chip,
+    suitIndex,
+    suit,
+    enhancementType,
+    editionType,
+    sealType
+  }
 }) => {
   useExtend({ LayoutContainer, HTMLText, Text });
 
@@ -108,6 +130,8 @@ const HandCardTooltip = ({
   const enhancementRenderFlag = !!enhancementType;
 
   const editionRenderFlag = !!editionType;
+
+  const sealRenderFlag = !!sealType;
 
   return (
     <pixiLayoutContainer
@@ -234,7 +258,7 @@ const HandCardTooltip = ({
         </Badge>
       )}
 
-      {editionRenderFlag && (
+      {(editionRenderFlag || sealRenderFlag) && (
         <Badge layout={{ minWidth, ...layout }}>
           {editionRenderFlag && (
             <Badge key='edition' layout={_layout}>
@@ -268,6 +292,47 @@ const HandCardTooltip = ({
                       chip: { fill: 0x007bc7 },
                       mult: { fill: 0xfe5f55 },
                       negative: { fill: 0x5d59a1 }
+                    }
+                  }}
+                />
+              </Badge>
+            </Badge>
+          )}
+
+          {sealRenderFlag && (
+            <Badge key='seal' layout={_layout}>
+              <Badge
+                layout={{
+                  ...__layout,
+                  backgroundColor:
+                    {
+                      gold: 0xfecb52,
+                      purple: 0x8867a5,
+                      red: 0xfe5f55,
+                      blue: 0x007bc7
+                    }[sealType] || 0x8689e9
+                }}
+              >
+                <pixiText
+                  text={`${_.startCase(sealType)} Seal`}
+                  layout={{}}
+                  style={{ ...style, fill: 0xffffff }}
+                />
+              </Badge>
+
+              <Badge layout={__layout}>
+                <pixiHTMLText
+                  key={sealType}
+                  text={sealTextGet(sealType)}
+                  layout={{}}
+                  style={{
+                    ..._style,
+                    tagStyles: {
+                      money: { fill: 0xfecb52 },
+                      tarot: { fill: 0xa782d1 },
+                      planet: { fill: 0x13afce },
+                      attention: { fill: 0xfda200 },
+                      inactive: { fill: 0x888888 }
                     }
                   }}
                 />
