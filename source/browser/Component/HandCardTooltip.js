@@ -141,7 +141,17 @@ const HandCardTooltip = ({
               <Badge
                 layout={{
                   ...__layout,
-                  backgroundColor: 0x8689e9
+                  backgroundColor:
+                    {
+                      bonus: 0x007bc7,
+                      mult: 0xfe5f55,
+                      wild: 0x47b247,
+                      glass: 0x8aa6a3,
+                      steel: 0x5a637c,
+                      stone: 0x595959,
+                      gold: 0xfecb52,
+                      lucky: 0x3a9e3a
+                    }[enhancementType] || 0x8689e9
                 }}
               >
                 <pixiText
@@ -231,7 +241,13 @@ const HandCardTooltip = ({
               <Badge
                 layout={{
                   ...__layout,
-                  backgroundColor: 0x6a61ff
+                  backgroundColor:
+                    {
+                      folio: 0x5a637c,
+                      holographic: 0x8689e9,
+                      polychrome: 0xc75985,
+                      negative: 0x3d3d3d
+                    }[editionType] || 0x8689e9
                 }}
               >
                 <pixiText
