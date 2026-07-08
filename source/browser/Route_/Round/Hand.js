@@ -620,6 +620,10 @@ const Hand = ({
 
   const [hoverCardIndex, hoverCardIndexSet] = useState(undefined);
 
+  const hoverCardIndexSetDebounceRef = useRef(
+    _.debounce(hoverCardIndexSet, 1000)
+  );
+
   useTouchTilt({ hand, cardDimension, cardCollectionRef, containerRef: ref });
 
   useEffect(() => {
@@ -837,10 +841,21 @@ const Hand = ({
   );
 
   const onPointerEnterLeaveHandle = ({ type, currentTarget: { label } }) => {
-    hoverCardIndexSet(
-      type.match(/pointerenter|pointerdown|pointerup/) &&
-        Number(hand.findIndex(({ id }) => id === label))
-    );
+    switch (type) {
+      case 'pointerenter':
+      case 'pointerdown':
+      case 'pointerup':
+        return hoverCardIndexSetDebounceRef.current(
+          Number(hand.findIndex(({ id }) => id === label))
+        );
+
+      default:
+        return (() => {
+          hoverCardIndexSetDebounceRef.current.cancel();
+
+          hoverCardIndexSet(undefined);
+        })();
+    }
   };
 
   const _onPointerUpHandle = contextSafe((event) => {
