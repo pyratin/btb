@@ -1,14 +1,21 @@
 import { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import _ from 'lodash';
+import * as pixiJs from 'pixi.js';
 import { HTMLText, Text } from 'pixi.js';
 import * as pixiLayout from '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
 import { useExtend } from '@pixi/react';
+import { gsap } from 'gsap';
+import { PixiPlugin as gsapPixiPlugin } from 'gsap/PixiPlugin';
+import { useGSAP } from '@gsap/react';
 
 import useStore from '#browser/component/useStore';
 import cardModifierConfig from '#browser/component/definition/cardModifier.json';
 import Badge from '#browser/Component/Badge';
+
+gsap.registerPlugin(gsapPixiPlugin, useGSAP);
+gsapPixiPlugin.registerPIXI(pixiJs);
 
 /** @type {Omit<pixiLayout.LayoutOptions, 'target'>} */
 const layout = {
@@ -121,9 +128,26 @@ const HandCardTooltip = ({
     }))
   );
 
+  const ref = useRef(undefined);
+
   const cardIdRef = useRef(undefined);
 
   const [marginLeft, marginLeftSet] = useState(undefined);
+
+  useGSAP(
+    () => {
+      const refCurrent = ref.current;
+
+      gsap.set(refCurrent, { pixi: { alpha: 0 } });
+
+      gsap.to(refCurrent, {
+        pixi: { alpha: 1 },
+        duration: 0.5,
+        ease: 'back.out(1.4)'
+      });
+    },
+    { dependencies: [] }
+  );
 
   const baseRenderFlag = enhancementType !== 'stone';
 
@@ -135,6 +159,7 @@ const HandCardTooltip = ({
 
   return (
     <pixiLayoutContainer
+      ref={ref}
       layout={{
         position: 'absolute',
         bottom: 0,
@@ -142,6 +167,7 @@ const HandCardTooltip = ({
         borderWidth: 0,
         borderColor: 0xff0000
       }}
+      alpha={0}
       onLayout={(event) => {
         id !== cardIdRef.current &&
           // eslint-disable-next-line @eslint-react/unsupported-syntax
