@@ -234,7 +234,7 @@ const HandCardTooltip = ({
 
               <Badge layout={__layout}>
                 <pixiHTMLText
-                  key={enhancementType}
+                  key={editionType}
                   text={editionTextGet(editionType)}
                   layout={{}}
                   style={{
