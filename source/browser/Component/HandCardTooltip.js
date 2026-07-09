@@ -138,13 +138,11 @@ const HandCardTooltip = ({
     () => {
       const refCurrent = ref.current;
 
-      gsap.set(refCurrent, { pixi: { alpha: 0 } });
-
       gsap.to(refCurrent, {
-        pixi: { alpha: 1 },
-        delay: 0.25,
-        duration: 0.5,
-        ease: 'none'
+        keyframes: [
+          { pixi: { y: 5, alpha: 0 }, duration: 0.25, ease: 'none' },
+          { pixi: { y: 0, alpha: 1 }, duration: 0.1, ease: 'back.out(1.4)' }
+        ]
       });
     },
     { dependencies: [] }
