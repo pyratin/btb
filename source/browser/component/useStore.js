@@ -89,18 +89,18 @@ export const cardGet = (
   _rankIndex,
   suitIndex,
   packIndex = _rankIndex + suitIndex * rankLength,
-  faceDownFlag = true,
+  enhancementType = undefined,
+  editionType = undefined,
+  sealType = undefined,
+  faceDownFlag = false,
   activeFlag = false,
-  // enhancementType = undefined,
-  // editionType = undefined,
-  // sealType = undefined,
   scoringFlag = false,
   scoringActiveFlag = false,
   entryFlag = undefined,
   discardFlag = undefined,
   playedFlag = undefined
 ) => {
-  const rankIndex = _rankIndex + 1;
+  const rankIndex = _.isFinite(_rankIndex) ? _rankIndex + 1 : _rankIndex;
 
   const rankIndexCollection = [
     rankIndex,
@@ -118,87 +118,24 @@ export const cardGet = (
           return [rank, false, rank];
         })();
 
-      case rankIndex === 13:
-        return ['Ace', false, rankIndexFaceCardMinimum + 1];
-
-      default:
+      case rankIndex < 13:
         return [
           ['jack', 'queen', 'king'][rankIndex - rankIndexFaceCardMinimum],
           true,
           rankIndexFaceCardMinimum
         ];
+
+      case rankIndex === 13:
+        return ['Ace', false, rankIndexFaceCardMinimum + 1];
+
+      default:
+        return [];
     }
   })();
 
   const suitIndexCollection = [suitIndex];
 
   const suit = ['heart', 'club', 'diamond', 'spade'][suitIndexCollection[0]];
-
-  const enhancementType = (() => {
-    switch (true) {
-      case !((rankIndex + 1) % 9):
-        return 'lucky';
-
-      case !((rankIndex + 1) % 8):
-        return 'gold';
-
-      case !((rankIndex + 1) % 7):
-        return 'stone';
-
-      case !((rankIndex + 1) % 6):
-        return 'steel';
-
-      case !((rankIndex + 1) % 5):
-        return 'glass';
-
-      case !((rankIndex + 1) % 4):
-        return 'wild';
-
-      case !((rankIndex + 1) % 3):
-        return 'mult';
-
-      case !((rankIndex + 1) % 2):
-        return 'bonus';
-
-      default:
-        return undefined;
-    }
-  })();
-
-  const editionType = (() => {
-    switch (true) {
-      case !((rankIndex + 1) % 4):
-        return 'polychrome';
-
-      case !((rankIndex + 1) % 3):
-        return 'holographic';
-
-      case !((rankIndex + 1) % 2):
-        return 'folio';
-
-      default:
-        return undefined;
-    }
-  })();
-
-  const sealType = (() => {
-    switch (true) {
-      case !((rankIndex + 1) % 5):
-        return 'gold';
-
-      case !((rankIndex + 1) % 4):
-        return 'purple';
-
-      case !((rankIndex + 1) % 3):
-        return 'red';
-
-      case !((rankIndex + 1) % 2):
-        return 'blue';
-
-      default:
-        return undefined;
-    }
-  })();
 
   return {
     id: packIndex,
@@ -245,24 +182,35 @@ const collectionSuffledGet = (seed, collection) => {
 const handSortedGet = (handSortTypeIndex, hand) => {
   const keyCollection = ['rankIndexCollection', 'suitIndexCollection'];
 
-  return [...hand].sort((a, b) => {
-    const fn = (object) => {
-      return object[keyCollection[handSortTypeIndex]][0];
-    };
+  return [
+    ...hand
+      .filter(
+        ({ rankIndex, suitIndex }) =>
+          _.isFinite(rankIndex) && _.isFinite(suitIndex)
+      )
+      .sort((a, b) => {
+        const fn = (object) => {
+          return object[keyCollection[handSortTypeIndex]][0];
+        };
 
-    const _fn = (object) => object[keyCollection[1 - handSortTypeIndex]][0];
+        const _fn = (object) => object[keyCollection[1 - handSortTypeIndex]][0];
 
-    const _collection = [a, b];
+        const _collection = [a, b];
 
-    const collection = !handSortTypeIndex
-      ? _collection
-      : [..._collection].reverse();
+        const collection = !handSortTypeIndex
+          ? _collection
+          : [..._collection].reverse();
 
-    return (
-      fn(collection[1]) - fn(collection[0]) ||
-      _fn(collection[0]) - _fn(collection[1])
-    );
-  });
+        return (
+          fn(collection[1]) - fn(collection[0]) ||
+          _fn(collection[0]) - _fn(collection[1])
+        );
+      }),
+    ...hand.filter(
+      ({ rankIndex, suitIndex }) =>
+        !(_.isFinite(rankIndex) && _.isFinite(suitIndex))
+    )
+  ];
 };
 
 const handCardGet = (card) => {
@@ -549,6 +497,103 @@ const _onWindowResizeHandle = () => {
 window.removeEventListener('resize', _onWindowResizeHandle);
 
 window.addEventListener('resize', _onWindowResizeHandle);
+
+useStore.subscribe(
+  () => {},
+  () => {
+    const { getState } = useStore;
+
+    const { handSortTypeIndex, handSet } = getState();
+
+    handSet((hand) =>
+      handSortedGet(
+        handSortTypeIndex,
+        hand.map((card) => {
+          const { rankIndex, suitIndex, packIndex } = card;
+
+          const enhancementType = (() => {
+            switch (true) {
+              case !((rankIndex + 1) % 9):
+                return 'lucky';
+
+              case !((rankIndex + 1) % 8):
+                return 'gold';
+
+              case !((rankIndex + 1) % 7):
+                return 'stone';
+
+              case !((rankIndex + 1) % 6):
+                return 'steel';
+
+              case !((rankIndex + 1) % 5):
+                return 'glass';
+
+              case !((rankIndex + 1) % 4):
+                return 'wild';
+
+              case !((rankIndex + 1) % 3):
+                return 'mult';
+
+              case !((rankIndex + 1) % 2):
+                return 'bonus';
+
+              default:
+                return undefined;
+            }
+          })();
+
+          const editionType = (() => {
+            switch (true) {
+              case !((rankIndex + 1) % 4):
+                return 'polychrome';
+
+              case !((rankIndex + 1) % 3):
+                return 'holographic';
+
+              case !((rankIndex + 1) % 2):
+                return 'folio';
+
+              default:
+                return undefined;
+            }
+          })();
+
+          const sealType = (() => {
+            switch (true) {
+              case !((rankIndex + 1) % 5):
+                return 'gold';
+
+              case !((rankIndex + 1) % 4):
+                return 'purple';
+
+              case !((rankIndex + 1) % 3):
+                return 'red';
+
+              case !((rankIndex + 1) % 2):
+                return 'blue';
+
+              default:
+                return undefined;
+            }
+          })();
+
+          return {
+            ...card,
+            ...(enhancementType === 'stone' && {
+              ...cardGet(undefined, undefined, packIndex),
+              _rankIndex: rankIndex,
+              _suitIndex: suitIndex
+            }),
+            enhancementType,
+            editionType,
+            sealType
+          };
+        })
+      )
+    );
+  },
+  { fireImmediately: true }
+);
 
 useStore.subscribe(
   ({ round: { index } }) => index,
