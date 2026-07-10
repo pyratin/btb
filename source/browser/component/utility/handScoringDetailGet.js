@@ -11,7 +11,11 @@ import handTypeDefinitionCollection from '#browser/component/definition/handType
 export default (hand) => {
   const cardActiveCollection = hand.filter(({ activeFlag }) => activeFlag);
 
-  const rankGroups = cardActiveCollection.reduce((memo, card) => {
+  const cardActiveEvaluationCollection = cardActiveCollection.filter(
+    ({ enhancementType }) => enhancementType !== 'stone'
+  );
+
+  const rankGroups = cardActiveEvaluationCollection.reduce((memo, card) => {
     const { rankIndex } = card;
     return {
       ...memo,
@@ -24,7 +28,7 @@ export default (hand) => {
     return lengthDiff !== 0 ? lengthDiff : b[0].rankIndex - a[0].rankIndex;
   });
 
-  const suitGroups = cardActiveCollection.reduce((memo, card) => {
+  const suitGroups = cardActiveEvaluationCollection.reduce((memo, card) => {
     const { suit } = card;
     return {
       ...memo,
@@ -38,8 +42,8 @@ export default (hand) => {
   const flushFlag = !!flushGroup;
 
   const straightFlag =
-    cardActiveCollection.length === 5 &&
-    cardActiveCollection
+    cardActiveEvaluationCollection.length === 5 &&
+    cardActiveEvaluationCollection
       .reduce((memo, { rankIndexCollection }) => {
         return !memo.length
           ? rankIndexCollection.map((val) => [val])
@@ -64,12 +68,20 @@ export default (hand) => {
       case !cardActiveCollection.length:
         return { handTypeIndex: undefined, scoringCardCollection: [] };
 
+      case !cardActiveEvaluationCollection.length:
+        return {
+          handTypeIndex: handTypeDefinitionCollection.findIndex(
+            ({ id }) => id === 'highCard'
+          ),
+          scoringCardCollection: []
+        };
+
       case straightFlag && flushFlag:
         return {
           handTypeIndex: handTypeDefinitionCollection.findIndex(
             ({ id }) => id === 'straightFlush'
           ),
-          scoringCardCollection: cardActiveCollection
+          scoringCardCollection: cardActiveEvaluationCollection
         };
 
       case sortedGroups[0].length === 4:
@@ -101,7 +113,7 @@ export default (hand) => {
           handTypeIndex: handTypeDefinitionCollection.findIndex(
             ({ id }) => id === 'straight'
           ),
-          scoringCardCollection: cardActiveCollection
+          scoringCardCollection: cardActiveEvaluationCollection
         };
 
       case sortedGroups[0].length === 3:
