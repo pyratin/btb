@@ -1,5 +1,8 @@
 import handTypeDefinitionCollection from '#browser/component/definition/handType.json';
 
+const enhancementStoneFlagGet = ({ enhancementType }) =>
+  enhancementType === 'stone';
+
 /**
  * Evaluates the played hand and returns the index of the hand type from
  * handtype.json and the hand with scoring flags.
@@ -12,7 +15,7 @@ export default (hand) => {
   const cardActiveCollection = hand.filter(({ activeFlag }) => activeFlag);
 
   const cardActiveEvaluationCollection = cardActiveCollection.filter(
-    ({ enhancementType }) => enhancementType !== 'stone'
+    (card) => !enhancementStoneFlagGet(card)
   );
 
   const rankGroups = cardActiveEvaluationCollection.reduce((memo, card) => {
@@ -153,7 +156,7 @@ export default (hand) => {
   const _hand = hand.map((card) => {
     return {
       ...card,
-      scoringFlag: card.activeFlag && card.enhancementType === 'stone'
+      scoringFlag: card.activeFlag && enhancementStoneFlagGet(card)
         ? true
         : result.scoringCardCollection.some(({ id }) => id === card.id)
     };
