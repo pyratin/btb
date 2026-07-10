@@ -129,7 +129,7 @@ export const cardGet = (
         return ['Ace', false, rankIndexFaceCardMinimum + 1];
 
       default:
-        return [];
+        return [undefined, false, 0];
     }
   })();
 

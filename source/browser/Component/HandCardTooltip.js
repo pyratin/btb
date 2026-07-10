@@ -148,8 +148,6 @@ const HandCardTooltip = ({
     { dependencies: [] }
   );
 
-  const baseRenderFlag = enhancementType !== 'stone';
-
   const enhancementRenderFlag = !!enhancementType;
 
   const editionRenderFlag = !!editionType;
@@ -183,105 +181,103 @@ const HandCardTooltip = ({
           })();
       }}
     >
-      {(baseRenderFlag || enhancementRenderFlag) && (
-        <Badge layout={{ minWidth, ...layout }}>
-          {enhancementRenderFlag && (
-            <Badge key='enhancement' layout={_layout}>
-              <Badge
-                layout={{
-                  ...__layout,
-                  backgroundColor:
-                    {
-                      bonus: 0x007bc7,
-                      mult: 0xfe5f55,
-                      wild: 0x47b247,
-                      glass: 0x8aa6a3,
-                      steel: 0x5a637c,
-                      stone: 0x595959,
-                      gold: 0xfecb52,
-                      lucky: 0x3a9e3a
-                    }[enhancementType] || 0x8689e9
+      <Badge layout={{ minWidth, ...layout }}>
+        {enhancementRenderFlag && (
+          <Badge key='enhancement' layout={_layout}>
+            <Badge
+              layout={{
+                ...__layout,
+                backgroundColor:
+                  {
+                    bonus: 0x007bc7,
+                    mult: 0xfe5f55,
+                    wild: 0x47b247,
+                    glass: 0x8aa6a3,
+                    steel: 0x5a637c,
+                    stone: 0x595959,
+                    gold: 0xfecb52,
+                    lucky: 0x3a9e3a
+                  }[enhancementType] || 0x8689e9
+              }}
+            >
+              <pixiText
+                text={`${_.startCase(enhancementType)} Card`}
+                layout={{}}
+                style={{ ...style, fill: 0xffffff }}
+              />
+            </Badge>
+
+            <Badge layout={__layout}>
+              <pixiHTMLText
+                key={enhancementType}
+                text={enhancementTextGet(enhancementType)}
+                layout={{}}
+                style={{
+                  ..._style,
+                  tagStyles: {
+                    chip: { fill: 0x007bc7 },
+                    mult: { fill: 0xfe5f55 },
+                    money: { fill: 0xfecb52 },
+                    green: { fill: 0x47b247 }
+                  }
                 }}
-              >
-                <pixiText
-                  text={`${_.startCase(enhancementType)} Card`}
-                  layout={{}}
-                  style={{ ...style, fill: 0xffffff }}
-                />
-              </Badge>
-
-              <Badge layout={__layout}>
-                <pixiHTMLText
-                  key={enhancementType}
-                  text={enhancementTextGet(enhancementType)}
-                  layout={{}}
-                  style={{
-                    ..._style,
-                    tagStyles: {
-                      chip: { fill: 0x007bc7 },
-                      mult: { fill: 0xfe5f55 },
-                      money: { fill: 0xfecb52 },
-                      green: { fill: 0x47b247 }
-                    }
-                  }}
-                />
-              </Badge>
+              />
             </Badge>
-          )}
+          </Badge>
+        )}
 
-          {baseRenderFlag && (
-            <Badge key='base' layout={_layout}>
-              <Badge layout={__layout}>
-                <pixiHTMLText
-                  key={`${rank}-${suit}`}
-                  text={`${_.startCase(rank)} of <highlight>${suit}</highlight>`}
-                  layout={{}}
-                  style={{
-                    ..._style,
-                    tagStyles: {
-                      highlight: {
-                        // eslint-disable-next-line @eslint-react/unsupported-syntax
-                        fill: (() => {
-                          switch (suitIndex) {
-                            case 0:
-                              return 0xd01d11;
+        <Badge key='base' layout={_layout}>
+          <Badge layout={__layout}>
+            <pixiHTMLText
+              key={`${rank}-${suit}`}
+              text={`${
+                _.startCase(rank) || '--'
+              } of <highlight>${suit || '--'}</highlight>`}
+              layout={{}}
+              style={{
+                ..._style,
+                tagStyles: {
+                  highlight: {
+                    // eslint-disable-next-line @eslint-react/unsupported-syntax
+                    fill: (() => {
+                      switch (suitIndex) {
+                        case 0:
+                          return 0xd01d11;
 
-                            case 1:
-                              return 0x007bc7;
+                        case 1:
+                          return 0x007bc7;
 
-                            case 2:
-                              return 0xc77f00;
+                        case 2:
+                          return 0xc77f00;
 
-                            case 3:
-                              return 0x374649;
+                        case 3:
+                          return 0x374649;
 
-                            default:
-                              return 0x000000;
-                          }
-                        })()
+                        default:
+                          return 0x000000;
                       }
-                    }
-                  }}
-                />
-              </Badge>
+                    })()
+                  }
+                }
+              }}
+            />
+          </Badge>
 
-              <Badge layout={__layout}>
-                <pixiHTMLText
-                  key={chip}
-                  text={`<highlight>+${chip}</highlight> chips`}
-                  layout={{}}
-                  style={{
-                    ..._style,
-                    tagStyles: {
-                      highlight: { fill: 0x007bc7 }
-                    }
-                  }}
-                />
-              </Badge>
-            </Badge>
-          )}
+          <Badge layout={__layout}>
+            <pixiHTMLText
+              key={chip}
+              text={`<highlight>+${chip}</highlight> chips`}
+              layout={{}}
+              style={{
+                ..._style,
+                tagStyles: {
+                  highlight: { fill: 0x007bc7 }
+                }
+              }}
+            />
+          </Badge>
         </Badge>
-      )}
+      </Badge>
 
       {(editionRenderFlag || sealRenderFlag) && (
         <Badge layout={{ minWidth, ...layout }}>
