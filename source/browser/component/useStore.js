@@ -88,17 +88,7 @@ const rankLength = 13;
 export const cardGet = (
   _rankIndex,
   suitIndex,
-  packIndex = _rankIndex + suitIndex * rankLength,
-  enhancementType = undefined,
-  editionType = undefined,
-  sealType = undefined,
-  faceDownFlag = false,
-  activeFlag = false,
-  scoringFlag = false,
-  scoringActiveFlag = false,
-  entryFlag = undefined,
-  discardFlag = undefined,
-  playedFlag = undefined
+  packIndex = _rankIndex + suitIndex * rankLength
 ) => {
   const rankIndex = _.isFinite(_rankIndex) ? _rankIndex + 1 : _rankIndex;
 
@@ -148,16 +138,15 @@ export const cardGet = (
     suitIndex,
     suitIndexCollection,
     suit,
-    faceDownFlag,
-    activeFlag,
-    editionType,
-    sealType,
-    enhancementType,
-    scoringFlag,
-    scoringActiveFlag,
-    entryFlag,
-    discardFlag,
-    playedFlag
+    enhancementType: undefined,
+    editionType: undefined,
+    sealType: undefined,
+    faceDownFlag: false,
+    activeFlag: false,
+    scoringFlag: false,
+    entryFlag: false,
+    discardFlag: false,
+    playedFlag: false
   };
 };
 
@@ -213,13 +202,6 @@ const handSortedGet = (handSortTypeIndex, hand) => {
   ];
 };
 
-const handCardGet = (card) => {
-  return {
-    ...card,
-    faceDownFlag: false
-  };
-};
-
 const roundInitializedGet = (
   seed,
   handSize,
@@ -232,9 +214,7 @@ const roundInitializedGet = (
     pack
   ).map((card, deckIndex) => ({ ...card, deckIndex }));
 
-  const hand = handSortedGet(handSortTypeIndex, _deck.slice(0, handSize)).map(
-    (card) => handCardGet(card)
-  );
+  const hand = handSortedGet(handSortTypeIndex, _deck.slice(0, handSize));
 
   const deck = _deck.slice(handSize);
 
@@ -246,7 +226,8 @@ const roundInitializedGet = (
     hand,
     handPlayed: undefined,
     muck: undefined,
-    handTypeIndex: undefined
+    handTypeIndex: undefined,
+    cardIdActive: undefined
   };
 };
 
@@ -331,9 +312,7 @@ const handSortTypeIndexSet = (handSortTypeIndex, set) => {
 
         return {
           ...rest,
-          hand: handSortedGet(handSortTypeIndex, hand).map((card) =>
-            handCardGet(card)
-          )
+          hand: handSortedGet(handSortTypeIndex, hand)
         };
       })(round)
     };
@@ -387,7 +366,7 @@ const onHandCardDiscardTriggerHandle = (set) => {
         const _hand = handSortedGet(handSortTypeIndex, [
           ...hand.filter(({ activeFlag }) => !activeFlag),
           ...deck.slice(0, discardCollection.length)
-        ]).map((card) => handCardGet(card));
+        ]);
 
         const _deck = deck.slice(discardCollection.length);
 
@@ -434,6 +413,24 @@ const onHandPlayedTriggerHandle = (set) => {
   });
 };
 
+const cardIdActiveSet = (cardIdActive, set) => {
+  set((state) => {
+    const { round, ...rest } = current(state);
+
+    return {
+      ...rest,
+      round: produce((round) => {
+        const rest = /** @type {ReturnType<typeof cardGet>} */ (current(round));
+
+        return {
+          ...rest,
+          cardIdActive
+        };
+      })(round)
+    };
+  });
+};
+
 const useStore = create(
   persist(
     subscribeWithSelector(
@@ -447,7 +444,9 @@ const useStore = create(
             handSet: (hand) => handSet(hand, set),
             onHandCardDiscardTriggerHandle: () =>
               onHandCardDiscardTriggerHandle(set),
-            onHandPlayedTriggerHandle: () => onHandPlayedTriggerHandle(set)
+            onHandPlayedTriggerHandle: () => onHandPlayedTriggerHandle(set),
+            cardIdAcitveSet: (cardIdActive) =>
+              cardIdActiveSet(cardIdActive, set)
           };
         })
       )
@@ -478,9 +477,9 @@ const useStore = create(
         removeItem: (name) => localStorage.removeItem(name)
       },
       partialize: (state) => {
-        const { seed } = state;
+        const { _bundle, bundle, ...rest } = state;
 
-        return { seed };
+        return rest;
       }
     }
   )
