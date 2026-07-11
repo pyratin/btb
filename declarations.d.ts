@@ -25,7 +25,7 @@ declare module 'react' {
           import('pixi.js').HTMLTextOptions,
         'style'
       > & {
-        style?: any;
+        style?: unknown;
       };
       /** Registered at runtime via `@pixi/react` useExtend */
       pixiBitmapText: import('@pixi/react').PixiReactElementProps<

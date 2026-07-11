@@ -44,7 +44,11 @@ const Card = ({
         borderColor: 0xff0000
       }}
     >
-      <pixiSprite texture={backgroundTexture} {...shadowConfiguration} />
+      <pixiSprite
+        label='shadow'
+        texture={backgroundTexture}
+        {...shadowConfiguration}
+      />
 
       <PerspectiveMesh
         ref={ref}

@@ -117,7 +117,6 @@ const scoringAnimationHandle = (
   collection,
   cardDimension,
   containerElement,
-  shadowDefinitionSet,
   onComplete
 ) => {
   const gsapTimeline = gsap.timeline();
@@ -150,20 +149,14 @@ const scoringAnimationHandle = (
       timelinePosition
     );
 
-    const _shadowDefinition = { [index]: 0 };
+    const cardShadowElement = element.children[0].getChildByLabel('shadow');
 
     card.scoringFlag &&
       gsapTimeline.to(
-        _shadowDefinition,
+        cardShadowElement,
         {
-          [index]: 20,
-          ...option,
-          onUpdate: () => {
-            shadowDefinitionSet((shadowDefinition) => ({
-              ...shadowDefinition,
-              ..._shadowDefinition
-            }));
-          }
+          y: 20,
+          ...option
         },
         timelinePosition
       );
@@ -188,8 +181,6 @@ const HandPlayed = () => {
   const [scoringAnimationTriggerFlag, scoringAnimationTriggerFlagSet] =
     useState(false);
 
-  const [shadowDefinition, shadowDefinitionSet] = useState(undefined);
-
   useGSAP(
     () => {
       layoutInitializedFlag &&
@@ -206,15 +197,9 @@ const HandPlayed = () => {
   useGSAP(
     () => {
       scoringAnimationTriggerFlag &&
-        scoringAnimationHandle(
-          handPlayed,
-          cardDimension,
-          ref.current,
-          shadowDefinitionSet,
-          () => {
-            cardIdActiveSet(cardIdActiveGet(undefined, handPlayed));
-          }
-        );
+        scoringAnimationHandle(handPlayed, cardDimension, ref.current, () => {
+          cardIdActiveSet(cardIdActiveGet(undefined, handPlayed));
+        });
     },
     { dependencies: [scoringAnimationTriggerFlag, handPlayed] }
   );
@@ -262,7 +247,6 @@ const HandPlayed = () => {
             <Card
               perspectiveMeshDisableFlag={true}
               shadowConfiguration={{
-                position: { x: -1, y: shadowDefinition?.[index] || 5 },
                 tint: 0x000000,
                 alpha: 0.25
               }}
