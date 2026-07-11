@@ -22,6 +22,20 @@ const containerElementWidthGet = (containerElement) => {
   return width;
 };
 
+const cardIdActiveGet = (cardIdActive, HandPlayed) => {
+  const handPlayedScoringIdCollection = HandPlayed.filter(
+    ({ scoringFlag }) => scoringFlag
+  ).map(({ id }) => id);
+
+  const index = handPlayedScoringIdCollection.findIndex(
+    (id) => id === cardIdActive
+  );
+
+  return handPlayedScoringIdCollection[
+    index !== handPlayedScoringIdCollection.length - 1 ? index + 1 : -1
+  ];
+};
+
 const cardTransformGet = (index, hand, cardDimension, containerElement) => {
   const _width = containerElementWidthGet(containerElement);
 
@@ -159,10 +173,11 @@ const scoringAnimationHandle = (
 const HandPlayed = () => {
   useExtend({ LayoutContainer, Container, Sprite });
 
-  const { cardDimension, handPlayed } = useStore(
-    useShallow(({ cardDimension, round: { handPlayed } }) => ({
+  const { cardDimension, handPlayed, cardIdActiveSet } = useStore(
+    useShallow(({ cardDimension, round: { handPlayed }, cardIdActiveSet }) => ({
+      cardDimension,
       handPlayed,
-      cardDimension
+      cardIdActiveSet
     }))
   );
 
@@ -177,15 +192,15 @@ const HandPlayed = () => {
 
   useGSAP(
     () => {
-      handPlayed &&
-        layoutInitializedFlag &&
+      layoutInitializedFlag &&
+        handPlayed &&
         (() => {
           entryAnimationHandle(handPlayed, cardDimension, ref.current, () => {
             scoringAnimationTriggerFlagSet(true);
           });
         })();
     },
-    { dependencies: [handPlayed] }
+    { dependencies: [layoutInitializedFlag, handPlayed] }
   );
 
   useGSAP(
@@ -196,7 +211,9 @@ const HandPlayed = () => {
           cardDimension,
           ref.current,
           shadowDefinitionSet,
-          () => {}
+          () => {
+            cardIdActiveSet(cardIdActiveGet(undefined, handPlayed));
+          }
         );
     },
     { dependencies: [scoringAnimationTriggerFlag, handPlayed] }

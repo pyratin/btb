@@ -445,7 +445,7 @@ const useStore = create(
             onHandCardDiscardTriggerHandle: () =>
               onHandCardDiscardTriggerHandle(set),
             onHandPlayedTriggerHandle: () => onHandPlayedTriggerHandle(set),
-            cardIdAcitveSet: (cardIdActive) =>
+            cardIdActiveSet: (cardIdActive) =>
               cardIdActiveSet(cardIdActive, set)
           };
         })
