@@ -1,3 +1,4 @@
+import { useMemo, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import '@pixi/layout';
 import { LayoutContainer } from '@pixi/layout/components';
@@ -8,6 +9,7 @@ import useStore from '#browser/component/useStore';
 import cardTextureGet from '#browser/component/utility/cardTextureGet';
 import PerspectiveMesh from '#browser/Component/PerspectiveMesh';
 import Edition from '#browser/Component/Edition';
+import GoldSeal from '#browser/component/shader/GoldSeal';
 
 /**
  * @param {import('#browser/component/type/Card').CardProps} props The component
@@ -37,6 +39,17 @@ const Card = ({
       }))
     );
 
+  const sealFilterCollection = useMemo(
+    () => [...(card.sealType === 'gold' ? [new GoldSeal()] : [])],
+    [card.sealType]
+  );
+
+  useEffect(() => {
+    return () => {
+      sealFilterCollection.map((sealFilter) => sealFilter.destroy());
+    };
+  }, [sealFilterCollection]);
+
   return (
     <pixiLayoutContainer
       layout={{
@@ -53,7 +66,7 @@ const Card = ({
       <PerspectiveMesh
         ref={ref}
         dirtyKey={`${id}-${faceDownFlag}`}
-        animating={!faceDownFlag && !!editionType}
+        animating={!faceDownFlag && (!!editionType || card.sealType === 'gold')}
         cursor={cursor}
         idle={idle}
         disableFlag={perspectiveMeshDisableFlag}
@@ -73,7 +86,9 @@ const Card = ({
           </pixiContainer>
         </Edition>
 
-        {card.sealType && <pixiSprite texture={sealTexture} />}
+        {card.sealType && (
+          <pixiSprite texture={sealTexture} filters={sealFilterCollection} />
+        )}
       </PerspectiveMesh>
     </pixiLayoutContainer>
   );
