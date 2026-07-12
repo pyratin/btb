@@ -31,17 +31,13 @@ export default (hand) => {
     return lengthDiff !== 0 ? lengthDiff : b[0].rankIndex - a[0].rankIndex;
   });
 
-  const suitGroups = cardActiveEvaluationCollection.reduce((memo, card) => {
-    const { suit } = card;
-    return {
-      ...memo,
-      [suit]: [...(memo[suit] || []), card]
-    };
-  }, {});
-
-  const flushGroup = Object.values(suitGroups).find(
-    (group) => group.length >= 5
-  );
+  const flushGroup = Array.from({ length: 4 })
+    .map((_, suitIndex) =>
+      cardActiveEvaluationCollection.filter(({ suitIndexCollection }) =>
+        suitIndexCollection.includes(suitIndex)
+      )
+    )
+    .find((group) => group.length >= 5);
   const flushFlag = !!flushGroup;
 
   const straightFlag =
