@@ -166,11 +166,10 @@ const scoringAnimationHandle = (
 const HandPlayed = () => {
   useExtend({ LayoutContainer, Container, Sprite });
 
-  const { cardDimension, handPlayed, cardIdActiveSet } = useStore(
-    useShallow(({ cardDimension, round: { handPlayed }, cardIdActiveSet }) => ({
+  const { cardDimension, handPlayed } = useStore(
+    useShallow(({ cardDimension, round: { handPlayed } }) => ({
       cardDimension,
-      handPlayed,
-      cardIdActiveSet
+      handPlayed
     }))
   );
 
@@ -180,6 +179,11 @@ const HandPlayed = () => {
 
   const [scoringAnimationTriggerFlag, scoringAnimationTriggerFlagSet] =
     useState(false);
+
+  const [cardIdActive, cardIdActiveSet] = useState(undefined);
+
+  // eslint-disable-next-line no-console
+  console.log('HERE>', cardIdActive);
 
   useGSAP(
     () => {

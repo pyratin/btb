@@ -226,8 +226,7 @@ const roundInitializedGet = (
     hand,
     handPlayed: undefined,
     muck: undefined,
-    handTypeIndex: undefined,
-    cardIdActive: undefined
+    handTypeIndex: undefined
   };
 };
 
@@ -413,24 +412,6 @@ const onHandPlayedTriggerHandle = (set) => {
   });
 };
 
-const cardIdActiveSet = (cardIdActive, set) => {
-  set((state) => {
-    const { round, ...rest } = current(state);
-
-    return {
-      ...rest,
-      round: produce((round) => {
-        const rest = /** @type {ReturnType<typeof cardGet>} */ (current(round));
-
-        return {
-          ...rest,
-          cardIdActive
-        };
-      })(round)
-    };
-  });
-};
-
 const useStore = create(
   persist(
     subscribeWithSelector(
@@ -444,9 +425,7 @@ const useStore = create(
             handSet: (hand) => handSet(hand, set),
             onHandCardDiscardTriggerHandle: () =>
               onHandCardDiscardTriggerHandle(set),
-            onHandPlayedTriggerHandle: () => onHandPlayedTriggerHandle(set),
-            cardIdActiveSet: (cardIdActive) =>
-              cardIdActiveSet(cardIdActive, set)
+            onHandPlayedTriggerHandle: () => onHandPlayedTriggerHandle(set)
           };
         })
       )
