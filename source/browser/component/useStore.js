@@ -85,6 +85,12 @@ const seedGet = () => {
 
 const rankLength = 13;
 
+const suitLength = 4;
+
+const suitIndexCollection = Array.from({ length: suitLength }).map(
+  (_, index) => index
+);
+
 export const cardGet = (
   _rankIndex,
   suitIndex,
@@ -154,7 +160,9 @@ const packInitializedGet = () => {
   return Array.from({ length: rankLength }).reduce((memo, _, index) => {
     return [
       ...memo,
-      ...Array.from({ length: 4 }).map((_, _index) => cardGet(index, _index))
+      ...Array.from({ length: suitLength }).map((_, _index) =>
+        cardGet(index, _index)
+      )
     ];
   }, []);
 };
@@ -557,6 +565,9 @@ useStore.subscribe(
 
           return {
             ...card,
+            ...(enhancementType === 'wild' && {
+              suitIndexCollection
+            }),
             ...(enhancementType === 'stone' && {
               ...cardGet(undefined, undefined, packIndex),
               _rankIndex: rankIndex,
