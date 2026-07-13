@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import _ from 'lodash';
 import * as pixiJs from 'pixi.js';
 import { Container, Sprite } from 'pixi.js';
 import '@pixi/layout';
@@ -22,18 +23,20 @@ const containerElementWidthGet = (containerElement) => {
   return width;
 };
 
-const cardIdActiveGet = (cardIdActive, HandPlayed) => {
-  const handPlayedScoringIdCollection = HandPlayed.filter(
-    ({ scoringFlag }) => scoringFlag
-  ).map(({ id }) => id);
+const indexActiveGet = (indexActive, handPlayed) => {
+  return handPlayed.reduce((memo, { scoringFlag }, index) => {
+    switch (true) {
+      case _.isFinite(memo):
+        return memo;
 
-  const index = handPlayedScoringIdCollection.findIndex(
-    (id) => id === cardIdActive
-  );
+      case !_.isFinite(indexActive):
+      case index > indexActive:
+        return scoringFlag ? index : undefined;
 
-  return handPlayedScoringIdCollection[
-    index !== handPlayedScoringIdCollection.length - 1 ? index + 1 : -1
-  ];
+      default:
+        return memo;
+    }
+  }, undefined);
 };
 
 const cardTransformGet = (index, hand, cardDimension, containerElement) => {
@@ -180,10 +183,10 @@ const HandPlayed = () => {
   const [scoringAnimationTriggerFlag, scoringAnimationTriggerFlagSet] =
     useState(false);
 
-  const [cardIdActive, cardIdActiveSet] = useState(undefined);
+  const [indexActive, indexActiveSet] = useState(undefined);
 
   // eslint-disable-next-line no-console
-  console.log('HERE>', cardIdActive);
+  console.log('HERE>', indexActive);
 
   useGSAP(
     () => {
@@ -202,7 +205,7 @@ const HandPlayed = () => {
     () => {
       scoringAnimationTriggerFlag &&
         scoringAnimationHandle(handPlayed, cardDimension, ref.current, () => {
-          cardIdActiveSet(cardIdActiveGet(undefined, handPlayed));
+          indexActiveSet(indexActiveGet(undefined, handPlayed));
         });
     },
     { dependencies: [scoringAnimationTriggerFlag, handPlayed] }
